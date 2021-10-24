@@ -24,3 +24,5 @@ Please refer to the UAVPatrol project webpage: http://www.yfan.site/UAVPatrol.ht
 tcpServer_for_receive port: 6666
 
 tcpServer_for_send port: 6665
+
+tcpServer_for_python_controller port: 5555

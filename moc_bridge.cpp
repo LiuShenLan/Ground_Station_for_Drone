@@ -45,17 +45,17 @@ QT_MOC_LITERAL(10, 100, 14), // "rotateNavPoint"
 QT_MOC_LITERAL(11, 115, 3), // "rot"
 QT_MOC_LITERAL(12, 119, 9), // "onLightOn"
 QT_MOC_LITERAL(13, 129, 10), // "onLightOff"
-QT_MOC_LITERAL(14, 140, 12), // "onUpdateData"
-QT_MOC_LITERAL(15, 153, 9), // "jsSendMsg"
-QT_MOC_LITERAL(16, 163, 17), // "jsSendTargetPoint"
-QT_MOC_LITERAL(17, 181, 12) // "GetLightData"
+QT_MOC_LITERAL(14, 140, 12), // "GetLightData"
+QT_MOC_LITERAL(15, 153, 12), // "onUpdateData"
+QT_MOC_LITERAL(16, 166, 9), // "jsSendMsg"
+QT_MOC_LITERAL(17, 176, 17) // "jsSendTargetPoint"
 
     },
     "bridge\0sigUpdateLight\0\0removePoints\0"
     "sigLightStatus\0strName\0nvalue\0toRecvMsg\0"
     "msg\0targetPointReceived\0rotateNavPoint\0"
-    "rot\0onLightOn\0onLightOff\0onUpdateData\0"
-    "jsSendMsg\0jsSendTargetPoint\0GetLightData"
+    "rot\0onLightOn\0onLightOff\0GetLightData\0"
+    "onUpdateData\0jsSendMsg\0jsSendTargetPoint"
 };
 #undef QT_MOC_LITERAL
 
@@ -84,9 +84,9 @@ static const uint qt_meta_data_bridge[] = {
       12,    1,   90,    2, 0x0a /* Public */,
       13,    1,   93,    2, 0x0a /* Public */,
       14,    0,   96,    2, 0x0a /* Public */,
-      15,    1,   97,    2, 0x0a /* Public */,
-      16,    1,  100,    2, 0x0a /* Public */,
-      17,    0,  103,    2, 0x0a /* Public */,
+      15,    0,   97,    2, 0x0a /* Public */,
+      16,    1,   98,    2, 0x0a /* Public */,
+      17,    1,  101,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void,
@@ -99,10 +99,10 @@ static const uint qt_meta_data_bridge[] = {
  // slots: parameters
     QMetaType::Void, QMetaType::QString,    5,
     QMetaType::Void, QMetaType::QString,    5,
+    QMetaType::QVariantList,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    8,
     QMetaType::Void, QMetaType::QString,    8,
-    QMetaType::QVariantList,
 
        0        // eod
 };
@@ -121,11 +121,11 @@ void bridge::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 5: _t->rotateNavPoint((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 6: _t->onLightOn((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 7: _t->onLightOff((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 8: _t->onUpdateData(); break;
-        case 9: _t->jsSendMsg((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 10: _t->jsSendTargetPoint((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 11: { QVariantList _r = _t->GetLightData();
+        case 8: { QVariantList _r = _t->GetLightData();
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 9: _t->onUpdateData(); break;
+        case 10: _t->jsSendMsg((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 11: _t->jsSendTargetPoint((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {

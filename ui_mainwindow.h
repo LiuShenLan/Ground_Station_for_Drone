@@ -61,7 +61,7 @@ public:
     QPushButton *turnRightButton;   // 人工导航 右转按钮 Turn right
     QLabel *turnLabel;
     QCheckBox *manulDirectCheckBox; // 人工导航确定框 Manul direct
-    QSlider *navPointSlider;    // 添加导航点 导航点滑块
+    QSlider *navPointSlider;    // 添加导航点 导航点方向滑块
     QLabel *label_9;
     QGroupBox *groupBox_3;
     QVBoxLayout *verticalLayout;
@@ -87,14 +87,14 @@ public:
     QLabel *label_2;
     QLineEdit *lineEditLng; // GPS信息 经度
     QLabel *label_4;
-    QLabel *Alt;    // GPS信息 海拔
+    QLabel *Alt;    // GPS信息 高度
     QGroupBox *groupBox1;
     QHBoxLayout *horizontalLayout_7;
     QComboBox *cbLight; // WayPoints 下拉菜单
     QPushButton *btnAdd;    // WayPoints Add按钮
     QPushButton *clearAllPointButton;   // WayPoints Clear按钮
     QPushButton *takeoffButton; // WayPoints TakeOff按钮
-    QLineEdit *waypointAlt; // WayPoints 海拔输入框
+    QLineEdit *waypointAlt; // WayPoints 高度输入框
     QPushButton *goButton;  // WayPoints Go按钮
     QGroupBox *groupBox_2;
     QHBoxLayout *horizontalLayout_4;

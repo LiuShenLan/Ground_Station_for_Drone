@@ -238,6 +238,7 @@ DIST          = bin/index.html \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/qt_config.prf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/toolchain.prf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/default_pre.prf \
@@ -445,6 +446,7 @@ Makefile: Ground_Station_for_Drone.pro /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/l
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/qt_config.prf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/toolchain.prf \
 		/home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/default_pre.prf \
@@ -649,6 +651,7 @@ Makefile: Ground_Station_for_Drone.pro /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/l
 /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/qt_config.prf:
 /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/linux-g++/qmake.conf:
 /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/exclusive_builds.prf:
 /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/toolchain.prf:
 /home/lsl/tool/qt/5.12.1/gcc_64/mkspecs/features/default_pre.prf:
@@ -2641,6 +2644,17 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtCore/QJsonArray \
 		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtCore/QVariantList \
 		ui_mainwindow.h \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QApplication \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QCheckBox \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QComboBox \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QGroupBox \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QHBoxLayout \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QLineEdit \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QPushButton \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QSlider \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QStatusBar \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QToolBar \
+		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtWidgets/QVBoxLayout \
 		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtCore/QDebug \
 		/home/lsl/tool/qt/5.12.1/gcc_64/include/QtCore/QCoreApplication
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp

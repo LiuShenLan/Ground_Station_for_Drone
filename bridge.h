@@ -23,36 +23,38 @@ typedef struct
 
 class bridge : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
+    // Init
     static bridge* instance();  // 返回bridge对象
+    // WayPoints
+    Light_t AddLight(int rot);  // 根据导航旋转信息生成Light_t对象
+    void newPoint(double lng, double lat);  // 设置经纬度信息
+    QList<Light_t> returnWayPointList();    // 返回所有的WayPoints的list
+    const QList<Light_t>& GetLightList(){return m_lightList;}   // 返回所有的WayPoints的list的引用
+    void removeAllPoints(); // 移除所有WayPoints信息
+    void setNavPointRotate(int rot);    // 设置导航点方向
 private:
-    bridge();
     double _fLng = 0, _fLat = 0;    // 经纬度信息
 	QList<Light_t> m_lightList; // 所有WayPoints的list
-	void SetLightValue(QString strName, int nValue);
+    bridge();   // 空构造函数
+	void SetLightValue(QString strName, int nValue);    // 将WayPoints中strName的nValue设置为给定值
 signals:    // 信号声明区
     void sigUpdateLight();
     void removePoints();
 	void sigLightStatus(const QString& strName, int nvalue);
     void toRecvMsg(const QString& msg); //收到数据
-    void targetPointReceived(const QString& msg);
-    void rotateNavPoint(int rot);
+    void targetPointReceived(const QString& msg);   // TCP 接收到目标点信息
+    void rotateNavPoint(int rot);   // 旋转导航点方向
 public slots:   // 槽声明区
-    void onLightOn(QString strName);
-	void onLightOff(QString strName);
-	void onUpdateData();
-    void jsSendMsg(const QString& msg);     // 接收到页面发送来的消息
-    void jsSendTargetPoint(const QString& msg);
-	QVariantList	GetLightData();
-public:
-    QList<Light_t>	returnWayPointList();   // 返回所有的WayPoints的list
-    Light_t			AddLight(int rot);  // 根据导航旋转信息生成Light_t对象
-	const QList<Light_t>& GetLightList(){return m_lightList;}
-    void newPoint(double lng, double lat);  // 设置经纬度信息
-    void removeAllPoints(); // 移除所有WayPoints信息
-    void setNavPointRotate(int rot);
-
+    // WayPoints
+    void onLightOn(QString strName);    // 将WayPoints中的strName的nValue设置为1
+	void onLightOff(QString strName);   // 将WayPoints中的strName的nValue设置为0
+    QVariantList GetLightData();    // 返回WayPoints list的map形式
+	void onUpdateData();    // WayPoints更新数据
+    // 发射信号
+    void jsSendMsg(const QString& msg); // 发射toRecvMsg信号
+    void jsSendTargetPoint(const QString& msg); // 发射targetPointReceived信号
 };
 
 #endif // BRIDGE_H

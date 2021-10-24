@@ -44,22 +44,22 @@ QT_MOC_LITERAL(9, 129, 13), // "onBtnLightOff"
 QT_MOC_LITERAL(10, 143, 13), // "onBtnAddLight"
 QT_MOC_LITERAL(11, 157, 10), // "onGoButton"
 QT_MOC_LITERAL(12, 168, 15), // "onClearAllPoint"
-QT_MOC_LITERAL(13, 184, 9), // "onTimeOut"
-QT_MOC_LITERAL(14, 194, 15), // "onTakeoffButton"
-QT_MOC_LITERAL(15, 210, 18), // "onReleaseYawSlider"
-QT_MOC_LITERAL(16, 229, 20), // "onReleasePitchSlider"
-QT_MOC_LITERAL(17, 250, 19), // "onReleaseRollSlider"
-QT_MOC_LITERAL(18, 270, 23), // "onReleaseThrottleSlider"
-QT_MOC_LITERAL(19, 294, 26), // "onEnableVirtualStickButton"
-QT_MOC_LITERAL(20, 321, 27), // "onDisableVirtualStickButton"
-QT_MOC_LITERAL(21, 349, 23), // "sendVirtualStickCommand"
-QT_MOC_LITERAL(22, 373, 9), // "onSetRoll"
-QT_MOC_LITERAL(23, 383, 18), // "onReleaseNavSlider"
-QT_MOC_LITERAL(24, 402, 9), // "readFarme"
-QT_MOC_LITERAL(25, 412, 11), // "closeCamara"
-QT_MOC_LITERAL(26, 424, 27), // "on_detect_carButton_clicked"
-QT_MOC_LITERAL(27, 452, 26), // "on_track_carButton_clicked"
-QT_MOC_LITERAL(28, 479, 21) // "on_do_nothing_clicked"
+QT_MOC_LITERAL(13, 184, 18), // "onReleaseNavSlider"
+QT_MOC_LITERAL(14, 203, 15), // "onTakeoffButton"
+QT_MOC_LITERAL(15, 219, 26), // "onEnableVirtualStickButton"
+QT_MOC_LITERAL(16, 246, 23), // "sendVirtualStickCommand"
+QT_MOC_LITERAL(17, 270, 27), // "onDisableVirtualStickButton"
+QT_MOC_LITERAL(18, 298, 18), // "onReleaseYawSlider"
+QT_MOC_LITERAL(19, 317, 20), // "onReleasePitchSlider"
+QT_MOC_LITERAL(20, 338, 19), // "onReleaseRollSlider"
+QT_MOC_LITERAL(21, 358, 9), // "onSetRoll"
+QT_MOC_LITERAL(22, 368, 23), // "onReleaseThrottleSlider"
+QT_MOC_LITERAL(23, 392, 9), // "readFarme"
+QT_MOC_LITERAL(24, 402, 11), // "closeCamara"
+QT_MOC_LITERAL(25, 414, 27), // "on_detect_carButton_clicked"
+QT_MOC_LITERAL(26, 442, 26), // "on_track_carButton_clicked"
+QT_MOC_LITERAL(27, 469, 21), // "on_do_nothing_clicked"
+QT_MOC_LITERAL(28, 491, 9) // "onTimeOut"
 
     },
     "MainWindow\0onTurnLeftButton\0\0"
@@ -67,16 +67,16 @@ QT_MOC_LITERAL(28, 479, 21) // "on_do_nothing_clicked"
     "on_pushButton_clicked\0timeCountsFunction\0"
     "callJava\0onBtnLightOn\0onBtnLightOff\0"
     "onBtnAddLight\0onGoButton\0onClearAllPoint\0"
-    "onTimeOut\0onTakeoffButton\0onReleaseYawSlider\0"
-    "onReleasePitchSlider\0onReleaseRollSlider\0"
-    "onReleaseThrottleSlider\0"
+    "onReleaseNavSlider\0onTakeoffButton\0"
     "onEnableVirtualStickButton\0"
+    "sendVirtualStickCommand\0"
     "onDisableVirtualStickButton\0"
-    "sendVirtualStickCommand\0onSetRoll\0"
-    "onReleaseNavSlider\0readFarme\0closeCamara\0"
-    "on_detect_carButton_clicked\0"
+    "onReleaseYawSlider\0onReleasePitchSlider\0"
+    "onReleaseRollSlider\0onSetRoll\0"
+    "onReleaseThrottleSlider\0readFarme\0"
+    "closeCamara\0on_detect_carButton_clicked\0"
     "on_track_carButton_clicked\0"
-    "on_do_nothing_clicked"
+    "on_do_nothing_clicked\0onTimeOut"
 };
 #undef QT_MOC_LITERAL
 
@@ -171,22 +171,22 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 8: _t->onBtnAddLight(); break;
         case 9: _t->onGoButton(); break;
         case 10: _t->onClearAllPoint(); break;
-        case 11: _t->onTimeOut(); break;
+        case 11: _t->onReleaseNavSlider(); break;
         case 12: _t->onTakeoffButton(); break;
-        case 13: _t->onReleaseYawSlider(); break;
-        case 14: _t->onReleasePitchSlider(); break;
-        case 15: _t->onReleaseRollSlider(); break;
-        case 16: _t->onReleaseThrottleSlider(); break;
-        case 17: _t->onEnableVirtualStickButton(); break;
-        case 18: _t->onDisableVirtualStickButton(); break;
-        case 19: _t->sendVirtualStickCommand(); break;
-        case 20: _t->onSetRoll(); break;
-        case 21: _t->onReleaseNavSlider(); break;
-        case 22: _t->readFarme(); break;
-        case 23: _t->closeCamara(); break;
-        case 24: _t->on_detect_carButton_clicked(); break;
-        case 25: _t->on_track_carButton_clicked(); break;
-        case 26: _t->on_do_nothing_clicked(); break;
+        case 13: _t->onEnableVirtualStickButton(); break;
+        case 14: _t->sendVirtualStickCommand(); break;
+        case 15: _t->onDisableVirtualStickButton(); break;
+        case 16: _t->onReleaseYawSlider(); break;
+        case 17: _t->onReleasePitchSlider(); break;
+        case 18: _t->onReleaseRollSlider(); break;
+        case 19: _t->onSetRoll(); break;
+        case 20: _t->onReleaseThrottleSlider(); break;
+        case 21: _t->readFarme(); break;
+        case 22: _t->closeCamara(); break;
+        case 23: _t->on_detect_carButton_clicked(); break;
+        case 24: _t->on_track_carButton_clicked(); break;
+        case 25: _t->on_do_nothing_clicked(); break;
+        case 26: _t->onTimeOut(); break;
         default: ;
         }
     }
