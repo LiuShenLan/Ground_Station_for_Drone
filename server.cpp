@@ -66,6 +66,7 @@ namespace Ui {
     // TCP
     void Server::sendMessage(QString infomation)
     {
+        qDebug() << "send data to socket";
         QByteArray message = infomation.toLocal8Bit();  // 将字符串的本地8位表示作为QByteArray返回
     //    QDataStream out(&message, QIODevice::WriteOnly);
     //    out.setVersion(QDataStream::Qt_DefaultCompiledVersion);
@@ -105,6 +106,7 @@ namespace Ui {
     }
     void Server::updateServerProgress()
     {
+        qDebug() << "read data form socket";
         // 时间
         QDateTime time = QDateTime::currentDateTime();
         QString str = time.toString("\n[ hh:mm:ss ]"); // 时间信息，设置显示格式
@@ -151,6 +153,7 @@ namespace Ui {
     }
     void Server::acceptConnection_for_receive()
     {
+        qDebug() << "tcpServer receive connect";
         tcpServerConnection_for_receive = tcpServer_for_receive.nextPendingConnection();
         connect(tcpServerConnection_for_receive, &QTcpSocket::readyRead,
                 this, &Server::updateServerProgress);
@@ -162,6 +165,7 @@ namespace Ui {
     }
     void Server::acceptConnection_for_send()
     {
+        qDebug() << "tcpServer send connect";
         tcpServerConnection_for_send = tcpServer_for_send.nextPendingConnection();
         socket_list->append(tcpServerConnection_for_send);
         qDebug() <<"============== found send target=========";

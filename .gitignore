@@ -1,0 +1,5 @@
+*.o
+*.pro
+*.por.user
+Makefile
+GroundStation_for_Drone

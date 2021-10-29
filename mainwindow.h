@@ -25,8 +25,8 @@
 #define CAM_LOAD_PC_VIDEO       "/home/lsl/data/project/UAV/dataset/video/282.mp4"
 
 // 摄像头数据保存路径
-#define READ_FRAME_PIC_TEMP_PATH    "/home/lsl/data/project/UAV/dataset/QT image/014.jpg"
-#define READ_FRAME_PIC_PATH         "/home/lsl/data/project/UAV/dataset/QT image/014.jpg"
+#define READ_FRAME_PIC_TEMP_PATH    "/home/lsl/data/project/UAV/dataset/realTimeImg_temp.jpg"
+#define READ_FRAME_PIC_PATH         "/home/lsl/data/project/UAV/dataset/realTimeImg.jpg"
 
 // Car detect保存路径
 #define QFILE_CAR_DETECT_NUMBER "/home/lsl/data/project/UAV/code/Ground_Station_for_Drone/Qfile/number.txt"
