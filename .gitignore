@@ -2,7 +2,7 @@
 
 *.pro
 
-*.por.user
+*.pro.user
 
 Makefile
 
