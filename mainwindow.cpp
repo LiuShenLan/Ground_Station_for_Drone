@@ -45,10 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //dock_server_->setFloating(1);
     manul_direction = 0;
 
-    cam = cv::VideoCapture(CAM_LOAD_DRONE_CAMERA);
-    // 从摄像头中获取视频(CAM_LOAD_PC_CAMERA / 1)
-    // get images from the drone's cam:(CAM_LOAD_DRONE_CAMERA / 0)
-    // get images from a video file:(CAM_LOAD_PC_VIDEO / 本地文件地址)
+    // 加载摄像头或本地视频
+    cam = cv::VideoCapture(CAM_LOAD);
     if(!cam.isOpened())
         std::cerr << "Can't open camera!" <<std::endl;
 

@@ -20,9 +20,11 @@
 #include "bridge.h"
 
 // 摄像头数据读取目标
-#define CAM_LOAD_DRONE_CAMERA   0
-#define CAM_LOAD_PC_CAMERA      1
+#define CAM_LOAD_PC_CAMERA      0
+#define CAM_LOAD_DRONE_CAMERA   2
 #define CAM_LOAD_PC_VIDEO       "/home/lsl/data/project/UAV/dataset/video/282.mp4"
+// 摄像头读取选择
+#define CAM_LOAD    CAM_LOAD_PC_CAMERA
 
 // 摄像头数据保存路径
 #define READ_FRAME_PIC_TEMP_PATH    "../../dataset/realTimeImg_temp.jpg"
