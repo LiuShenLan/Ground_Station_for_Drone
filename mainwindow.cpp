@@ -71,6 +71,9 @@ void MainWindow::InitForm()
     ui->webView->page()->setWebChannel(channel);
     ui->webView->page()->load(QUrl::fromLocalFile(qApp->applicationDirPath() + "/bin/index.html"));
 
+    // GPS Data初始化
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
+
     // WayPoints初始化
     const QList<Light_t>& list = bridgeins->GetLightList();
     int nCount = list.count();
@@ -404,18 +407,18 @@ void MainWindow::readFarme()
 //    cv::rectangle(frame,cvPoint(20,200),cvPoint(200,300),cvScalar(255,0,0),1,1,0);
     //将抓取到的帧，转换为QImage格式。QImage::Format_RGB888不同的摄像头用不同的格式。
     QImage image = QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888).rgbSwapped().scaled(640,360,Qt::KeepAspectRatioByExpanding);
-    ui->label_3->setPixmap(QPixmap::fromImage(image));  // 将图片显示到label上
     cv::imwrite(READ_FRAME_PIC_TEMP_PATH,frame);
     if(access(READ_FRAME_PIC_PATH,F_OK))
         remove(READ_FRAME_PIC_PATH);
     rename(READ_FRAME_PIC_TEMP_PATH, READ_FRAME_PIC_PATH);
 
-//    cv::Mat frame = cv::imread( "/home/wwh/Desktop/0.jpg",1);//读入一站图片 暂时读入桌面上的一个文件
-//    //cv::cvtColor(frame,frame,CV_BGR2RGB);//opencv读取图片按照BGR方式读取，为了正常显示，所以将BGR转为RGB
-//     QImage image = QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888).rgbSwapped().scaled(640,320,Qt::KeepAspectRatioByExpanding);
-////     cv::waitKey(100);
-//    ui->label_3->setPixmap(QPixmap::fromImage(image)); //将图片显示在QLabel上
-
+    // 显示detect后的图片
+    if (CAM_SHOW_DETECT_CAMERA_FLAG) {
+        frame = cv::imread(CAM_SHOW_DETECT_CAMERA, 1);    //读入一张本地图片
+//        cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);//opencv读取图片按照BGR方式读取，为了正常显示，所以将BGR转为RGB
+        image = QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888).rgbSwapped().scaled(640,320,Qt::KeepAspectRatioByExpanding);
+    }
+    ui->label_3->setPixmap(QPixmap::fromImage(image));  // 显示图片
 
 //    ui->deepImg->setPixmap(QPixmap("/home/wwh/2.jpg").scaled(320,160));
 

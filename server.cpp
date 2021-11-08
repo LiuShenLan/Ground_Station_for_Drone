@@ -137,7 +137,7 @@ namespace Ui {
             jsonBattery = json["Battery0"].toObject();
         }
 
-        //显示到控件上
+        //显示到lesten状态栏上
         textEdit->insertPlainText(str);//在标签上显示时间
         textEdit->insertPlainText(utf8str);
         textEdit->insertPlainText(tr("\n"));
@@ -153,7 +153,7 @@ namespace Ui {
     }
     void Server::acceptConnection_for_receive()
     {
-        qDebug() << "tcpServer receive connect";
+        qDebug() << "============== tcpServer receive connect ==============";
         tcpServerConnection_for_receive = tcpServer_for_receive.nextPendingConnection();
         connect(tcpServerConnection_for_receive, &QTcpSocket::readyRead,
                 this, &Server::updateServerProgress);
@@ -165,7 +165,7 @@ namespace Ui {
     }
     void Server::acceptConnection_for_send()
     {
-        qDebug() << "tcpServer send connect";
+        qDebug() << "============== tcpServer send connect ==============";
         tcpServerConnection_for_send = tcpServer_for_send.nextPendingConnection();
         socket_list->append(tcpServerConnection_for_send);
         qDebug() <<"============== found send target=========";

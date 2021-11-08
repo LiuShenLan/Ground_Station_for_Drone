@@ -22,9 +22,12 @@
 // 摄像头数据读取目标
 #define CAM_LOAD_PC_CAMERA      0
 #define CAM_LOAD_DRONE_CAMERA   2
-#define CAM_LOAD_PC_VIDEO       "/home/lsl/data/project/UAV/dataset/video/282.mp4"
+#define CAM_LOAD_PC_VIDEO       "../../dataset/SD card data/2021.11.1/DJI_0002.MOV"
 // 摄像头读取选择
-#define CAM_LOAD    CAM_LOAD_PC_CAMERA
+#define CAM_LOAD    CAM_LOAD_PC_VIDEO
+// 摄像头显示选择
+#define CAM_SHOW_DETECT_CAMERA_FLAG true
+#define CAM_SHOW_DETECT_CAMERA      "../../dataset/detece result/show_realTimeImg.jpg"
 
 // 摄像头数据保存路径
 #define READ_FRAME_PIC_TEMP_PATH    "../../dataset/realTimeImg_temp.jpg"
