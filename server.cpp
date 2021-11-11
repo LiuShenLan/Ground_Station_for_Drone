@@ -119,15 +119,15 @@ namespace Ui {
         //开始转换编码
         QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
         QString utf8str = utf8codec->toUnicode(alldata.mid(2));
-        //qDebug()<<"hex:["<<alldata.toHex().toUpper()<<"]";
-    //    qDebug()<<"utf-8 ["<< (utf8str) << "]";
+//        qDebug()<<"hex:["<<alldata.toHex().toUpper()<<"]";
+//        qDebug()<<"utf-8 ["<< (utf8str) << "]";
 
 
         json = getJsonObjectFromString(utf8str);
 
         if(json.contains("GPS")){
             jsonGPS = json["GPS"].toObject();
-    //        qDebug()<<"\n->"<< jsonGPS["altitude"].toDouble();
+//            qDebug()<<"\n->"<< jsonGPS["altitude"].toDouble();
         }
 
         if(json.contains("Gimbal")){
@@ -148,8 +148,8 @@ namespace Ui {
         if (scrollbar)
             scrollbar->setSliderPosition(scrollbar->maximum());
 
-    //    QString ser = "test,test,test,test,test,test\n";
-    //    sendMessage(ser);
+//        QString ser = "test,test,test,test,test,test\n";
+//        sendMessage(ser);
     }
     void Server::acceptConnection_for_receive()
     {
@@ -180,9 +180,25 @@ namespace Ui {
             qDebug()<< "===> please check the string "<< jsonString.toLocal8Bit().data();
         }
         QJsonObject jsonObject = jsonDocument.object();
+
+        saveJsonObject(SAVE_JSON_TEMP_PATH, SAVE_JSON_RENAME_PATH, jsonString);  // 保存QJson文件
+
         return jsonObject;
     }
+    void Server::saveJsonObject(const char* saveTempPath, const char* saveRenamePath, const QString jsonString){
+        // 删除已存在文件
+        if(access(saveTempPath,F_OK))
+            remove(saveTempPath);
 
+        QByteArray byteArray = jsonString.toLocal8Bit();
+
+        QFile file(saveTempPath);
+
+        file.open(QIODevice::WriteOnly);
+        file.write(byteArray);
+        file.close();
+        rename(saveTempPath, saveRenamePath);
+    }
 
     // 不明定义
 //    void Server::responseToCheckBox()

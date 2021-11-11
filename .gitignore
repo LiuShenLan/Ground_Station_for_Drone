@@ -1,3 +1,5 @@
+.idea
+
 *.o
 
 *.pro
@@ -5,5 +7,7 @@
 *.pro.user
 
 Makefile
+
+mod_*
 
 GroundStation_for_Drone

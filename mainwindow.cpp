@@ -205,7 +205,7 @@ void MainWindow::callJava()
 {
     QString strJs_ = "myFunction(%1, %2, ";
     strJs_ += QString::number(server_->jsonGPS["yaw"].toDouble(), 10, 1);
-    //strJs_ += QString::number(10.5, 10, 1);
+//    strJs_ += QString::number(10.5, 10, 1);
     strJs_ += ")";
 //    QString strJs = strJs_
 //            .arg(ui->lineEditLng->text().toDouble()*0.01+109.03525)

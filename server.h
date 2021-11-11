@@ -14,6 +14,8 @@
 #include <QtNetwork>
 #include <QList>
 
+#include "mainwindow.h"
+
 class QTcpSocket;
 
 namespace Ui{
@@ -51,7 +53,8 @@ namespace Ui{
         void acceptConnection_for_send();   // TCP socket 发送信息初始化
         void clear();   // 清除listen显示信息
 
-        QJsonObject getJsonObjectFromString(const QString jsonString);  // 将string转换为Json文件
+        QJsonObject getJsonObjectFromString(const QString jsonString);  // 将string转换为Json文件并保存
+        void saveJsonObject(const char* saveTempPath, const char* saveRenamePath, const QString jsonString);
 
         // 不明定义
         qint64 totalBytes;     // 存放总大小信息

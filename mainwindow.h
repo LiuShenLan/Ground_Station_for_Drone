@@ -33,6 +33,10 @@
 #define READ_FRAME_PIC_TEMP_PATH    "../../dataset/realTimeImg_temp.jpg"
 #define READ_FRAME_PIC_PATH         "../../dataset/realTimeImg.jpg"
 
+// 无人机信息Json文件保存信息
+#define SAVE_JSON_TEMP_PATH     "../../dataset/uav_temp.json"
+#define SAVE_JSON_RENAME_PATH   "../../dataset/uav.json"
+
 // Car detect保存路径
 #define QFILE_CAR_DETECT_NUMBER "./Qfile/number.txt"
 #define QFILE_CAR_DETECT_TRACK  "./Qfile/detect_track.txt"
@@ -81,7 +85,7 @@ private:
     QTcpSocket *tcpSocket_for_python_controller;    // TCP python控制socket
     void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
     void onRecvTargetPoint(const QString msg);  // 根据TCP接收到的信息计算目标点方位并设置方向值
-    void updateCommand_from_python_controller();    // 接受socket数据并设置虚拟控制与方向信息
+    void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
     void sendWayPoint();    // 向TCP发送所有的WayPoints信息
     void onRecvdMsg(const QString msg); // 接受信息并设置经纬度信息
 
