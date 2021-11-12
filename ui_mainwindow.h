@@ -33,76 +33,76 @@ class Ui_MainWindow
 public:
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout_3;
-    QVBoxLayout *verticalLayout_2;
-    QLabel *label_3;    // 摄像头显示信息
-    QHBoxLayout *horizontalLayout_9;
-    QGroupBox *groupBox_5;
-    QGroupBox *groupBox_4;
-    QPushButton *enableVirtualStickButton;  // 允许虚拟控制按钮 Enable virtual Stick
-    QSlider *yawSlider;     // 虚拟控制 航向滑块 Yaw
-    QSlider *pitchSlider;   // 虚拟控制 俯仰滑块 Pitch
-    QSlider *rollSlider;    // 虚拟控制 横滚滑块 Roll
+    QVBoxLayout *lWindow;
+    QLabel *camShow;
+    QHBoxLayout *virtualStickLayout;
+    QGroupBox *manualControlGBox;
+    QGroupBox *virtualStickGBox;
+    QPushButton *virtualStickEnableBtn;
+    QSlider *virtualStickYawSlider;
+    QSlider *virtualStickPitchSlider;
+    QSlider *virtualStickRollSlider;
     QLabel *yawLabel;
     QLabel *rollLabel;
-    QPushButton *onRestStickValueButton;    // 虚拟控制 reset按钮
+    QPushButton *virtualStickResetBtn;
     QLabel *pitchLabel;
-    QPushButton *disableVirtualStickButton; // 禁止虚拟控制按钮 Disable virtual Stick
-    QSlider *throttleSlider;    // 虚拟控制 油门滑块 Throttle
+    QPushButton *virtualStickDisableBtn;
+    QSlider *virtualStickThrottleSlider;
     QLabel *throttleLabel;
-    QPushButton *setRollButton; // 虚拟控制 横滚设置按钮 Roll Set
+    QPushButton *virtualStickRollSetBtn;
     QLabel *yawBiasLabel;
     QLabel *pitchBiasLabel;
     QLabel *throttleBiasLabel;
     QLabel *rollBiasLabel;
-    QSlider *zoomSlider;    // 摄像头图像缩放滑块 Zoom
+    QSlider *camZoomSlider;
     QLabel *label_7;
-    QPushButton *goStraightButton;  // 人工导航 直行按钮 Go straight
-    QPushButton *turnLeftButton;    // 人工导航 左转按钮 Turn left
-    QPushButton *turnRightButton;   // 人工导航 右转按钮 Turn right
+    QPushButton *manualDirectGoStraightBtn;
+    QPushButton *manualDirectTurnLeftBtn;
+    QPushButton *manualDirectTurnRightBtn;
     QLabel *turnLabel;
-    QCheckBox *manulDirectCheckBox; // 人工导航确定框 Manul direct
-    QSlider *navPointSlider;    // 添加导航点 导航点方向滑块
+    QCheckBox *manualDirectCheckBox;
+    QSlider *navigationPointDirectSlider;
     QLabel *label_9;
     QGroupBox *groupBox_3;
     QVBoxLayout *verticalLayout;
-    QWebEngineView *webView;    // 地图显示
+    QWebEngineView *mapShow;
     QHBoxLayout *horizontalLayout_5;
     QHBoxLayout *horizontalLayout_8;
     QLabel *label_8;
-    QLabel *VelV;   // 无人机信息 垂直速度
+    QLabel *uavStatusVelocityV;
     QLabel *label_12;
     QHBoxLayout *horizontalLayout_6;
     QLabel *label_6;
-    QLabel *VelH;   // 无人机信息 水平速度
+    QLabel *uavStatusVelocityH;
     QLabel *label_14;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_10;
-    QLabel *Bat;    // 无人机信息 电池剩余电量
+    QLabel *uavStatusBattery;
     QLabel *label_13;
     QGroupBox *groupBox;
     QHBoxLayout *horizontalLayout;
-    QPushButton *pushButton;    // 地图刷新按钮 Map_Refresh
+    QPushButton *pushButton;
     QLabel *label;
-    QLineEdit *lineEditLat; // GPS信息 纬度
+    QLineEdit *GPSLatitudeLineEdit;
     QLabel *label_2;
-    QLineEdit *lineEditLng; // GPS信息 经度
+    QLineEdit *GPSLongitudeLineEdit;
     QLabel *label_4;
-    QLabel *Alt;    // GPS信息 高度
+    QLabel *GPSHeight;
     QGroupBox *groupBox1;
     QHBoxLayout *horizontalLayout_7;
-    QComboBox *cbLight; // WayPoints 下拉菜单
-    QPushButton *btnAdd;    // WayPoints Add按钮
-    QPushButton *clearAllPointButton;   // WayPoints Clear按钮
-    QPushButton *takeoffButton; // WayPoints TakeOff按钮
-    QLineEdit *waypointAlt; // WayPoints 高度输入框
-    QPushButton *goButton;  // WayPoints Go按钮
+    QComboBox *wayPointsComboBox;
+    QPushButton *wayPointsAddBtn;
+    QPushButton *wayPointsClearBtn;
+    QPushButton *wayPointsTakeOffBtn;
+    QLineEdit *wayPointsHeightLineEdit;
+    QPushButton *wayPointsGoBtn;
     QGroupBox *groupBox_2;
     QHBoxLayout *horizontalLayout_4;
-    QPushButton *detect_carButton;  // Car detection detect_car按钮
-    QPushButton *track_carButton;   // Car detection track_car按钮
-    QPushButton *do_nothing;    // Car detection wait按钮
+    QPushButton *carDetectBtn;
+    QPushButton *carDetectTrackCarBtn;
+    QPushButton *carDetectWaitBtn;
     QLabel *label_5;
-    QLineEdit *lineEditnumber;  // Car detection number输入框
+    QLineEdit *carDetectNumberLineEdit;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -118,114 +118,114 @@ public:
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        verticalLayout_2 = new QVBoxLayout();
-        verticalLayout_2->setSpacing(6);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        label_3 = new QLabel(centralWidget);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setMinimumSize(QSize(640, 320));
-        label_3->setBaseSize(QSize(0, 0));
-        label_3->setLineWidth(1);
+        lWindow = new QVBoxLayout();
+        lWindow->setSpacing(6);
+        lWindow->setObjectName(QString::fromUtf8("lWindow"));
+        camShow = new QLabel(centralWidget);
+        camShow->setObjectName(QString::fromUtf8("camShow"));
+        camShow->setMinimumSize(QSize(640, 320));
+        camShow->setBaseSize(QSize(0, 0));
+        camShow->setLineWidth(1);
 
-        verticalLayout_2->addWidget(label_3);
+        lWindow->addWidget(camShow);
 
-        horizontalLayout_9 = new QHBoxLayout();
-        horizontalLayout_9->setSpacing(6);
-        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
-        groupBox_5 = new QGroupBox(centralWidget);
-        groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_4 = new QGroupBox(groupBox_5);
-        groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
-        groupBox_4->setGeometry(QRect(0, 0, 316, 301));
-        enableVirtualStickButton = new QPushButton(groupBox_4);
-        enableVirtualStickButton->setObjectName(QString::fromUtf8("enableVirtualStickButton"));
-        enableVirtualStickButton->setGeometry(QRect(10, 30, 141, 25));
-        yawSlider = new QSlider(groupBox_4);
-        yawSlider->setObjectName(QString::fromUtf8("yawSlider"));
-        yawSlider->setGeometry(QRect(10, 100, 121, 16));
-        yawSlider->setOrientation(Qt::Horizontal);
-        pitchSlider = new QSlider(groupBox_4);
-        pitchSlider->setObjectName(QString::fromUtf8("pitchSlider"));
-        pitchSlider->setGeometry(QRect(169, 100, 131, 20));
-        pitchSlider->setOrientation(Qt::Horizontal);
-        rollSlider = new QSlider(groupBox_4);
-        rollSlider->setObjectName(QString::fromUtf8("rollSlider"));
-        rollSlider->setGeometry(QRect(210, 130, 16, 121));
-        rollSlider->setOrientation(Qt::Vertical);
-        yawLabel = new QLabel(groupBox_4);
+        virtualStickLayout = new QHBoxLayout();
+        virtualStickLayout->setSpacing(6);
+        virtualStickLayout->setObjectName(QString::fromUtf8("virtualStickLayout"));
+        manualControlGBox = new QGroupBox(centralWidget);
+        manualControlGBox->setObjectName(QString::fromUtf8("manualControlGBox"));
+        virtualStickGBox = new QGroupBox(manualControlGBox);
+        virtualStickGBox->setObjectName(QString::fromUtf8("virtualStickGBox"));
+        virtualStickGBox->setGeometry(QRect(0, 0, 316, 301));
+        virtualStickEnableBtn = new QPushButton(virtualStickGBox);
+        virtualStickEnableBtn->setObjectName(QString::fromUtf8("virtualStickEnableBtn"));
+        virtualStickEnableBtn->setGeometry(QRect(10, 30, 141, 25));
+        virtualStickYawSlider = new QSlider(virtualStickGBox);
+        virtualStickYawSlider->setObjectName(QString::fromUtf8("virtualStickYawSlider"));
+        virtualStickYawSlider->setGeometry(QRect(10, 100, 121, 16));
+        virtualStickYawSlider->setOrientation(Qt::Horizontal);
+        virtualStickPitchSlider = new QSlider(virtualStickGBox);
+        virtualStickPitchSlider->setObjectName(QString::fromUtf8("virtualStickPitchSlider"));
+        virtualStickPitchSlider->setGeometry(QRect(169, 100, 131, 20));
+        virtualStickPitchSlider->setOrientation(Qt::Horizontal);
+        virtualStickRollSlider = new QSlider(virtualStickGBox);
+        virtualStickRollSlider->setObjectName(QString::fromUtf8("virtualStickRollSlider"));
+        virtualStickRollSlider->setGeometry(QRect(210, 130, 16, 121));
+        virtualStickRollSlider->setOrientation(Qt::Vertical);
+        yawLabel = new QLabel(virtualStickGBox);
         yawLabel->setObjectName(QString::fromUtf8("yawLabel"));
         yawLabel->setGeometry(QRect(20, 80, 67, 17));
-        rollLabel = new QLabel(groupBox_4);
+        rollLabel = new QLabel(virtualStickGBox);
         rollLabel->setObjectName(QString::fromUtf8("rollLabel"));
         rollLabel->setGeometry(QRect(230, 170, 31, 16));
-        onRestStickValueButton = new QPushButton(groupBox_4);
-        onRestStickValueButton->setObjectName(QString::fromUtf8("onRestStickValueButton"));
-        onRestStickValueButton->setGeometry(QRect(100, 260, 89, 25));
-        pitchLabel = new QLabel(groupBox_4);
+        virtualStickResetBtn = new QPushButton(virtualStickGBox);
+        virtualStickResetBtn->setObjectName(QString::fromUtf8("virtualStickResetBtn"));
+        virtualStickResetBtn->setGeometry(QRect(100, 260, 89, 25));
+        pitchLabel = new QLabel(virtualStickGBox);
         pitchLabel->setObjectName(QString::fromUtf8("pitchLabel"));
         pitchLabel->setGeometry(QRect(190, 80, 67, 17));
-        disableVirtualStickButton = new QPushButton(groupBox_4);
-        disableVirtualStickButton->setObjectName(QString::fromUtf8("disableVirtualStickButton"));
-        disableVirtualStickButton->setGeometry(QRect(170, 30, 131, 25));
-        throttleSlider = new QSlider(groupBox_4);
-        throttleSlider->setObjectName(QString::fromUtf8("throttleSlider"));
-        throttleSlider->setGeometry(QRect(60, 130, 16, 121));
-        throttleSlider->setOrientation(Qt::Vertical);
-        throttleLabel = new QLabel(groupBox_4);
+        virtualStickDisableBtn = new QPushButton(virtualStickGBox);
+        virtualStickDisableBtn->setObjectName(QString::fromUtf8("virtualStickDisableBtn"));
+        virtualStickDisableBtn->setGeometry(QRect(170, 30, 131, 25));
+        virtualStickThrottleSlider = new QSlider(virtualStickGBox);
+        virtualStickThrottleSlider->setObjectName(QString::fromUtf8("virtualStickThrottleSlider"));
+        virtualStickThrottleSlider->setGeometry(QRect(60, 130, 16, 121));
+        virtualStickThrottleSlider->setOrientation(Qt::Vertical);
+        throttleLabel = new QLabel(virtualStickGBox);
         throttleLabel->setObjectName(QString::fromUtf8("throttleLabel"));
         throttleLabel->setGeometry(QRect(80, 170, 67, 17));
-        setRollButton = new QPushButton(groupBox_4);
-        setRollButton->setObjectName(QString::fromUtf8("setRollButton"));
-        setRollButton->setGeometry(QRect(230, 190, 61, 31));
-        yawBiasLabel = new QLabel(groupBox_4);
+        virtualStickRollSetBtn = new QPushButton(virtualStickGBox);
+        virtualStickRollSetBtn->setObjectName(QString::fromUtf8("virtualStickRollSetBtn"));
+        virtualStickRollSetBtn->setGeometry(QRect(230, 190, 61, 31));
+        yawBiasLabel = new QLabel(virtualStickGBox);
         yawBiasLabel->setObjectName(QString::fromUtf8("yawBiasLabel"));
         yawBiasLabel->setGeometry(QRect(20, 60, 67, 17));
-        pitchBiasLabel = new QLabel(groupBox_4);
+        pitchBiasLabel = new QLabel(virtualStickGBox);
         pitchBiasLabel->setObjectName(QString::fromUtf8("pitchBiasLabel"));
         pitchBiasLabel->setGeometry(QRect(190, 60, 67, 17));
-        throttleBiasLabel = new QLabel(groupBox_4);
+        throttleBiasLabel = new QLabel(virtualStickGBox);
         throttleBiasLabel->setObjectName(QString::fromUtf8("throttleBiasLabel"));
         throttleBiasLabel->setGeometry(QRect(80, 150, 67, 17));
-        rollBiasLabel = new QLabel(groupBox_4);
+        rollBiasLabel = new QLabel(virtualStickGBox);
         rollBiasLabel->setObjectName(QString::fromUtf8("rollBiasLabel"));
         rollBiasLabel->setGeometry(QRect(230, 150, 67, 17));
-        zoomSlider = new QSlider(groupBox_5);
-        zoomSlider->setObjectName(QString::fromUtf8("zoomSlider"));
-        zoomSlider->setGeometry(QRect(430, 40, 160, 16));
-        zoomSlider->setOrientation(Qt::Horizontal);
-        label_7 = new QLabel(groupBox_5);
+        camZoomSlider = new QSlider(manualControlGBox);
+        camZoomSlider->setObjectName(QString::fromUtf8("camZoomSlider"));
+        camZoomSlider->setGeometry(QRect(430, 40, 160, 16));
+        camZoomSlider->setOrientation(Qt::Horizontal);
+        label_7 = new QLabel(manualControlGBox);
         label_7->setObjectName(QString::fromUtf8("label_7"));
         label_7->setGeometry(QRect(350, 40, 67, 17));
-        goStraightButton = new QPushButton(groupBox_5);
-        goStraightButton->setObjectName(QString::fromUtf8("goStraightButton"));
-        goStraightButton->setGeometry(QRect(430, 240, 89, 21));
-        turnLeftButton = new QPushButton(groupBox_5);
-        turnLeftButton->setObjectName(QString::fromUtf8("turnLeftButton"));
-        turnLeftButton->setGeometry(QRect(330, 240, 91, 21));
-        turnRightButton = new QPushButton(groupBox_5);
-        turnRightButton->setObjectName(QString::fromUtf8("turnRightButton"));
-        turnRightButton->setGeometry(QRect(530, 240, 89, 21));
-        turnLabel = new QLabel(groupBox_5);
+        manualDirectGoStraightBtn = new QPushButton(manualControlGBox);
+        manualDirectGoStraightBtn->setObjectName(QString::fromUtf8("manualDirectGoStraightBtn"));
+        manualDirectGoStraightBtn->setGeometry(QRect(430, 240, 89, 21));
+        manualDirectTurnLeftBtn = new QPushButton(manualControlGBox);
+        manualDirectTurnLeftBtn->setObjectName(QString::fromUtf8("manualDirectTurnLeftBtn"));
+        manualDirectTurnLeftBtn->setGeometry(QRect(330, 240, 91, 21));
+        manualDirectTurnRightBtn = new QPushButton(manualControlGBox);
+        manualDirectTurnRightBtn->setObjectName(QString::fromUtf8("manualDirectTurnRightBtn"));
+        manualDirectTurnRightBtn->setGeometry(QRect(530, 240, 89, 21));
+        turnLabel = new QLabel(manualControlGBox);
         turnLabel->setObjectName(QString::fromUtf8("turnLabel"));
         turnLabel->setGeometry(QRect(420, 180, 111, 51));
-        manulDirectCheckBox = new QCheckBox(groupBox_5);
-        manulDirectCheckBox->setObjectName(QString::fromUtf8("manulDirectCheckBox"));
-        manulDirectCheckBox->setGeometry(QRect(330, 270, 151, 23));
-        navPointSlider = new QSlider(groupBox_5);
-        navPointSlider->setObjectName(QString::fromUtf8("navPointSlider"));
-        navPointSlider->setGeometry(QRect(430, 90, 160, 16));
-        navPointSlider->setOrientation(Qt::Horizontal);
-        label_9 = new QLabel(groupBox_5);
+        manualDirectCheckBox = new QCheckBox(manualControlGBox);
+        manualDirectCheckBox->setObjectName(QString::fromUtf8("manualDirectCheckBox"));
+        manualDirectCheckBox->setGeometry(QRect(330, 270, 151, 23));
+        navigationPointDirectSlider = new QSlider(manualControlGBox);
+        navigationPointDirectSlider->setObjectName(QString::fromUtf8("navigationPointDirectSlider"));
+        navigationPointDirectSlider->setGeometry(QRect(430, 90, 160, 16));
+        navigationPointDirectSlider->setOrientation(Qt::Horizontal);
+        label_9 = new QLabel(manualControlGBox);
         label_9->setObjectName(QString::fromUtf8("label_9"));
         label_9->setGeometry(QRect(350, 90, 67, 17));
 
-        horizontalLayout_9->addWidget(groupBox_5);
+        virtualStickLayout->addWidget(manualControlGBox);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_9);
+        lWindow->addLayout(virtualStickLayout);
 
 
-        horizontalLayout_3->addLayout(verticalLayout_2);
+        horizontalLayout_3->addLayout(lWindow);
 
         groupBox_3 = new QGroupBox(centralWidget);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
@@ -235,13 +235,13 @@ public:
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        webView = new QWebEngineView(groupBox_3);
-        webView->setObjectName(QString::fromUtf8("webView"));
-        webView->setEnabled(true);
-        webView->setMinimumSize(QSize(0, 300));
-        webView->setMaximumSize(QSize(16777215, 16777215));
+        mapShow = new QWebEngineView(groupBox_3);
+        mapShow->setObjectName(QString::fromUtf8("mapShow"));
+        mapShow->setEnabled(true);
+        mapShow->setMinimumSize(QSize(0, 300));
+        mapShow->setMaximumSize(QSize(16777215, 16777215));
 
-        verticalLayout->addWidget(webView);
+        verticalLayout->addWidget(mapShow);
 
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setSpacing(6);
@@ -254,10 +254,10 @@ public:
 
         horizontalLayout_8->addWidget(label_8);
 
-        VelV = new QLabel(groupBox_3);
-        VelV->setObjectName(QString::fromUtf8("VelV"));
+        uavStatusVelocityV = new QLabel(groupBox_3);
+        uavStatusVelocityV->setObjectName(QString::fromUtf8("uavStatusVelocityV"));
 
-        horizontalLayout_8->addWidget(VelV);
+        horizontalLayout_8->addWidget(uavStatusVelocityV);
 
         label_12 = new QLabel(groupBox_3);
         label_12->setObjectName(QString::fromUtf8("label_12"));
@@ -276,11 +276,11 @@ public:
 
         horizontalLayout_6->addWidget(label_6);
 
-        VelH = new QLabel(groupBox_3);
-        VelH->setObjectName(QString::fromUtf8("VelH"));
-        VelH->setMinimumSize(QSize(0, 30));
+        uavStatusVelocityH = new QLabel(groupBox_3);
+        uavStatusVelocityH->setObjectName(QString::fromUtf8("uavStatusVelocityH"));
+        uavStatusVelocityH->setMinimumSize(QSize(0, 30));
 
-        horizontalLayout_6->addWidget(VelH);
+        horizontalLayout_6->addWidget(uavStatusVelocityH);
 
         label_14 = new QLabel(groupBox_3);
         label_14->setObjectName(QString::fromUtf8("label_14"));
@@ -298,10 +298,10 @@ public:
 
         horizontalLayout_2->addWidget(label_10);
 
-        Bat = new QLabel(groupBox_3);
-        Bat->setObjectName(QString::fromUtf8("Bat"));
+        uavStatusBattery = new QLabel(groupBox_3);
+        uavStatusBattery->setObjectName(QString::fromUtf8("uavStatusBattery"));
 
-        horizontalLayout_2->addWidget(Bat);
+        horizontalLayout_2->addWidget(uavStatusBattery);
 
         label_13 = new QLabel(groupBox_3);
         label_13->setObjectName(QString::fromUtf8("label_13"));
@@ -330,33 +330,33 @@ public:
 
         horizontalLayout->addWidget(label);
 
-        lineEditLat = new QLineEdit(groupBox);
-        lineEditLat->setObjectName(QString::fromUtf8("lineEditLat"));
-        lineEditLat->setMinimumSize(QSize(60, 0));
+        GPSLatitudeLineEdit = new QLineEdit(groupBox);
+        GPSLatitudeLineEdit->setObjectName(QString::fromUtf8("GPSLatitudeLineEdit"));
+        GPSLatitudeLineEdit->setMinimumSize(QSize(60, 0));
 
-        horizontalLayout->addWidget(lineEditLat);
+        horizontalLayout->addWidget(GPSLatitudeLineEdit);
 
         label_2 = new QLabel(groupBox);
         label_2->setObjectName(QString::fromUtf8("label_2"));
 
         horizontalLayout->addWidget(label_2);
 
-        lineEditLng = new QLineEdit(groupBox);
-        lineEditLng->setObjectName(QString::fromUtf8("lineEditLng"));
-        lineEditLng->setMinimumSize(QSize(60, 0));
-        lineEditLng->setCursorPosition(8);
+        GPSLongitudeLineEdit = new QLineEdit(groupBox);
+        GPSLongitudeLineEdit->setObjectName(QString::fromUtf8("GPSLongitudeLineEdit"));
+        GPSLongitudeLineEdit->setMinimumSize(QSize(60, 0));
+        GPSLongitudeLineEdit->setCursorPosition(8);
 
-        horizontalLayout->addWidget(lineEditLng);
+        horizontalLayout->addWidget(GPSLongitudeLineEdit);
 
         label_4 = new QLabel(groupBox);
         label_4->setObjectName(QString::fromUtf8("label_4"));
 
         horizontalLayout->addWidget(label_4);
 
-        Alt = new QLabel(groupBox);
-        Alt->setObjectName(QString::fromUtf8("Alt"));
+        GPSHeight = new QLabel(groupBox);
+        GPSHeight->setObjectName(QString::fromUtf8("GPSHeight"));
 
-        horizontalLayout->addWidget(Alt);
+        horizontalLayout->addWidget(GPSHeight);
 
 
         verticalLayout->addWidget(groupBox);
@@ -367,35 +367,35 @@ public:
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
-        cbLight = new QComboBox(groupBox1);
-        cbLight->setObjectName(QString::fromUtf8("cbLight"));
+        wayPointsComboBox = new QComboBox(groupBox1);
+        wayPointsComboBox->setObjectName(QString::fromUtf8("wayPointsComboBox"));
 
-        horizontalLayout_7->addWidget(cbLight);
+        horizontalLayout_7->addWidget(wayPointsComboBox);
 
-        btnAdd = new QPushButton(groupBox1);
-        btnAdd->setObjectName(QString::fromUtf8("btnAdd"));
+        wayPointsAddBtn = new QPushButton(groupBox1);
+        wayPointsAddBtn->setObjectName(QString::fromUtf8("wayPointsAddBtn"));
 
-        horizontalLayout_7->addWidget(btnAdd);
+        horizontalLayout_7->addWidget(wayPointsAddBtn);
 
-        clearAllPointButton = new QPushButton(groupBox1);
-        clearAllPointButton->setObjectName(QString::fromUtf8("clearAllPointButton"));
+        wayPointsClearBtn = new QPushButton(groupBox1);
+        wayPointsClearBtn->setObjectName(QString::fromUtf8("wayPointsClearBtn"));
 
-        horizontalLayout_7->addWidget(clearAllPointButton);
+        horizontalLayout_7->addWidget(wayPointsClearBtn);
 
-        takeoffButton = new QPushButton(groupBox1);
-        takeoffButton->setObjectName(QString::fromUtf8("takeoffButton"));
+        wayPointsTakeOffBtn = new QPushButton(groupBox1);
+        wayPointsTakeOffBtn->setObjectName(QString::fromUtf8("wayPointsTakeOffBtn"));
 
-        horizontalLayout_7->addWidget(takeoffButton);
+        horizontalLayout_7->addWidget(wayPointsTakeOffBtn);
 
-        waypointAlt = new QLineEdit(groupBox1);
-        waypointAlt->setObjectName(QString::fromUtf8("waypointAlt"));
+        wayPointsHeightLineEdit = new QLineEdit(groupBox1);
+        wayPointsHeightLineEdit->setObjectName(QString::fromUtf8("wayPointsHeightLineEdit"));
 
-        horizontalLayout_7->addWidget(waypointAlt);
+        horizontalLayout_7->addWidget(wayPointsHeightLineEdit);
 
-        goButton = new QPushButton(groupBox1);
-        goButton->setObjectName(QString::fromUtf8("goButton"));
+        wayPointsGoBtn = new QPushButton(groupBox1);
+        wayPointsGoBtn->setObjectName(QString::fromUtf8("wayPointsGoBtn"));
 
-        horizontalLayout_7->addWidget(goButton);
+        horizontalLayout_7->addWidget(wayPointsGoBtn);
 
 
         verticalLayout->addWidget(groupBox1);
@@ -406,30 +406,30 @@ public:
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        detect_carButton = new QPushButton(groupBox_2);
-        detect_carButton->setObjectName(QString::fromUtf8("detect_carButton"));
+        carDetectBtn = new QPushButton(groupBox_2);
+        carDetectBtn->setObjectName(QString::fromUtf8("carDetectBtn"));
 
-        horizontalLayout_4->addWidget(detect_carButton);
+        horizontalLayout_4->addWidget(carDetectBtn);
 
-        track_carButton = new QPushButton(groupBox_2);
-        track_carButton->setObjectName(QString::fromUtf8("track_carButton"));
+        carDetectTrackCarBtn = new QPushButton(groupBox_2);
+        carDetectTrackCarBtn->setObjectName(QString::fromUtf8("carDetectTrackCarBtn"));
 
-        horizontalLayout_4->addWidget(track_carButton);
+        horizontalLayout_4->addWidget(carDetectTrackCarBtn);
 
-        do_nothing = new QPushButton(groupBox_2);
-        do_nothing->setObjectName(QString::fromUtf8("do_nothing"));
+        carDetectWaitBtn = new QPushButton(groupBox_2);
+        carDetectWaitBtn->setObjectName(QString::fromUtf8("carDetectWaitBtn"));
 
-        horizontalLayout_4->addWidget(do_nothing);
+        horizontalLayout_4->addWidget(carDetectWaitBtn);
 
         label_5 = new QLabel(groupBox_2);
         label_5->setObjectName(QString::fromUtf8("label_5"));
 
         horizontalLayout_4->addWidget(label_5);
 
-        lineEditnumber = new QLineEdit(groupBox_2);
-        lineEditnumber->setObjectName(QString::fromUtf8("lineEditnumber"));
+        carDetectNumberLineEdit = new QLineEdit(groupBox_2);
+        carDetectNumberLineEdit->setObjectName(QString::fromUtf8("carDetectNumberLineEdit"));
 
-        horizontalLayout_4->addWidget(lineEditnumber);
+        horizontalLayout_4->addWidget(carDetectNumberLineEdit);
 
 
         verticalLayout->addWidget(groupBox_2);
@@ -453,55 +453,55 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", nullptr));
-        label_3->setText(QString());
-        groupBox_5->setTitle(QApplication::translate("MainWindow", "                                                                                             Add navigation point", nullptr));
-        groupBox_4->setTitle(QApplication::translate("MainWindow", "Virtual stick", nullptr));
-        enableVirtualStickButton->setText(QApplication::translate("MainWindow", "Enable virtual Stick", nullptr));
+        camShow->setText(QString());
+        manualControlGBox->setTitle(QApplication::translate("MainWindow", "                                                                                             Add navigation point", nullptr));
+        virtualStickGBox->setTitle(QApplication::translate("MainWindow", "Virtual stick", nullptr));
+        virtualStickEnableBtn->setText(QApplication::translate("MainWindow", "Enable virtual Stick", nullptr));
         yawLabel->setText(QApplication::translate("MainWindow", "Yaw", nullptr));
         rollLabel->setText(QApplication::translate("MainWindow", "Roll", nullptr));
-        onRestStickValueButton->setText(QApplication::translate("MainWindow", "reset", nullptr));
+        virtualStickResetBtn->setText(QApplication::translate("MainWindow", "reset", nullptr));
         pitchLabel->setText(QApplication::translate("MainWindow", "Pitch", nullptr));
-        disableVirtualStickButton->setText(QApplication::translate("MainWindow", "Disable virtual S", nullptr));
+        virtualStickDisableBtn->setText(QApplication::translate("MainWindow", "Disable virtual S", nullptr));
         throttleLabel->setText(QApplication::translate("MainWindow", "Throttle", nullptr));
-        setRollButton->setText(QApplication::translate("MainWindow", "Set", nullptr));
+        virtualStickRollSetBtn->setText(QApplication::translate("MainWindow", "Set", nullptr));
         yawBiasLabel->setText(QString());
         pitchBiasLabel->setText(QString());
         throttleBiasLabel->setText(QString());
         rollBiasLabel->setText(QString());
         label_7->setText(QApplication::translate("MainWindow", "Zoom", nullptr));
-        goStraightButton->setText(QApplication::translate("MainWindow", "Go straight", nullptr));
-        turnLeftButton->setText(QApplication::translate("MainWindow", "Turn left", nullptr));
-        turnRightButton->setText(QApplication::translate("MainWindow", "Turn right", nullptr));
+        manualDirectGoStraightBtn->setText(QApplication::translate("MainWindow", "Go straight", nullptr));
+        manualDirectTurnLeftBtn->setText(QApplication::translate("MainWindow", "Turn left", nullptr));
+        manualDirectTurnRightBtn->setText(QApplication::translate("MainWindow", "Turn right", nullptr));
         turnLabel->setText(QString());
-        manulDirectCheckBox->setText(QApplication::translate("MainWindow", "Manul direct", nullptr));
+        manualDirectCheckBox->setText(QApplication::translate("MainWindow", "Manul direct", nullptr));
         label_9->setText(QApplication::translate("MainWindow", "Nav point", nullptr));
         groupBox_3->setTitle(QApplication::translate("MainWindow", "Map", nullptr));
         label_8->setText(QApplication::translate("MainWindow", "Velocity_V:", nullptr));
-        VelV->setText(QApplication::translate("MainWindow", "3.3", nullptr));
+        uavStatusVelocityV->setText(QApplication::translate("MainWindow", "3.3", nullptr));
         label_12->setText(QApplication::translate("MainWindow", "m/s", nullptr));
         label_6->setText(QApplication::translate("MainWindow", "Velocity_H:", nullptr));
-        VelH->setText(QApplication::translate("MainWindow", "3.3", nullptr));
+        uavStatusVelocityH->setText(QApplication::translate("MainWindow", "3.3", nullptr));
         label_14->setText(QApplication::translate("MainWindow", "m/s", nullptr));
         label_10->setText(QApplication::translate("MainWindow", "Battery:", nullptr));
-        Bat->setText(QApplication::translate("MainWindow", "99", nullptr));
+        uavStatusBattery->setText(QApplication::translate("MainWindow", "99", nullptr));
         label_13->setText(QApplication::translate("MainWindow", "%", nullptr));
         groupBox->setTitle(QApplication::translate("MainWindow", "GPS Data", nullptr));
         pushButton->setText(QApplication::translate("MainWindow", "Map_Refresh", nullptr));
         label->setText(QApplication::translate("MainWindow", "Lat", nullptr));
-        lineEditLat->setText(QApplication::translate("MainWindow", "29.6169", nullptr));
+        GPSLatitudeLineEdit->setText(QApplication::translate("MainWindow", "29.6169", nullptr));
         label_2->setText(QApplication::translate("MainWindow", "Lng", nullptr));
-        lineEditLng->setText(QApplication::translate("MainWindow", "106.4988", nullptr));
-        label_4->setText(QApplication::translate("MainWindow", " Alt ", nullptr));
-        Alt->setText(QApplication::translate("MainWindow", "000.0", nullptr));
+        GPSLongitudeLineEdit->setText(QApplication::translate("MainWindow", "106.4988", nullptr));
+        label_4->setText(QApplication::translate("MainWindow", " GPSHeight ", nullptr));
+        GPSHeight->setText(QApplication::translate("MainWindow", "000.0", nullptr));
         groupBox1->setTitle(QApplication::translate("MainWindow", "WayPoints", nullptr));
-        btnAdd->setText(QApplication::translate("MainWindow", "Add", nullptr));
-        clearAllPointButton->setText(QApplication::translate("MainWindow", "Clear", nullptr));
-        takeoffButton->setText(QApplication::translate("MainWindow", "TakeOff", nullptr));
-        goButton->setText(QApplication::translate("MainWindow", "Go", nullptr));
+        wayPointsAddBtn->setText(QApplication::translate("MainWindow", "Add", nullptr));
+        wayPointsClearBtn->setText(QApplication::translate("MainWindow", "Clear", nullptr));
+        wayPointsTakeOffBtn->setText(QApplication::translate("MainWindow", "TakeOff", nullptr));
+        wayPointsGoBtn->setText(QApplication::translate("MainWindow", "Go", nullptr));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "Car detection", nullptr));
-        detect_carButton->setText(QApplication::translate("MainWindow", "detect_car", nullptr));
-        track_carButton->setText(QApplication::translate("MainWindow", "track_car", nullptr));
-        do_nothing->setText(QApplication::translate("MainWindow", "wait", nullptr));
+        carDetectBtn->setText(QApplication::translate("MainWindow", "detect_car", nullptr));
+        carDetectTrackCarBtn->setText(QApplication::translate("MainWindow", "track_car", nullptr));
+        carDetectWaitBtn->setText(QApplication::translate("MainWindow", "wait", nullptr));
         label_5->setText(QApplication::translate("MainWindow", "     number:", nullptr));
     } // retranslateUi
 

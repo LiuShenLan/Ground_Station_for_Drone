@@ -135,9 +135,9 @@ private slots:  // 槽声明区
     void closeCamara(); // 关闭摄像头，释放资源，必须释放
 
     // Car setection
-    void on_detect_carButton_clicked(); // 向car detect track 文件写入"detect"
-    void on_track_carButton_clicked();  // 向car detect track 文件写入"track"
-    void on_do_nothing_clicked();       // 向car detect track 文件写入"wait"
+    void on_carDetectBtn_clicked(); // 向car detect track 文件写入"detect"
+    void on_carDetectTrackCarBtn_clicked();  // 向car detect track 文件写入"track"
+    void on_carDetectWaitBtn_clicked();       // 向car detect track 文件写入"wait"
 
     // 不明函数
     void onTimeOut();   // 空定时中断函数

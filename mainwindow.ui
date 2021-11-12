@@ -22,9 +22,9 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="lWindow">
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="camShow">
         <property name="minimumSize">
          <size>
           <width>640</width>
@@ -46,13 +46,13 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <layout class="QHBoxLayout" name="virtualStickLayout">
         <item>
-         <widget class="QGroupBox" name="groupBox_5">
+         <widget class="QGroupBox" name="manualControlGBox">
           <property name="title">
            <string>                                                                                             Add navigation point</string>
           </property>
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="virtualStickGBox">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -64,7 +64,7 @@
            <property name="title">
             <string>Virtual stick</string>
            </property>
-           <widget class="QPushButton" name="enableVirtualStickButton">
+           <widget class="QPushButton" name="virtualStickEnableBtn">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -77,7 +77,7 @@
              <string>Enable virtual Stick</string>
             </property>
            </widget>
-           <widget class="QSlider" name="yawSlider">
+           <widget class="QSlider" name="virtualStickYawSlider">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -90,7 +90,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
-           <widget class="QSlider" name="pitchSlider">
+           <widget class="QSlider" name="virtualStickPitchSlider">
             <property name="geometry">
              <rect>
               <x>169</x>
@@ -103,7 +103,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
-           <widget class="QSlider" name="rollSlider">
+           <widget class="QSlider" name="virtualStickRollSlider">
             <property name="geometry">
              <rect>
               <x>210</x>
@@ -142,7 +142,7 @@
              <string>Roll</string>
             </property>
            </widget>
-           <widget class="QPushButton" name="onRestStickValueButton">
+           <widget class="QPushButton" name="virtualStickResetBtn">
             <property name="geometry">
              <rect>
               <x>100</x>
@@ -168,7 +168,7 @@
              <string>Pitch</string>
             </property>
            </widget>
-           <widget class="QPushButton" name="disableVirtualStickButton">
+           <widget class="QPushButton" name="virtualStickDisableBtn">
             <property name="geometry">
              <rect>
               <x>170</x>
@@ -181,7 +181,7 @@
              <string>Disable virtual S</string>
             </property>
            </widget>
-           <widget class="QSlider" name="throttleSlider">
+           <widget class="QSlider" name="virtualStickThrottleSlider">
             <property name="geometry">
              <rect>
               <x>60</x>
@@ -207,7 +207,7 @@
              <string>Throttle</string>
             </property>
            </widget>
-           <widget class="QPushButton" name="setRollButton">
+           <widget class="QPushButton" name="virtualStickRollSetBtn">
             <property name="geometry">
              <rect>
               <x>230</x>
@@ -273,7 +273,7 @@
             </property>
            </widget>
           </widget>
-          <widget class="QSlider" name="zoomSlider">
+          <widget class="QSlider" name="camZoomSlider">
            <property name="geometry">
             <rect>
              <x>430</x>
@@ -299,7 +299,7 @@
             <string>Zoom</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="goStraightButton">
+          <widget class="QPushButton" name="manualDirectGoStraightBtn">
            <property name="geometry">
             <rect>
              <x>430</x>
@@ -312,7 +312,7 @@
             <string>Go straight</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="turnLeftButton">
+          <widget class="QPushButton" name="manualDirectTurnLeftBtn">
            <property name="geometry">
             <rect>
              <x>330</x>
@@ -325,7 +325,7 @@
             <string>Turn left</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="turnRightButton">
+          <widget class="QPushButton" name="manualDirectTurnRightBtn">
            <property name="geometry">
             <rect>
              <x>530</x>
@@ -351,7 +351,7 @@
             <string/>
            </property>
           </widget>
-          <widget class="QCheckBox" name="manulDirectCheckBox">
+          <widget class="QCheckBox" name="manualDirectCheckBox">
            <property name="geometry">
             <rect>
              <x>330</x>
@@ -364,7 +364,7 @@
             <string>Manul direct</string>
            </property>
           </widget>
-          <widget class="QSlider" name="navPointSlider">
+          <widget class="QSlider" name="navigationPointDirectSlider">
            <property name="geometry">
             <rect>
              <x>430</x>
@@ -415,7 +415,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QWebEngineView" name="webView" native="true">
+        <widget class="QWebEngineView" name="mapShow" native="true">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -445,7 +445,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="VelV">
+            <widget class="QLabel" name="uavStatusVelocityV">
              <property name="text">
               <string>3.3</string>
              </property>
@@ -476,7 +476,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="VelH">
+            <widget class="QLabel" name="uavStatusVelocityH">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -507,7 +507,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="Bat">
+            <widget class="QLabel" name="uavStatusBattery">
              <property name="text">
               <string>99</string>
              </property>
@@ -545,7 +545,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEditLat">
+           <widget class="QLineEdit" name="GPSLatitudeLineEdit">
             <property name="minimumSize">
              <size>
               <width>60</width>
@@ -565,7 +565,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEditLng">
+           <widget class="QLineEdit" name="GPSLongitudeLineEdit">
             <property name="minimumSize">
              <size>
               <width>60</width>
@@ -583,12 +583,12 @@
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string> Alt </string>
+             <string> GPSHeight </string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="Alt">
+           <widget class="QLabel" name="GPSHeight">
             <property name="text">
              <string>000.0</string>
             </property>
@@ -604,34 +604,34 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
-           <widget class="QComboBox" name="cbLight"/>
+           <widget class="QComboBox" name="wayPointsComboBox"/>
           </item>
           <item>
-           <widget class="QPushButton" name="btnAdd">
+           <widget class="QPushButton" name="wayPointsAddBtn">
             <property name="text">
              <string>Add</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="clearAllPointButton">
+           <widget class="QPushButton" name="wayPointsClearBtn">
             <property name="text">
              <string>Clear</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="takeoffButton">
+           <widget class="QPushButton" name="wayPointsTakeOffBtn">
             <property name="text">
              <string>TakeOff</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="waypointAlt"/>
+           <widget class="QLineEdit" name="wayPointsHeightLineEdit"/>
           </item>
           <item>
-           <widget class="QPushButton" name="goButton">
+           <widget class="QPushButton" name="wayPointsGoBtn">
             <property name="text">
              <string>Go</string>
             </property>
@@ -647,21 +647,21 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QPushButton" name="detect_carButton">
+           <widget class="QPushButton" name="carDetectBtn">
             <property name="text">
              <string>detect_car</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="track_carButton">
+           <widget class="QPushButton" name="carDetectTrackCarBtn">
             <property name="text">
              <string>track_car</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="do_nothing">
+           <widget class="QPushButton" name="carDetectWaitBtn">
             <property name="text">
              <string>wait</string>
             </property>
@@ -675,7 +675,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEditnumber"/>
+           <widget class="QLineEdit" name="carDetectNumberLineEdit"/>
           </item>
          </layout>
         </widget>

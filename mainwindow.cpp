@@ -54,12 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start(50);              // 开始计时，超时则发出timeout()信号，读取摄像头信息
 
     // Zoom与Nav point滑动块初始化
-    ui->zoomSlider->setMaximum(1000);
-    ui->zoomSlider->setMinimum(0);
-    ui->zoomSlider->setValue(1000);
-    ui->navPointSlider->setMaximum(365);
-    ui->navPointSlider->setMinimum(0);
-    ui->navPointSlider->setValue(0);
+    ui->camZoomSlider->setMaximum(1000);
+    ui->camZoomSlider->setMinimum(0);
+    ui->camZoomSlider->setValue(1000);
+    ui->navigationPointDirectSlider->setMaximum(365);
+    ui->navigationPointDirectSlider->setMinimum(0);
+    ui->navigationPointDirectSlider->setValue(0);
 
     connect(timer, SIGNAL(timeout()), this, SLOT(readFarme()));  // 时间到，读取当前摄像头信息
 }
@@ -68,8 +68,8 @@ void MainWindow::InitForm()
     QWebChannel *channel = new QWebChannel(this);
     bridgeins = bridge::instance(); // 返回bridge对象
     channel->registerObject("bridge", (QObject*)bridgeins); // 将bridgeins对象注册到channel
-    ui->webView->page()->setWebChannel(channel);
-    ui->webView->page()->load(QUrl::fromLocalFile(qApp->applicationDirPath() + "/bin/index.html"));
+    ui->mapShow->page()->setWebChannel(channel);
+    ui->mapShow->page()->load(QUrl::fromLocalFile(qApp->applicationDirPath() + "/bin/index.html"));
 
     // GPS Data初始化
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
@@ -80,25 +80,25 @@ void MainWindow::InitForm()
     for(int i=0; i<nCount; i++)
     {
         Light_t tLight = list[i];
-        ui->cbLight->addItem(tLight.strDesc, tLight.strName);   // 在WayPoints下拉菜单中添加信息
+        ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);   // 在WayPoints下拉菜单中添加信息
     }
-    ui->cbLight->setCurrentIndex(0);
-    connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(onBtnAddLight()));
+    ui->wayPointsComboBox->setCurrentIndex(0);
+    connect(ui->wayPointsAddBtn, SIGNAL(clicked()), this, SLOT(onBtnAddLight()));
 //    connect(ui->btnLightOn, SIGNAL(clicked()), this, SLOT(onBtnLightOn()));
 //    connect(ui->btnLightOff, SIGNAL(clicked()), this, SLOT(onBtnLightOff()));
-    connect(ui->takeoffButton, SIGNAL(clicked()), this, SLOT(onTakeoffButton()));
-    connect(ui->goButton, SIGNAL(clicked()), this, SLOT(onGoButton()));
-    connect(ui->clearAllPointButton, SIGNAL(clicked()), this, SLOT(onClearAllPoint()));
+    connect(ui->wayPointsTakeOffBtn, SIGNAL(clicked()), this, SLOT(onTakeoffButton()));
+    connect(ui->wayPointsGoBtn, SIGNAL(clicked()), this, SLOT(onGoButton()));
+    connect(ui->wayPointsClearBtn, SIGNAL(clicked()), this, SLOT(onClearAllPoint()));
 
     // GPS信息初始化
-    ui->lineEditLat->setMinimumWidth(10);
-    ui->lineEditLng->setMinimumWidth(10);
+    ui->GPSLatitudeLineEdit->setMinimumWidth(10);
+    ui->GPSLongitudeLineEdit->setMinimumWidth(10);
     connect(bridgeins, &bridge::toRecvMsg, this, &MainWindow::onRecvdMsg);
 
     // 无人机方向控制
-    connect(ui->turnLeftButton,SIGNAL(clicked()), this, SLOT(onTurnLeftButton()));
-    connect(ui->turnRightButton,SIGNAL(clicked()), this, SLOT(onTurnRightButton()));
-    connect(ui->goStraightButton,SIGNAL(clicked()), this, SLOT(onGoStraightButton()));
+    connect(ui->manualDirectTurnLeftBtn,SIGNAL(clicked()), this, SLOT(onTurnLeftButton()));
+    connect(ui->manualDirectTurnRightBtn,SIGNAL(clicked()), this, SLOT(onTurnRightButton()));
+    connect(ui->manualDirectGoStraightBtn,SIGNAL(clicked()), this, SLOT(onGoStraightButton()));
 
     // 不明定时器
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
@@ -110,36 +110,36 @@ void MainWindow::InitVirtualStickControl()
 {
     tcpSocket_for_python_controller = new QTcpSocket(this);
     // 无人机虚拟控制
-    connect(ui->enableVirtualStickButton, SIGNAL(clicked()), this, SLOT(onEnableVirtualStickButton()));
-    connect(ui->disableVirtualStickButton, SIGNAL(clicked()), this, SLOT(onDisableVirtualStickButton()));
-    connect(ui->setRollButton, SIGNAL(clicked()), this, SLOT(onSetRoll()));
+    connect(ui->virtualStickEnableBtn, SIGNAL(clicked()), this, SLOT(onEnableVirtualStickButton()));
+    connect(ui->virtualStickDisableBtn, SIGNAL(clicked()), this, SLOT(onDisableVirtualStickButton()));
+    connect(ui->virtualStickRollSetBtn, SIGNAL(clicked()), this, SLOT(onSetRoll()));
     virtualStickTimer = new QTimer(this);   // 实例化定时器
-    ui->disableVirtualStickButton->setEnabled(false);
+    ui->virtualStickDisableBtn->setEnabled(false);
     // 虚拟控制滑块
-    ui->yawSlider->setMaximum(1000);
-    ui->yawSlider->setMinimum(-1000);
-    ui->yawSlider->setValue(0);
+    ui->virtualStickYawSlider->setMaximum(1000);
+    ui->virtualStickYawSlider->setMinimum(-1000);
+    ui->virtualStickYawSlider->setValue(0);
 
-    ui->pitchSlider->setMaximum(1000);
-    ui->pitchSlider->setMinimum(-1000);
-    ui->pitchSlider->setValue(0);
+    ui->virtualStickPitchSlider->setMaximum(1000);
+    ui->virtualStickPitchSlider->setMinimum(-1000);
+    ui->virtualStickPitchSlider->setValue(0);
 
-    ui->rollSlider->setMaximum(1000);
-    ui->rollSlider->setMinimum(-1000);
-    ui->rollSlider->setValue(0);
+    ui->virtualStickRollSlider->setMaximum(1000);
+    ui->virtualStickRollSlider->setMinimum(-1000);
+    ui->virtualStickRollSlider->setValue(0);
 
-    ui->throttleSlider->setMaximum(1000);
-    ui->throttleSlider->setMinimum(-1000);
-    ui->throttleSlider->setValue(0);
+    ui->virtualStickThrottleSlider->setMaximum(1000);
+    ui->virtualStickThrottleSlider->setMinimum(-1000);
+    ui->virtualStickThrottleSlider->setValue(0);
 
     // 释放滑块，设置信息
-    connect(ui->yawSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseYawSlider()));
-    connect(ui->pitchSlider, SIGNAL(sliderReleased()), this, SLOT(onReleasePitchSlider()));
-    connect(ui->rollSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseRollSlider()));
-    connect(ui->throttleSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseThrottleSlider()));
+    connect(ui->virtualStickYawSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseYawSlider()));
+    connect(ui->virtualStickPitchSlider, SIGNAL(sliderReleased()), this, SLOT(onReleasePitchSlider()));
+    connect(ui->virtualStickRollSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseRollSlider()));
+    connect(ui->virtualStickThrottleSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseThrottleSlider()));
 
     // WayPoints
-    connect(ui->navPointSlider, SIGNAL(sliderMoved(int)), this, SLOT(onReleaseNavSlider()));
+    connect(ui->navigationPointDirectSlider, SIGNAL(sliderMoved(int)), this, SLOT(onReleaseNavSlider()));
 
     // TCP
     if(!tcpServer_for_python_controller.isListening() && !tcpServer_for_python_controller.listen(QHostAddress::LocalHost, 5555))
@@ -183,7 +183,7 @@ void MainWindow::on_pushButton_clicked()
     timer_2 = new QTimer(this);
     timer_2->start(200);
 
-    bridgeins->setNavPointRotate(int(ui->navPointSlider->value()));
+    bridgeins->setNavPointRotate(int(ui->navigationPointDirectSlider->value()));
 
     connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
     connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
@@ -191,15 +191,15 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::timeCountsFunction()
 {
     // 设置GPS经纬度信息
-    ui->lineEditLng->setText(QString::number(server_->jsonGPS["longitude"].toDouble(), 10, 8));
+    ui->GPSLongitudeLineEdit->setText(QString::number(server_->jsonGPS["longitude"].toDouble(), 10, 8));
     //qDebug() <<"\n->"<< server_->jsonGPS["altitude"].toString();
-    ui->lineEditLat->setText(QString::number(server_->jsonGPS["latitude"].toDouble(), 10, 8));
-    ui->Alt->setText(QString::number(server_->jsonGPS["altitude"].toDouble()));
+    ui->GPSLatitudeLineEdit->setText(QString::number(server_->jsonGPS["latitude"].toDouble(), 10, 8));
+    ui->GPSHeight->setText(QString::number(server_->jsonGPS["altitude"].toDouble()));
     // 设置无人机速度信息
-    ui->VelH->setText(QString::number(sqrt(pow(server_->jsonGPS["velocityY"].toDouble(),2)+pow(server_->jsonGPS["velocityX"].toDouble(), 2))));
-    ui->VelV->setText(QString::number(server_->jsonGPS["velocityZ"].toDouble()));
+    ui->uavStatusVelocityH->setText(QString::number(sqrt(pow(server_->jsonGPS["velocityY"].toDouble(),2)+pow(server_->jsonGPS["velocityX"].toDouble(), 2))));
+    ui->uavStatusVelocityV->setText(QString::number(server_->jsonGPS["velocityZ"].toDouble()));
     // 设置无人机电池信息
-    ui->Bat->setText(QString::number(server_->jsonBattery["BatteryEnergyRemainingPercent"].toDouble()));
+    ui->uavStatusBattery->setText(QString::number(server_->jsonBattery["BatteryEnergyRemainingPercent"].toDouble()));
 }
 void MainWindow::callJava()
 {
@@ -208,33 +208,33 @@ void MainWindow::callJava()
 //    strJs_ += QString::number(10.5, 10, 1);
     strJs_ += ")";
 //    QString strJs = strJs_
-//            .arg(ui->lineEditLng->text().toDouble()*0.01+109.03525)
-//            .arg(ui->lineEditLat->text().toDouble()*0.01+26.6564);
+//            .arg(ui->GPSLongitudeLineEdit->text().toDouble()*0.01+109.03525)
+//            .arg(ui->GPSLatitudeLineEdit->text().toDouble()*0.01+26.6564);
     QString strJs = strJs_
-            .arg(ui->lineEditLng->text().toDouble()+0.0126,0,10,8)
-            .arg(ui->lineEditLat->text().toDouble()+0.0062,0,10,8);
-    ui->webView->page()->runJavaScript(strJs);
+            .arg(ui->GPSLongitudeLineEdit->text().toDouble()+0.0126,0,10,8)
+            .arg(ui->GPSLatitudeLineEdit->text().toDouble()+0.0062,0,10,8);
+    ui->mapShow->page()->runJavaScript(strJs);
     //qDebug()<<strJs;
 }
 
 // WayPoints
 void MainWindow::onBtnLightOn()
 {
-    QString strName = ui->cbLight->currentData().toString();
+    QString strName = ui->wayPointsComboBox->currentData().toString();
     bridgeins->onLightOn(strName);
 }
 void MainWindow::onBtnLightOff()
 {
-    QString strName = ui->cbLight->currentData().toString();
+    QString strName = ui->wayPointsComboBox->currentData().toString();
     bridgeins->onLightOff(strName);
 }
 void MainWindow::onBtnAddLight()
 {
     // 根据导航点方向滑块生成Light_t对象
-    Light_t tLight = bridgeins->AddLight(int(ui->navPointSlider->value()));
+    Light_t tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()));
     // 向WayPoints下拉菜单中写入信息
-    ui->cbLight->addItem(tLight.strDesc, tLight.strName);
-    ui->cbLight->setCurrentIndex(ui->cbLight->count()-1);
+    ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
+    ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
     bridgeins->onUpdateData();
 }
 void MainWindow::onGoButton()
@@ -246,7 +246,7 @@ void MainWindow::sendWayPoint()
     QList<Light_t> wayPointList = bridgeins->returnWayPointList();  // 获取所有的WayPoints信息
     QJsonObject jsonToSend;
     jsonToSend.insert("mission", 1);            //takeoff = 0, waypoint = 1
-    jsonToSend.insert("altitude", ui->waypointAlt->text().toDouble());
+    jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
     jsonToSend.insert("way_point_num", wayPointList.size());
     for(int i = 0; i < wayPointList.size(); i++)
     {
@@ -259,15 +259,15 @@ void MainWindow::sendWayPoint()
 }
 void MainWindow::onClearAllPoint()
 {
-    if(ui->cbLight->count()>=1)
+    if(ui->wayPointsComboBox->count()>=1)
     {
-        ui->cbLight->clear();
+        ui->wayPointsComboBox->clear();
         bridgeins->removeAllPoints();
     }
 }
 void MainWindow::onReleaseNavSlider()
 {
-    bridgeins->setNavPointRotate(int(ui->navPointSlider->value()));
+    bridgeins->setNavPointRotate(int(ui->navigationPointDirectSlider->value()));
 }
 void MainWindow::onTakeoffButton()
 {
@@ -281,8 +281,8 @@ void MainWindow::onTakeoffButton()
 // 无人机虚拟控制
 void MainWindow::onEnableVirtualStickButton()
 {
-    ui->enableVirtualStickButton->setEnabled(false);
-    ui->disableVirtualStickButton->setEnabled(true);
+    ui->virtualStickEnableBtn->setEnabled(false);
+    ui->virtualStickDisableBtn->setEnabled(true);
     virtualStickTimer->start(100);
     connect(virtualStickTimer, SIGNAL(timeout()), this, SLOT(sendVirtualStickCommand()));
 }
@@ -290,10 +290,10 @@ void MainWindow::sendVirtualStickCommand()
 {
     QJsonObject jsonToSend_0;
     jsonToSend_0.insert("mission", 2);            //takeoff = 0, waypoint = 1, virtual stick = 2, disable virtual stick = 3
-    jsonToSend_0.insert("yaw", double(ui->yawSlider->value())/1000);
-    jsonToSend_0.insert("roll", double(ui->rollSlider->value())/1000);
-    jsonToSend_0.insert("pitch", double(ui->pitchSlider->value())/1000);
-    jsonToSend_0.insert("throttle", double(ui->throttleSlider->value())/1000);
+    jsonToSend_0.insert("yaw", double(ui->virtualStickYawSlider->value())/1000);
+    jsonToSend_0.insert("roll", double(ui->virtualStickRollSlider->value())/1000);
+    jsonToSend_0.insert("pitch", double(ui->virtualStickPitchSlider->value())/1000);
+    jsonToSend_0.insert("throttle", double(ui->virtualStickThrottleSlider->value())/1000);
 
     QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 //    qDebug()<<str;
@@ -303,16 +303,16 @@ void MainWindow::onDisableVirtualStickButton()
 {
     disconnect(virtualStickTimer, SIGNAL(timeout()),0,0);
     virtualStickTimer->stop();
-    ui->yawSlider->setValue(0);
-    ui->pitchSlider->setValue(0);
-    ui->rollSlider->setValue(0);
+    ui->virtualStickYawSlider->setValue(0);
+    ui->virtualStickPitchSlider->setValue(0);
+    ui->virtualStickRollSlider->setValue(0);
 
 //    QJsonObject jsonToSend_0;
 //    jsonToSend_0.insert("mission", 2);            //takeoff = 0, waypoint = 1, virtual stick = 2, disable virtual stick = 3
-//    jsonToSend_0.insert("yaw", ui->yawSlider->value()/1000);
-//    jsonToSend_0.insert("roll", ui->rollSlider->value()/1000);
-//    jsonToSend_0.insert("pitch", ui->pitchSlider->value()/1000);
-//    jsonToSend_0.insert("throttle", double(ui->throttleSlider->value())/1000);
+//    jsonToSend_0.insert("yaw", ui->virtualStickYawSlider->value()/1000);
+//    jsonToSend_0.insert("roll", ui->virtualStickRollSlider->value()/1000);
+//    jsonToSend_0.insert("pitch", ui->virtualStickPitchSlider->value()/1000);
+//    jsonToSend_0.insert("throttle", double(ui->virtualStickThrottleSlider->value())/1000);
 
 //    QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 //    qDebug()<<str;
@@ -320,38 +320,38 @@ void MainWindow::onDisableVirtualStickButton()
 
     QJsonObject jsonToSend_1;
     jsonToSend_1.insert("mission", 3);
-    jsonToSend_1.insert("yaw", ui->yawSlider->value()/1000);
-    jsonToSend_1.insert("roll", ui->rollSlider->value()/1000);
-    jsonToSend_1.insert("pitch", ui->pitchSlider->value()/1000);
-    jsonToSend_1.insert("throttle", double(ui->throttleSlider->value())/1000);
+    jsonToSend_1.insert("yaw", ui->virtualStickYawSlider->value()/1000);
+    jsonToSend_1.insert("roll", ui->virtualStickRollSlider->value()/1000);
+    jsonToSend_1.insert("pitch", ui->virtualStickPitchSlider->value()/1000);
+    jsonToSend_1.insert("throttle", double(ui->virtualStickThrottleSlider->value())/1000);
 
     QString str  = QString(QJsonDocument(jsonToSend_1).toJson());
 //    qDebug()<<str;
     server_->sendMessage(str);
 
-    ui->enableVirtualStickButton->setEnabled(true);
-    ui->disableVirtualStickButton->setEnabled(false);
+    ui->virtualStickEnableBtn->setEnabled(true);
+    ui->virtualStickDisableBtn->setEnabled(false);
 }
 void MainWindow::onReleaseYawSlider()
 {
-    ui->yawSlider->setValue(0);
+    ui->virtualStickYawSlider->setValue(0);
 }
 void MainWindow::onReleasePitchSlider()
 {
-    ui->pitchSlider->setValue(0);
+    ui->virtualStickPitchSlider->setValue(0);
 }
 void MainWindow::onReleaseRollSlider()
 {
-    ui->rollSlider->setValue(0);
+    ui->virtualStickRollSlider->setValue(0);
 }
 void MainWindow::onSetRoll()
 {
-    ui->rollSlider->setValue(65);
+    ui->virtualStickRollSlider->setValue(65);
     ui->rollLabel->setText(tr("65"));
 }
 void MainWindow::onReleaseThrottleSlider()
 {
-    ui->throttleSlider->setValue(0);
+    ui->virtualStickThrottleSlider->setValue(0);
 }
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
@@ -359,12 +359,12 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     {
         case Qt::Key_W :    // W 增加油门
             throttleBias++;
-            ui->throttleSlider->setValue(ui->throttleSlider->value()+throttleBias);
+            ui->virtualStickThrottleSlider->setValue(ui->virtualStickThrottleSlider->value()+throttleBias);
             ui->throttleBiasLabel->setText(QString::number(throttleBias));
             break;
         case Qt::Key_S :    // S 减少油门
             throttleBias--;
-            ui->throttleSlider->setValue(ui->throttleSlider->value()+throttleBias);
+            ui->virtualStickThrottleSlider->setValue(ui->virtualStickThrottleSlider->value()+throttleBias);
             ui->throttleBiasLabel->setText(QString::number(throttleBias));
             break;
         case Qt::Key_A :    // A 向左偏航
@@ -402,7 +402,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 void MainWindow::readFarme()
 {
     cam >> frame;// 从摄像头中抓取并返回每一帧
-    double radio = (double)ui->zoomSlider->value()/1000;
+    double radio = (double)ui->camZoomSlider->value()/1000;
     frame(cv::Rect(int((1-radio)/2*frame.size().width),int((1-radio)/2*frame.size().height),int(radio*frame.size().width),int(radio*frame.size().height))).copyTo(frame);
 //    cv::rectangle(frame,cvPoint(20,200),cvPoint(200,300),cvScalar(255,0,0),1,1,0);
     //将抓取到的帧，转换为QImage格式。QImage::Format_RGB888不同的摄像头用不同的格式。
@@ -418,7 +418,7 @@ void MainWindow::readFarme()
 //        cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);//opencv读取图片按照BGR方式读取，为了正常显示，所以将BGR转为RGB
         image = QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888).rgbSwapped().scaled(640,320,Qt::KeepAspectRatioByExpanding);
     }
-    ui->label_3->setPixmap(QPixmap::fromImage(image));  // 显示图片
+    ui->camShow->setPixmap(QPixmap::fromImage(image));  // 显示图片
 
 //    ui->deepImg->setPixmap(QPixmap("/home/wwh/2.jpg").scaled(320,160));
 
@@ -431,7 +431,7 @@ void MainWindow::readFarme()
     QTextStream outText(&my_file);  //将QTextStream与特定文件关联
     QString number = outText.readAll();  //读出QTextStream对象中所有内容
     my_file.close(); //关闭文件
-    ui->lineEditnumber->setText(number);
+    ui->carDetectNumberLineEdit->setText(number);
 }
 /*******************************
 ***关闭摄像头，释放资源，必须释放***
@@ -462,21 +462,21 @@ void MainWindow::onRecvTargetPoint(const QString msg)
     double targetLat = lst[3].toDouble();
     int arrayListLength = lst[4].toInt();
     //qDebug()<<fixed<<qSetRealNumberPrecision(7)<<targetLng<<" "<<targetLat;
-    //qDebug()<<(ui->lineEditLng->text().toDouble()+0.0126)<<" "<<(ui->lineEditLat->text().toDouble()+0.0062);
-//    qDebug()<<((targetLng - (ui->lineEditLng->text().toDouble()+0.0125))/(targetLat - (ui->lineEditLat->text().toDouble()+0.0062);
+    //qDebug()<<(ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)<<" "<<(ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
+//    qDebug()<<((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125))/(targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
     // 计算方位角
     // first quadrant
-    if((targetLng - (ui->lineEditLng->text().toDouble()+0.0126))>0 && (targetLat - (ui->lineEditLat->text().toDouble()+0.0062))>0)
-        next_point_direction = atan2((targetLng - (ui->lineEditLng->text().toDouble()+0.0126)), (targetLat - (ui->lineEditLat->text().toDouble()+0.0062)))*180/3.14159;
+    if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))>0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))>0)
+        next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
     // second quadrant
-    if((targetLng - (ui->lineEditLng->text().toDouble()+0.0126))<0 && (targetLat - (ui->lineEditLat->text().toDouble()+0.0062))>0)
-        next_point_direction = 360 + atan2((targetLng - (ui->lineEditLng->text().toDouble()+0.0126)), (targetLat - (ui->lineEditLat->text().toDouble()+0.0062)))*180/3.14159;
+    if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))<0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))>0)
+        next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
     // third quadrant
-    if((targetLng - (ui->lineEditLng->text().toDouble()+0.0126))<0 && (targetLat - (ui->lineEditLat->text().toDouble()+0.0062))<0)
-        next_point_direction = 360 + atan2((targetLng - (ui->lineEditLng->text().toDouble()+0.0125)), (targetLat - (ui->lineEditLat->text().toDouble()+0.0062)))*180/3.14159;
+    if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))<0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))<0)
+        next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
     // forth quadrant
-    if((targetLng - (ui->lineEditLng->text().toDouble()+0.0126))>0 && (targetLat - (ui->lineEditLat->text().toDouble()+0.0062))<0)
-        next_point_direction = atan2((targetLng - (ui->lineEditLng->text().toDouble()+0.0125)), (targetLat - (ui->lineEditLat->text().toDouble()+0.0062)))*180/3.14159;
+    if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))>0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))<0)
+        next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 
     next_point_direction = (double)targetRotation;
     qDebug()<<next_point_direction<<":"<<targetNum<<","<<arrayListLength;//server_->jsonGPS["yaw"].toDouble();
@@ -499,20 +499,20 @@ void MainWindow::updateCommand_from_python_controller()
     //qDebug()<<"pthon_controller:"<<utf8str<<"\n";
     QStringList control_command = utf8str.split(",");
     // 设置虚拟控制滑块数值
-    ui->yawSlider->setValue(control_command.at(0).toDouble() + yawBias);
-    ui->pitchSlider->setValue(control_command.at(1).toDouble() + pitchBias);
+    ui->virtualStickYawSlider->setValue(control_command.at(0).toDouble() + yawBias);
+    ui->virtualStickPitchSlider->setValue(control_command.at(1).toDouble() + pitchBias);
 //    qDebug()<<"yaw:"<<control_command.at(0).toDouble()<<"\n";
     ui->yawLabel->setText(control_command.at(0));
     ui->pitchLabel->setText(control_command.at(1));
 
-    ui->rollSlider->setValue(control_command.at(2).toDouble() + rollBias);
+    ui->virtualStickRollSlider->setValue(control_command.at(2).toDouble() + rollBias);
     ui->rollLabel->setText(control_command.at(2));
 
     // send the map_direct to python controller
     // 设置方向信息
     if(direction>180||direction<-180)
         direction = 0;
-    if(ui->manulDirectCheckBox->isChecked())
+    if(ui->manualDirectCheckBox->isChecked())
         direction = manul_direction;
 
     // 显示方向信息
@@ -539,7 +539,7 @@ void MainWindow::onRecvdMsg(QString msg)
 }
 
 // Car detection
-void MainWindow::on_detect_carButton_clicked()
+void MainWindow::on_carDetectBtn_clicked()
 {
 
     QFile my_file(QFILE_CAR_DETECT_TRACK);  //将QFile与相关文件关联
@@ -553,7 +553,7 @@ void MainWindow::on_detect_carButton_clicked()
    in << str << "\n";
    my_file.close(); //关闭文件
 }
-void MainWindow::on_track_carButton_clicked()
+void MainWindow::on_carDetectTrackCarBtn_clicked()
 {
     QFile my_file(QFILE_CAR_DETECT_TRACK);//将QFile与相关文件关联
    if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text))//以只读和文本模式打开文件
@@ -566,7 +566,7 @@ void MainWindow::on_track_carButton_clicked()
    in << str << "\n";
    my_file.close(); //关闭文件
 }
-void MainWindow::on_do_nothing_clicked()
+void MainWindow::on_carDetectWaitBtn_clicked()
 {
     QFile my_file(QFILE_CAR_DETECT_TRACK);//将QFile与相关文件关联
    if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text))//以只读和文本模式打开文件
