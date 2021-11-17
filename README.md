@@ -16,10 +16,7 @@ Please refer to the UAVPatrol project webpage: http://www.yfan.site/UAVPatrol.ht
 |mission|1|发送WayPoints|
 |mission|2|允许虚拟控制|
 |mission|3|禁止虚拟控制|
-||||
-||||
-||||
-||||
+|mission|4|降落|
 
 tcpServer_for_receive port: 6666
 

@@ -45,14 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //dock_server_->setFloating(1);
     manul_direction = 0;
 
-    // 加载摄像头或本地视频
-    cam = cv::VideoCapture(CAM_LOAD);
-    if(!cam.isOpened())
-        std::cerr << "Can't open camera!" <<std::endl;
-
-    timer = new QTimer(this);
-    timer->start(50);              // 开始计时，超时则发出timeout()信号，读取摄像头信息
-
     // Zoom与Nav point滑动块初始化
     ui->camZoomSlider->setMaximum(1000);
     ui->camZoomSlider->setMinimum(0);
@@ -60,7 +52,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->navigationPointDirectSlider->setMaximum(365);
     ui->navigationPointDirectSlider->setMinimum(0);
     ui->navigationPointDirectSlider->setValue(0);
+    connect(ui->navigationPointDirectSlider, SIGNAL(sliderMoved(int)), this, SLOT(onReleaseNavSlider()));
 
+    // 加载摄像头或本地视频
+    cam = cv::VideoCapture(CAM_LOAD);
+    if(!cam.isOpened())
+        std::cerr << "Can't open camera!" <<std::endl;
+
+    timer = new QTimer(this);
+    timer->start(50);              // 开始计时，超时则发出timeout()信号，读取摄像头信息
     connect(timer, SIGNAL(timeout()), this, SLOT(readFarme()));  // 时间到，读取当前摄像头信息
 }
 void MainWindow::InitForm()
@@ -70,9 +70,6 @@ void MainWindow::InitForm()
     channel->registerObject("bridge", (QObject*)bridgeins); // 将bridgeins对象注册到channel
     ui->mapShow->page()->setWebChannel(channel);
     ui->mapShow->page()->load(QUrl::fromLocalFile(qApp->applicationDirPath() + "/bin/index.html"));
-
-    // GPS Data初始化
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
 
     // WayPoints初始化
     const QList<Light_t>& list = bridgeins->GetLightList();
@@ -86,14 +83,20 @@ void MainWindow::InitForm()
     connect(ui->wayPointsAddBtn, SIGNAL(clicked()), this, SLOT(onBtnAddLight()));
 //    connect(ui->btnLightOn, SIGNAL(clicked()), this, SLOT(onBtnLightOn()));
 //    connect(ui->btnLightOff, SIGNAL(clicked()), this, SLOT(onBtnLightOff()));
-    connect(ui->wayPointsTakeOffBtn, SIGNAL(clicked()), this, SLOT(onTakeoffButton()));
     connect(ui->wayPointsGoBtn, SIGNAL(clicked()), this, SLOT(onGoButton()));
     connect(ui->wayPointsClearBtn, SIGNAL(clicked()), this, SLOT(onClearAllPoint()));
 
-    // GPS信息初始化
+    connect(ui->wayPointsTakeOffBtn, SIGNAL(clicked()), this, SLOT(onTakeoffButton()));
+    connect(ui->wayPointsLandBtn, SIGNAL(clicked()), this, SLOT(onLandButton()));
+    ui->wayPointsLandBtn->setEnabled(false);
+    connect(ui->wayPointsSaveBtn, SIGNAL(clicked()), this, SLOT(onSaveButton()));
+    connect(ui->wayPointsLoadBtn, SIGNAL(clicked()), this, SLOT(onLoadButton()));
+
+    // GPS Data初始化
     ui->GPSLatitudeLineEdit->setMinimumWidth(10);
     ui->GPSLongitudeLineEdit->setMinimumWidth(10);
     connect(bridgeins, &bridge::toRecvMsg, this, &MainWindow::onRecvdMsg);
+    connect(ui->GPSMapRefreshBtn, SIGNAL(clicked()), this, SLOT(on_GPSMapRefreshBtn_clicked()));
 
     // 无人机方向控制
     connect(ui->manualDirectTurnLeftBtn,SIGNAL(clicked()), this, SLOT(onTurnLeftButton()));
@@ -138,9 +141,6 @@ void MainWindow::InitVirtualStickControl()
     connect(ui->virtualStickRollSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseRollSlider()));
     connect(ui->virtualStickThrottleSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseThrottleSlider()));
 
-    // WayPoints
-    connect(ui->navigationPointDirectSlider, SIGNAL(sliderMoved(int)), this, SLOT(onReleaseNavSlider()));
-
     // TCP
     if(!tcpServer_for_python_controller.isListening() && !tcpServer_for_python_controller.listen(QHostAddress::LocalHost, 5555))
     {
@@ -175,7 +175,7 @@ void MainWindow::onGoStraightButton()
 }
 
 // 刷新地图、GPS与无人机信息
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_GPSMapRefreshBtn_clicked()
 {
     timer_1 = new QTimer(this);
     timer_1->start(100);
@@ -271,11 +271,91 @@ void MainWindow::onReleaseNavSlider()
 }
 void MainWindow::onTakeoffButton()
 {
+    ui->wayPointsTakeOffBtn->setEnabled(false);
+    ui->wayPointsLandBtn->setEnabled(true);
     QJsonObject jsonToSend;
     jsonToSend.insert("mission", 0);
     QString str = QString(QJsonDocument(jsonToSend).toJson());
     qDebug()<<str;
     server_->sendMessage(str);
+}
+void MainWindow::onLandButton() {
+    ui->wayPointsLandBtn->setEnabled(false);
+    ui->wayPointsTakeOffBtn->setEnabled(true);
+    QJsonObject jsonToSend;
+    jsonToSend.insert("mission", 4);
+    QString str = QString(QJsonDocument(jsonToSend).toJson());
+    qDebug()<<str;
+    server_->sendMessage(str);
+}
+void MainWindow::onSaveButton() {
+    QJsonArray jsonArray;
+    QList<Light_t> wayPointList = bridgeins->returnWayPointList();  // 获取所有的WayPoints信息
+    for (int i = 0; i < wayPointList.size(); ++i)
+        jsonArray.append(wayPointsToJson(wayPointList.at(i)));
+
+    QFile file(SAVE_WAYPOINTS_PATH);
+    if (!file.open(QIODevice::ReadWrite)) {
+        qDebug() << SAVE_WAYPOINTS_PATH << " open error";
+        return;
+    }
+    file.resize(0);
+
+    QJsonDocument jsonDoc;
+    jsonDoc.setArray(jsonArray);
+    file.write(jsonDoc.toJson());
+    file.close();
+
+    qDebug() << "save wayPoints to " << SAVE_WAYPOINTS_PATH;
+    return;
+}
+void MainWindow::onLoadButton() {
+    QFile file(SAVE_WAYPOINTS_PATH);
+    if (!file.open(QIODevice::ReadWrite)) {
+        qDebug() << SAVE_WAYPOINTS_PATH << " open error";
+        return;
+    }
+    QJsonParseError jsonParserError;
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(file.readAll(), &jsonParserError);
+
+    if (!jsonDocument.isNull() && jsonParserError.error == QJsonParseError::NoError) {
+        // 文件解析未出现错误
+        onClearAllPoint();  // 清空WayPoints
+        QJsonArray array = jsonDocument.array();
+        for (int i = 0; i < array.count(); ++i) {
+            QJsonObject jsonWayPoint = array.at(i).toObject();
+            Light_t wayPoints = jsonToWayPoints(jsonWayPoint);
+            bridgeins->m_lightList.append(wayPoints);
+            ui->wayPointsComboBox->addItem(wayPoints.strDesc, wayPoints.strName);
+            ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
+            bridgeins->onUpdateData();
+        }
+        qDebug() << "load wayPoints from " << SAVE_WAYPOINTS_PATH;
+    } else {
+        // 文件解析错误
+        qDebug() << SAVE_WAYPOINTS_PATH << "文件解析失败";
+        return;
+    }
+}
+QJsonObject MainWindow::wayPointsToJson(Light_t point) {
+    QJsonObject jsonWayPoints;
+    jsonWayPoints.insert("strName", point.strName);
+    jsonWayPoints.insert("strDesc", point.strDesc);
+    jsonWayPoints.insert("fLng", point.fLng);
+    jsonWayPoints.insert("fLat", point.fLat);
+    jsonWayPoints.insert("nValue", point.nValue);
+    jsonWayPoints.insert("rotation", point.rotation);
+    return jsonWayPoints;
+}
+Light_t MainWindow::jsonToWayPoints(QJsonObject jsonWayPoints) {
+    Light_t tLight;
+    tLight.strName = jsonWayPoints.value("strName").toString();
+    tLight.strDesc = jsonWayPoints.value("strDesc").toString();
+    tLight.fLng = jsonWayPoints.value("fLng").toDouble();
+    tLight.fLat = jsonWayPoints.value("fLat").toDouble();
+    tLight.nValue = jsonWayPoints.value("nValue").toInt();
+    tLight.rotation = jsonWayPoints.value("rotation").toInt();
+    return tLight;
 }
 
 // 无人机虚拟控制

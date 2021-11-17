@@ -181,11 +181,11 @@ namespace Ui {
         }
         QJsonObject jsonObject = jsonDocument.object();
 
-        saveJsonObject(SAVE_JSON_TEMP_PATH, SAVE_JSON_RENAME_PATH, jsonString);  // 保存QJson文件
+        saveUAVStatus(SAVE_JSON_TEMP_PATH, SAVE_JSON_RENAME_PATH, jsonString);  // 保存QJson文件
 
         return jsonObject;
     }
-    void Server::saveJsonObject(const char* saveTempPath, const char* saveRenamePath, const QString jsonString){
+    void Server::saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString jsonString){
         // 删除已存在文件
         if(access(saveTempPath,F_OK))
             remove(saveTempPath);

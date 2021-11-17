@@ -54,7 +54,7 @@ namespace Ui{
         void clear();   // 清除listen显示信息
 
         QJsonObject getJsonObjectFromString(const QString jsonString);  // 将string转换为Json文件并保存
-        void saveJsonObject(const char* saveTempPath, const char* saveRenamePath, const QString jsonString);
+        void saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString jsonString);
 
         // 不明定义
         qint64 totalBytes;     // 存放总大小信息

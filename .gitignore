@@ -9,5 +9,7 @@
 Makefile
 
 moc_*
+qrc_*
+ui_*
 
 GroundStation_for_Drone

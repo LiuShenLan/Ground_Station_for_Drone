@@ -24,18 +24,21 @@
 #define CAM_LOAD_DRONE_CAMERA   2
 #define CAM_LOAD_PC_VIDEO       "../../dataset/SD card data/2021.11.1/DJI_0002.MOV"
 // 摄像头读取选择
-#define CAM_LOAD    CAM_LOAD_PC_VIDEO
+#define CAM_LOAD    CAM_LOAD_PC_CAMERA
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG true
-#define CAM_SHOW_DETECT_CAMERA      "../../dataset/detece result/show_realTimeImg.jpg"
+#define CAM_SHOW_DETECT_CAMERA      "../../dataset/hostData/detece result/show_realTimeImg.jpg"
 
 // 摄像头数据保存路径
-#define READ_FRAME_PIC_TEMP_PATH    "../../dataset/realTimeImg_temp.jpg"
-#define READ_FRAME_PIC_PATH         "../../dataset/realTimeImg.jpg"
+#define READ_FRAME_PIC_TEMP_PATH    "../../dataset/hostData/realTimeImg_temp.jpg"
+#define READ_FRAME_PIC_PATH         "../../dataset/hostData/realTimeImg.jpg"
 
-// 无人机信息Json文件保存信息
-#define SAVE_JSON_TEMP_PATH     "../../dataset/uav_temp.json"
-#define SAVE_JSON_RENAME_PATH   "../../dataset/uav.json"
+// 无人机信息Json文件保存路径
+#define SAVE_JSON_TEMP_PATH     "../../dataset/hostData/uav_temp.json"
+#define SAVE_JSON_RENAME_PATH   "../../dataset/hostData/uav.json"
+
+// WayPoints文件保存路径
+#define SAVE_WAYPOINTS_PATH   "../../dataset/hostData/wayPoints.json"
 
 // Car detect保存路径
 #define QFILE_CAR_DETECT_NUMBER "./Qfile/number.txt"
@@ -107,7 +110,7 @@ private slots:  // 槽声明区
     void onGoStraightButton();  // 人工导航 直行按钮 Go straight
 
     // 刷新地图、GPS与无人机信息
-    void on_pushButton_clicked();   // 刷新地图、GPS与无人机信息
+    void on_GPSMapRefreshBtn_clicked();   // 刷新地图、GPS与无人机信息
     void timeCountsFunction();  // 读取GPS与无人机信息并显示
     void callJava();    // 调用JAVA程序 在地图上显示导航点
 
@@ -119,6 +122,11 @@ private slots:  // 槽声明区
     void onClearAllPoint(); // 移除所有WayPoints信息
     void onReleaseNavSlider();  // 设置导航点方向
     void onTakeoffButton(); // 向TCP发送起飞命令
+    void onLandButton();    // 向TCP发送降落命令
+    void onSaveButton();    // 保存WayPoints信息
+    void onLoadButton();    // 读取WayPoints信息
+    QJsonObject wayPointsToJson(Light_t point); // wayPoints转换为Json
+    Light_t jsonToWayPoints(QJsonObject jsonWayPoints); // Json转换为wayPoints
 
     // 无人机虚拟控制
     void onEnableVirtualStickButton();  // 允许无人机虚拟控制

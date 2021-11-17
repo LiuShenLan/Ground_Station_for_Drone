@@ -15,14 +15,15 @@ typedef struct
 {
 	QString strName;    // 名称
 	QString strDesc;    // 描述
-    double   fLng;      // 经度
-    double	fLat;       // 纬度
-	int		nValue;     //
-    int rotation;       //
+    double fLng;    // 经度
+    double fLat;    // 纬度
+	int nValue;     //
+    int rotation;   //
 }Light_t;
 
 class bridge : public QObject
 {
+    friend class MainWindow;
     Q_OBJECT
 public:
     // Init
