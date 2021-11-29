@@ -61,6 +61,7 @@ public:
     double fLat;   // 纬度
     double direction; // the map_direct, comes from the Baidu Map route plan
     double manul_direction; // 手动控制 顺时针标记前进角度
+    bool setRollFlag = false;
 
 protected:
     void keyPressEvent(QKeyEvent *);    // 虚拟控制 键盘输入控制
@@ -87,10 +88,10 @@ private:
     QTcpServer tcpServer_for_python_controller;     // TCP python控制server
     QTcpSocket *tcpSocket_for_python_controller;    // TCP python控制socket
     void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
-    void onRecvTargetPoint(const QString msg);  // 根据TCP接收到的信息计算目标点方位并设置方向值
+    void onRecvTargetPoint(const QString msg);      // 根据TCP接收到的信息计算目标点方位并设置方向值
     void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
-    void sendWayPoint();    // 向TCP发送所有的WayPoints信息
-    void onRecvdMsg(const QString msg); // 接受信息并设置经纬度信息
+    void sendWayPoint();                            // 向TCP发送所有的WayPoints信息
+    void onRecvdMsg(const QString msg);             // 接受信息并设置经纬度信息
 
     // 摄像头
     QTimer *timer;  // 50ms定时器 读取摄像头信息器
@@ -130,22 +131,23 @@ private slots:  // 槽声明区
 
     // 无人机虚拟控制
     void onEnableVirtualStickButton();  // 允许无人机虚拟控制
-    void sendVirtualStickCommand(); // 向TCP发送无人机虚拟控制信息
+    void sendVirtualStickCommand();     // 向TCP发送无人机虚拟控制信息
     void onDisableVirtualStickButton(); // 禁止无人机虚拟控制
-    void onReleaseYawSlider();  // 清除虚拟控制航向数值
-    void onReleasePitchSlider();    // 清除虚拟控制俯仰数值
-    void onReleaseRollSlider(); // 清除虚拟控制横滚数值
-    void onSetRoll();   // 设置Roll滑块信息
-    void onReleaseThrottleSlider(); // 清除虚拟控制油门数值
+    void onReleaseYawSlider();          // 清除虚拟控制航向数值
+    void onReleasePitchSlider();        // 清除虚拟控制俯仰数值
+    void onReleaseRollSlider();         // 清除虚拟控制横滚数值
+    void onSetRoll();                   // 设置Roll滑块信息
+    void onReleaseThrottleSlider();     // 清除虚拟控制油门数值
+    void onVirtualStickResetButton();   // 重置虚拟控制
 
     // 摄像头
     void readFarme();   // 读取摄像头信息
     void closeCamara(); // 关闭摄像头，释放资源，必须释放
 
     // Car setection
-    void on_carDetectBtn_clicked(); // 向car detect track 文件写入"detect"
-    void on_carDetectTrackCarBtn_clicked();  // 向car detect track 文件写入"track"
-    void on_carDetectWaitBtn_clicked();       // 向car detect track 文件写入"wait"
+    void on_carDetectBtn_clicked();         // 向car detect track 文件写入"detect"
+    void on_carDetectTrackCarBtn_clicked(); // 向car detect track 文件写入"track"
+    void on_carDetectWaitBtn_clicked();     // 向car detect track 文件写入"wait"
 
     // 不明函数
     void onTimeOut();   // 空定时中断函数

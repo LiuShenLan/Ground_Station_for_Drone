@@ -116,6 +116,7 @@ void MainWindow::InitVirtualStickControl()
     connect(ui->virtualStickEnableBtn, SIGNAL(clicked()), this, SLOT(onEnableVirtualStickButton()));
     connect(ui->virtualStickDisableBtn, SIGNAL(clicked()), this, SLOT(onDisableVirtualStickButton()));
     connect(ui->virtualStickRollSetBtn, SIGNAL(clicked()), this, SLOT(onSetRoll()));
+    connect(ui->virtualStickResetBtn, SIGNAL(clicked()), this, SLOT(onVirtualStickResetButton()));
     virtualStickTimer = new QTimer(this);   // 实例化定时器
     ui->virtualStickDisableBtn->setEnabled(false);
     // 虚拟控制滑块
@@ -133,7 +134,7 @@ void MainWindow::InitVirtualStickControl()
 
     ui->virtualStickThrottleSlider->setMaximum(1000);
     ui->virtualStickThrottleSlider->setMinimum(-1000);
-    ui->virtualStickThrottleSlider->setValue(0);
+    ui->virtualStickThrottleSlider->setValue(throttleBias);
 
     // 释放滑块，设置信息
     connect(ui->virtualStickYawSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseYawSlider()));
@@ -142,18 +143,14 @@ void MainWindow::InitVirtualStickControl()
     connect(ui->virtualStickThrottleSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseThrottleSlider()));
 
     // TCP
-    if(!tcpServer_for_python_controller.isListening() && !tcpServer_for_python_controller.listen(QHostAddress::LocalHost, 5555))
-    {
+    if(!tcpServer_for_python_controller.isListening() && !tcpServer_for_python_controller.listen(QHostAddress::LocalHost, 5555)) {
         qDebug() <<"error_in_sever_for_receive"<< tcpServer_for_python_controller.errorString();
         close();
         return;
     }
     if(tcpServer_for_python_controller.isListening())
-    {
         qDebug()<<"=============start listening to python controller==========";
-    }
     connect(&tcpServer_for_python_controller, &QTcpServer::newConnection, this, &MainWindow::acceptConnection_for_python_controller);
-
 }
 MainWindow::~MainWindow()
 {
@@ -426,12 +423,32 @@ void MainWindow::onReleaseRollSlider()
 }
 void MainWindow::onSetRoll()
 {
+    setRollFlag = true;
     ui->virtualStickRollSlider->setValue(65);
     ui->rollLabel->setText(tr("65"));
+    ui->virtualStickRollSetBtn->setEnabled(false);
 }
 void MainWindow::onReleaseThrottleSlider()
 {
+    ui->virtualStickThrottleSlider->setValue(throttleBias);
+}
+void MainWindow::onVirtualStickResetButton() {
+    rollBias = 0;
+    pitchBias = 0;
+    yawBias = 0;
+    throttleBias = 0;
+
+    ui->rollLabel->setText(0);
+    ui->pitchLabel->setText(0);
+    ui->yawLabel->setText(0);
+
+    ui->virtualStickRollSlider->setValue(0);
+    ui->virtualStickPitchSlider->setValue(0);
+    ui->virtualStickYawSlider->setValue(0);
     ui->virtualStickThrottleSlider->setValue(0);
+
+    setRollFlag = false;
+    ui->virtualStickRollSetBtn->setEnabled(true);
 }
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
@@ -439,12 +456,12 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     {
         case Qt::Key_W :    // W 增加油门
             throttleBias++;
-            ui->virtualStickThrottleSlider->setValue(ui->virtualStickThrottleSlider->value()+throttleBias);
+            ui->virtualStickThrottleSlider->setValue(throttleBias);
             ui->throttleBiasLabel->setText(QString::number(throttleBias));
             break;
         case Qt::Key_S :    // S 减少油门
             throttleBias--;
-            ui->virtualStickThrottleSlider->setValue(ui->virtualStickThrottleSlider->value()+throttleBias);
+            ui->virtualStickThrottleSlider->setValue(throttleBias);
             ui->throttleBiasLabel->setText(QString::number(throttleBias));
             break;
         case Qt::Key_A :    // A 向左偏航
@@ -582,11 +599,13 @@ void MainWindow::updateCommand_from_python_controller()
     ui->virtualStickYawSlider->setValue(control_command.at(0).toDouble() + yawBias);
     ui->virtualStickPitchSlider->setValue(control_command.at(1).toDouble() + pitchBias);
 //    qDebug()<<"yaw:"<<control_command.at(0).toDouble()<<"\n";
+    if (!setRollFlag) {
+        ui->virtualStickRollSlider->setValue(control_command.at(2).toDouble() + rollBias);
+        ui->rollLabel->setText(control_command.at(2));
+    }
+
     ui->yawLabel->setText(control_command.at(0));
     ui->pitchLabel->setText(control_command.at(1));
-
-    ui->virtualStickRollSlider->setValue(control_command.at(2).toDouble() + rollBias);
-    ui->rollLabel->setText(control_command.at(2));
 
     // send the map_direct to python controller
     // 设置方向信息

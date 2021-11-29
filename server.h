@@ -47,11 +47,11 @@ namespace Ui{
         QList<QHostAddress> ipList; // 主机上找到的所有IP地址
 
         // listen 函数
-        void startListening();  // 开始监听 listen
-        void updateServerProgress();    // 读取TCP socket信息并显示到listen窗口
+        void startListening();                  // 开始监听 listen
+        void updateServerProgress();            // 读取TCP socket信息并显示到listen窗口
         void acceptConnection_for_receive();    // TCP socket 读取信息初始化
-        void acceptConnection_for_send();   // TCP socket 发送信息初始化
-        void clear();   // 清除listen显示信息
+        void acceptConnection_for_send();       // TCP socket 发送信息初始化
+        void clear();                           // 清除listen显示信息
 
         QJsonObject getJsonObjectFromString(const QString jsonString);  // 将string转换为Json文件并保存
         void saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString jsonString);
