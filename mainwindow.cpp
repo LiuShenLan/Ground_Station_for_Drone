@@ -424,8 +424,16 @@ void MainWindow::onReleaseRollSlider()
 void MainWindow::onSetRoll()
 {
     setRollFlag = true;
-    ui->virtualStickRollSlider->setValue(65);
-    ui->rollLabel->setText(tr("65"));
+    int rollInt;
+
+    QString rollStr = ui->virtualStickRollLineEdit->text();
+    if (rollStr.size() > 0)
+        rollInt = rollStr.toInt();
+    else
+        rollInt = 50;
+
+    ui->virtualStickRollSlider->setValue(rollInt);
+    ui->rollLabel->setText(QString::number(rollInt));
     ui->virtualStickRollSetBtn->setEnabled(false);
 }
 void MainWindow::onReleaseThrottleSlider()
@@ -588,24 +596,38 @@ void MainWindow::onRecvTargetPoint(const QString msg)
 }
 void MainWindow::updateCommand_from_python_controller()
 {
-    // 读取数据
-    qint64 len = tcpSocket_for_python_controller->bytesAvailable();
-    QByteArray alldate = tcpSocket_for_python_controller->read(len);
-    QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
-    QString utf8str = utf8codec->toUnicode(alldate.mid(2));
-    //qDebug()<<"pthon_controller:"<<utf8str<<"\n";
-    QStringList control_command = utf8str.split(",");
-    // 设置虚拟控制滑块数值
-    ui->virtualStickYawSlider->setValue(control_command.at(0).toDouble() + yawBias);
-    ui->virtualStickPitchSlider->setValue(control_command.at(1).toDouble() + pitchBias);
-//    qDebug()<<"yaw:"<<control_command.at(0).toDouble()<<"\n";
-    if (!setRollFlag) {
-        ui->virtualStickRollSlider->setValue(control_command.at(2).toDouble() + rollBias);
-        ui->rollLabel->setText(control_command.at(2));
-    }
+    if (ui->virtualStickDronetCheckBox->isChecked()) {
+        // 读取数据
+        qint64 len = tcpSocket_for_python_controller->bytesAvailable();
+        QByteArray alldate = tcpSocket_for_python_controller->read(len);
+        QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
+        QString utf8str = utf8codec->toUnicode(alldate.mid(2));
+        //qDebug()<<"pthon_controller:"<<utf8str<<"\n";
+        QStringList control_command = utf8str.split(",");
 
-    ui->yawLabel->setText(control_command.at(0));
-    ui->pitchLabel->setText(control_command.at(1));
+        // 设置虚拟控制滑块数值
+        ui->virtualStickYawSlider->setValue(control_command.at(0).toDouble() + yawBias);
+        ui->virtualStickPitchSlider->setValue(control_command.at(1).toDouble() + pitchBias);
+        if (!setRollFlag) {
+            ui->virtualStickRollSlider->setValue(control_command.at(2).toDouble() + rollBias);
+            ui->rollLabel->setText(control_command.at(2));
+        }
+
+        ui->yawLabel->setText(control_command.at(0));
+        ui->pitchLabel->setText(control_command.at(1));
+    } else {
+        // 设置虚拟控制滑块数值
+        ui->virtualStickYawSlider->setValue(yawBias);
+        ui->virtualStickPitchSlider->setValue(pitchBias);
+        if (!setRollFlag) {
+            ui->virtualStickRollSlider->setValue(rollBias);
+            ui->rollLabel->setText(0);
+        }
+
+        ui->yawLabel->setText(0);
+        ui->pitchLabel->setText(0);
+    }
+    // 250954973
 
     // send the map_direct to python controller
     // 设置方向信息
