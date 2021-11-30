@@ -446,14 +446,20 @@ void MainWindow::onVirtualStickResetButton() {
     yawBias = 0;
     throttleBias = 0;
 
-    ui->rollLabel->setText(0);
-    ui->pitchLabel->setText(0);
-    ui->yawLabel->setText(0);
-
     ui->virtualStickRollSlider->setValue(0);
     ui->virtualStickPitchSlider->setValue(0);
     ui->virtualStickYawSlider->setValue(0);
     ui->virtualStickThrottleSlider->setValue(0);
+
+    ui->rollLabel->setText(0);
+    ui->pitchLabel->setText(0);
+    ui->yawLabel->setText(0);
+    ui->throttleLabel->setText(0);
+
+    ui->rollBiasLabel->setText(0);
+    ui->pitchBiasLabel->setText(0);
+    ui->yawBiasLabel->setText(0);
+    ui->throttleBiasLabel->setText(0);
 
     setRollFlag = false;
     ui->virtualStickRollSetBtn->setEnabled(true);
@@ -596,7 +602,7 @@ void MainWindow::onRecvTargetPoint(const QString msg)
 }
 void MainWindow::updateCommand_from_python_controller()
 {
-    if (ui->virtualStickDronetCheckBox->isChecked()) {
+    if (ui->virtualStickDronetCheckBox->isChecked()) {  // 允许uav_dronet控制
         // 读取数据
         qint64 len = tcpSocket_for_python_controller->bytesAvailable();
         QByteArray alldate = tcpSocket_for_python_controller->read(len);
@@ -606,16 +612,29 @@ void MainWindow::updateCommand_from_python_controller()
         QStringList control_command = utf8str.split(",");
 
         // 设置虚拟控制滑块数值
-        ui->virtualStickYawSlider->setValue(control_command.at(0).toDouble() + yawBias);
-        ui->virtualStickPitchSlider->setValue(control_command.at(1).toDouble() + pitchBias);
-        if (!setRollFlag) {
-            ui->virtualStickRollSlider->setValue(control_command.at(2).toDouble() + rollBias);
-            ui->rollLabel->setText(control_command.at(2));
+        double yawSliderReceive = control_command.at(0).toDouble();
+        double pitchSliderReceive = control_command.at(1).toDouble();
+        double rollSliderReceive = control_command.at(2).toDouble();
+        if (ui->virtualStickSafeModeCheckBox->isChecked()) {    // 安全模式，限制阈值
+            yawSliderReceive = std::max(yawSliderReceive, -30.0);
+            yawSliderReceive = std::max(yawSliderReceive, -30.0);
+            pitchSliderReceive = std::max(pitchSliderReceive, -30.0);
+            pitchSliderReceive = std::min(pitchSliderReceive, 30.0);
+            rollSliderReceive = std::max(rollSliderReceive, -30.0);
+            rollSliderReceive = std::min(rollSliderReceive, 30.0);
         }
 
-        ui->yawLabel->setText(control_command.at(0));
-        ui->pitchLabel->setText(control_command.at(1));
-    } else {
+        ui->virtualStickYawSlider->setValue(yawSliderReceive + yawBias);
+        ui->yawLabel->setText(QString::number(yawSliderReceive));
+
+        ui->virtualStickPitchSlider->setValue(pitchSliderReceive + pitchBias);
+        ui->pitchLabel->setText(QString::number(pitchSliderReceive));
+
+        if (!setRollFlag) {
+            ui->virtualStickRollSlider->setValue(rollSliderReceive + rollBias);
+            ui->rollLabel->setText(QString::number(rollSliderReceive));
+        }
+    } else {    // 禁止uav_dronet控制
         // 设置虚拟控制滑块数值
         ui->virtualStickYawSlider->setValue(yawBias);
         ui->virtualStickPitchSlider->setValue(pitchBias);
