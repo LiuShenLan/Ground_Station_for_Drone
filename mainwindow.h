@@ -20,7 +20,9 @@
 #include "bridge.h"
 
 // 安全模式最大速度
-#define SAFE_MODE_THRESHOLD     25.0
+#define SAFE_MODE_YAW_THRESHOLD     80.0
+#define SAFE_MODE_PITCH_THRESHOLD   30.0
+#define SAFE_MODE_POLL_THRESHOLD    50.0
 
 // 摄像头数据读取目标
 #define CAM_LOAD_PC_CAMERA      0

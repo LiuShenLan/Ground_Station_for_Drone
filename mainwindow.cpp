@@ -616,12 +616,12 @@ void MainWindow::updateCommand_from_python_controller()
         double pitchSliderReceive = control_command.at(1).toDouble();
         double rollSliderReceive = control_command.at(2).toDouble();
         if (ui->virtualStickSafeModeCheckBox->isChecked()) {    // 安全模式，限制阈值
-            yawSliderReceive = std::max(yawSliderReceive, -SAFE_MODE_THRESHOLD);
-            yawSliderReceive = std::min(yawSliderReceive, SAFE_MODE_THRESHOLD);
-            pitchSliderReceive = std::max(pitchSliderReceive, -SAFE_MODE_THRESHOLD);
-            pitchSliderReceive = std::min(pitchSliderReceive, SAFE_MODE_THRESHOLD);
-            rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_THRESHOLD);
-            rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_THRESHOLD);
+            yawSliderReceive = std::max(yawSliderReceive, -SAFE_MODE_YAW_THRESHOLD);
+            yawSliderReceive = std::min(yawSliderReceive, SAFE_MODE_YAW_THRESHOLD);
+            pitchSliderReceive = std::max(pitchSliderReceive, -SAFE_MODE_PITCH_THRESHOLD);
+            pitchSliderReceive = std::min(pitchSliderReceive, SAFE_MODE_PITCH_THRESHOLD);
+            rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_POLL_THRESHOLD);
+            rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_POLL_THRESHOLD);
         }
 
         ui->virtualStickYawSlider->setValue(yawSliderReceive + yawBias);
