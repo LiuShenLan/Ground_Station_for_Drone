@@ -40,7 +40,7 @@ namespace Ui{
         QTextEdit *textEdit;    // listen信息
         QScrollBar *scrollbar;  // listen滚动条
 
-        // TCP
+        // QT上位机与MyUX APP之间通讯所用的TCP信息
         QTcpServer tcpServer_for_receive, tcpServer_for_send;   // TCP server
         QTcpSocket *tcpServerConnection_for_receive, *tcpServerConnection_for_send; // TCP socket
         QList<QTcpSocket*> *socket_list;    // TCP socket list

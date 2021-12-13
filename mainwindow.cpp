@@ -142,15 +142,31 @@ void MainWindow::InitVirtualStickControl()
     connect(ui->virtualStickRollSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseRollSlider()));
     connect(ui->virtualStickThrottleSlider, SIGNAL(sliderReleased()), this, SLOT(onReleaseThrottleSlider()));
 
-    // TCP
+    // TCP dronet
     if(!tcpServer_for_python_controller.isListening() && !tcpServer_for_python_controller.listen(QHostAddress::LocalHost, 5555)) {
         qDebug() <<"error_in_sever_for_receive"<< tcpServer_for_python_controller.errorString();
         close();
         return;
     }
     if(tcpServer_for_python_controller.isListening())
-        qDebug()<<"=============start listening to python controller==========";
+        qDebug()<<"=============start listening to dronet==========";
     connect(&tcpServer_for_python_controller, &QTcpServer::newConnection, this, &MainWindow::acceptConnection_for_python_controller);
+
+    // TCP coll pred
+    connect(ui->collControlEnableBtn, SIGNAL(clicked()), this, SLOT(onEnableCollButton()));
+    connect(ui->collControlDisableBtn, SIGNAL(clicked()), this, SLOT(onDisableCollButton()));
+    connect(ui->collThresholdSetBtn, SIGNAL(clicked()), this, SLOT(onSetCollThreshold()));
+    collPredTimer = new QTimer(this);   // 实例化定时器
+    ui->collControlDisableBtn->setEnabled(false);
+
+    if(!tcpServer_for_coll_pred.isListening() && !tcpServer_for_coll_pred.listen(QHostAddress::LocalHost, 5556)) {
+        qDebug() << "error_in_sever_for_receive" << tcpServer_for_coll_pred.errorString();
+        close();
+        return;
+    }
+    if(tcpServer_for_coll_pred.isListening())
+        qDebug()<<"=============start listening to coll pred==========";
+    connect(&tcpServer_for_coll_pred, &QTcpServer::newConnection, this, &MainWindow::acceptConnection_for_coll_pred);
 }
 MainWindow::~MainWindow()
 {
@@ -273,7 +289,7 @@ void MainWindow::onTakeoffButton()
     QJsonObject jsonToSend;
     jsonToSend.insert("mission", 0);
     QString str = QString(QJsonDocument(jsonToSend).toJson());
-    qDebug()<<str;
+    qDebug()<<str;https://www.douyu.com/88660
     server_->sendMessage(str);
 }
 void MainWindow::onLandButton() {
@@ -553,7 +569,7 @@ void MainWindow::closeCamara()
     cam.release();//释放内存；
 }
 
-// TCP
+// TCP dronet
 void MainWindow::acceptConnection_for_python_controller()
 {
     qDebug()<<"acceptConnection_for_python_controller";
@@ -676,6 +692,60 @@ void MainWindow::onRecvdMsg(QString msg)
     fLat = lst[1].toDouble();
     qDebug()<<fixed<<qSetRealNumberPrecision(7)<<fLng<<" "<<fLat;   // 设置实数精度
     bridgeins->newPoint(fLng,fLat);
+}
+
+// TCP coll pred
+void MainWindow::acceptConnection_for_coll_pred() {
+    qDebug()<<"acceptConnection_for_coll_pred";
+    tcpSocket_for_coll_pred = tcpServer_for_coll_pred.nextPendingConnection();
+    connect(tcpSocket_for_coll_pred, &QTcpSocket::readyRead, this, &MainWindow::update_coll_pred);
+}
+void MainWindow::update_coll_pred() {
+    // 读取数据
+    QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
+
+    qint64 len = tcpSocket_for_coll_pred->bytesAvailable();
+    QByteArray alldate = tcpSocket_for_coll_pred->read(len);
+    QString utf8str = utf8codec->toUnicode(alldate);
+    collPred = utf8str.toDouble();
+    isCollFlag = collPred >= collThreshold;
+    ui->collPredLabel->setText(QString::number(collPred, 'f', 7));
+    if (isCollFlag)
+        ui->collFlagLabel->setText("true");
+    else
+        ui->collFlagLabel->setText("false");
+}
+void MainWindow::onEnableCollButton() {
+    ui->collControlEnableBtn->setEnabled(false);
+    ui->collControlDisableBtn->setEnabled(true);
+    collPredTimer->start(100);
+    connect(collPredTimer, SIGNAL(timeout()), this, SLOT(sendCollPredCommand()));
+}
+void MainWindow::sendCollPredCommand() {
+    QJsonObject jsonToSend_0;
+    jsonToSend_0.insert("mission", 5);
+    jsonToSend_0.insert("isCollFlag", isCollFlag);
+
+    QString str = QString(QJsonDocument(jsonToSend_0).toJson());
+//    qDebug()<<str;
+    server_->sendMessage(str);
+}
+void MainWindow::onDisableCollButton() {
+    disconnect(collPredTimer, SIGNAL(timeout()),0,0);
+    collPredTimer->stop();
+
+    QJsonObject jsonToSend_1;
+    jsonToSend_1.insert("mission", 6);
+    jsonToSend_1.insert("isCollFlag", isCollFlag);
+    QString str  = QString(QJsonDocument(jsonToSend_1).toJson());
+//    qDebug()<<str;
+    server_->sendMessage(str);
+
+    ui->collControlEnableBtn->setEnabled(true);
+    ui->collControlDisableBtn->setEnabled(false);
+}
+void MainWindow::onSetCollThreshold() {
+    collThreshold = ui->collThresholdLineEdit->text().toDouble();
 }
 
 // Car detection

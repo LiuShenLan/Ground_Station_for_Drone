@@ -27,11 +27,11 @@
 // 摄像头数据读取目标
 #define CAM_LOAD_PC_CAMERA      0
 #define CAM_LOAD_DRONE_CAMERA   2
-#define CAM_LOAD_PC_VIDEO       "../../dataset/SD card data/2021.11.1/DJI_0002.MOV"
+#define CAM_LOAD_PC_VIDEO       "../../dataset/dronet test video/1.mp4"
 // 摄像头读取选择
-#define CAM_LOAD    CAM_LOAD_PC_CAMERA
+#define CAM_LOAD    CAM_LOAD_PC_VIDEO
 // 摄像头显示选择
-#define CAM_SHOW_DETECT_CAMERA_FLAG true
+#define CAM_SHOW_DETECT_CAMERA_FLAG false
 #define CAM_SHOW_DETECT_CAMERA      "../../dataset/hostData/detece result/show_realTimeImg.jpg"
 
 // 摄像头数据保存路径
@@ -68,6 +68,10 @@ public:
     double manul_direction; // 手动控制 顺时针标记前进角度
     bool setRollFlag = false;
 
+    double collPred = 1.0;      // coll 预测值
+    double collThreshold = 0.5; // 障碍预测阈值
+    bool isCollFlag = false;    // 前方是否是障碍
+
 protected:
     void keyPressEvent(QKeyEvent *);    // 虚拟控制 键盘输入控制
 //    void keyReleaseEvent(QKeyEvent *);
@@ -89,7 +93,7 @@ private:
     // 虚拟控制
     QTimer* virtualStickTimer;  // 100ms定时器 向无人机发送虚拟控制信息
 
-    // TCP
+    // TCP dronet
     QTcpServer tcpServer_for_python_controller;     // TCP python控制server
     QTcpSocket *tcpSocket_for_python_controller;    // TCP python控制socket
     void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
@@ -97,6 +101,13 @@ private:
     void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
     void sendWayPoint();                            // 向TCP发送所有的WayPoints信息
     void onRecvdMsg(const QString msg);             // 接受信息并设置经纬度信息
+
+    // TCP coll pred
+    QTcpServer tcpServer_for_coll_pred;     // TCP python控制server
+    QTcpSocket *tcpSocket_for_coll_pred;    // TCP python控制socket
+    void acceptConnection_for_coll_pred();  // TCP 接受信息并设置虚拟控制与方向数值
+    void update_coll_pred();                // 接受coll pred数据并发送
+    QTimer* collPredTimer;                  // 100ms定时器 向无人机发送障碍预测信息
 
     // 摄像头
     QTimer *timer;  // 50ms定时器 读取摄像头信息器
@@ -118,7 +129,7 @@ private slots:  // 槽声明区
     // 刷新地图、GPS与无人机信息
     void on_GPSMapRefreshBtn_clicked();   // 刷新地图、GPS与无人机信息
     void timeCountsFunction();  // 读取GPS与无人机信息并显示
-    void callJava();    // 调用JAVA程序 在地图上显示导航点
+    void callJava();    // 调用JAVA程序在地图上显示导航点
 
     // WayPoints
     void onBtnLightOn();    // 将WayPoints下拉菜单中显示的nValue设置为1
@@ -144,6 +155,12 @@ private slots:  // 槽声明区
     void onSetRoll();                   // 设置Roll滑块信息
     void onReleaseThrottleSlider();     // 清除虚拟控制油门数值
     void onVirtualStickResetButton();   // 重置虚拟控制
+
+    // 无人机障碍预测
+    void onEnableCollButton();  // 允许无人机障碍预测
+    void sendCollPredCommand(); // 向TCP发送无人机障碍预测信息
+    void onDisableCollButton(); // 禁止无人机障碍预测
+    void onSetCollThreshold();  // 设置障碍预测阈值
 
     // 摄像头
     void readFarme();   // 读取摄像头信息

@@ -319,9 +319,9 @@
            <property name="geometry">
             <rect>
              <x>110</x>
-             <y>180</y>
+             <y>220</y>
              <width>111</width>
-             <height>51</height>
+             <height>31</height>
             </rect>
            </property>
            <property name="text">
@@ -332,7 +332,7 @@
            <property name="geometry">
             <rect>
              <x>20</x>
-             <y>240</y>
+             <y>260</y>
              <width>91</width>
              <height>21</height>
             </rect>
@@ -358,7 +358,7 @@
            <property name="geometry">
             <rect>
              <x>20</x>
-             <y>270</y>
+             <y>290</y>
              <width>151</width>
              <height>23</height>
             </rect>
@@ -371,7 +371,7 @@
            <property name="geometry">
             <rect>
              <x>220</x>
-             <y>240</y>
+             <y>260</y>
              <width>89</width>
              <height>21</height>
             </rect>
@@ -397,7 +397,7 @@
            <property name="geometry">
             <rect>
              <x>120</x>
-             <y>240</y>
+             <y>260</y>
              <width>89</width>
              <height>21</height>
             </rect>
@@ -431,6 +431,75 @@
            <property name="text">
             <string>Zoom</string>
            </property>
+          </widget>
+          <widget class="QWidget" name="verticalLayoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>120</y>
+             <width>311</width>
+             <height>91</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <widget class="QLabel" name="collPredLabel">
+                <property name="text">
+                 <string>coll pred</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="collControlEnableBtn">
+                <property name="text">
+                 <string>Enable coll</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="collControlDisableBtn">
+                <property name="text">
+                 <string>Disable coll</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <item>
+               <widget class="QLabel" name="collStopLabel">
+                <property name="text">
+                 <string>Stop: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="collFlagLabel">
+                <property name="text">
+                 <string>Coll flag</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="collThresholdLineEdit">
+                <property name="text">
+                 <string>0.5</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="collThresholdSetBtn">
+                <property name="text">
+                 <string>threshold Set</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
