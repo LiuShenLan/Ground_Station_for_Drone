@@ -48,7 +48,7 @@ void bridge::setNavPointRotate(int rot)
 {
     emit rotateNavPoint(rot);
 }
-void bridge::SetLightValue(QString strName, int nValue)
+void bridge::SetLightValue(const QString& strName, int nValue)
 {
     int nCount = m_lightList.count();
     for(int i=0; i<nCount; i++)
@@ -62,11 +62,11 @@ void bridge::SetLightValue(QString strName, int nValue)
     }
     emit sigLightStatus(strName, nValue);
 }
-void bridge::onLightOn(QString strName)
+void bridge::onLightOn(const QString& strName)
 {
     SetLightValue(strName, 1);
 }
-void bridge::onLightOff(QString strName)
+void bridge::onLightOff(const QString& strName)
 {
     SetLightValue(strName, 0);
 }

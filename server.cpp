@@ -9,10 +9,10 @@ namespace Ui {
         setWindowTitle("Log");
         resize(320, 640);
 
-        QGridLayout* grid = new QGridLayout(this);  // 网格布局
+        auto* grid = new QGridLayout(this);  // 网格布局
         grid->setContentsMargins(5, 10, 5, 5);  // 设置内容边距
 
-        QHBoxLayout* upper_button_layout = new QHBoxLayout();   // 水平布局
+        auto* upper_button_layout = new QHBoxLayout();   // 水平布局
 
         setIpAddress = new QLineEdit(); // 单行文本编辑器
         upper_button_layout->addWidget(setIpAddress);
@@ -31,14 +31,14 @@ namespace Ui {
         }
 
 
-        QHBoxLayout* lower_button_layout = new QHBoxLayout();
+        auto* lower_button_layout = new QHBoxLayout();
 
         // listen按钮
         save_log_button = new QPushButton(tr("listen"), this);
         connect(save_log_button, &QPushButton::released, this, &Server::startListening);
         lower_button_layout->addWidget(save_log_button);
         // clear按钮
-        QPushButton* clear_button = new QPushButton(tr("Clear"), this);
+        auto* clear_button = new QPushButton(tr("Clear"), this);
         connect(clear_button, &QPushButton::released, this, &Server::clear);
         lower_button_layout->addWidget(clear_button);
 
@@ -64,7 +64,7 @@ namespace Ui {
     }
 
     // TCP
-    void Server::sendMessage(QString infomation)
+    void Server::sendMessage(const QString& infomation)
     {
         qDebug() << "send data to socket";
         QByteArray message = infomation.toLocal8Bit();  // 将字符串的本地8位表示作为QByteArray返回
@@ -72,10 +72,8 @@ namespace Ui {
     //    out.setVersion(QDataStream::Qt_DefaultCompiledVersion);
     //    out<<infomation.toLocal8Bit();
         //qDebug()<<message;
-        for(int i = 0; i < socket_list->length(); i++)
-        {
-            socket_list->at(i)->write(message);
-        }
+        for(auto i : *socket_list)
+            i->write(message);
     }
 
     // lsiten
@@ -174,7 +172,7 @@ namespace Ui {
         textEdit->clear();
     }
 
-    QJsonObject Server::getJsonObjectFromString(const QString jsonString){
+    QJsonObject Server::getJsonObjectFromString(const QString& jsonString){
         QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toLocal8Bit().data());
         if( jsonDocument.isNull() ){
             qDebug()<< "===> please check the string "<< jsonString.toLocal8Bit().data();
@@ -185,7 +183,7 @@ namespace Ui {
 
         return jsonObject;
     }
-    void Server::saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString jsonString){
+    void Server::saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString& jsonString){
         // 删除已存在文件
         if(access(saveTempPath,F_OK))
             remove(saveTempPath);

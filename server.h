@@ -31,7 +31,7 @@ namespace Ui{
 
         Server(QWidget* parent);    // 窗口左侧(Info)监听栏初始化
 
-        void sendMessage(QString infomation);   // 向所有TCP套接字socket_list写入information
+        void sendMessage(const QString& infomation);   // 向所有TCP套接字socket_list写入information
 
     private:
         // listen Init
@@ -53,8 +53,8 @@ namespace Ui{
         void acceptConnection_for_send();       // TCP socket 发送信息初始化
         void clear();                           // 清除listen显示信息
 
-        QJsonObject getJsonObjectFromString(const QString jsonString);  // 将string转换为Json文件并保存
-        void saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString jsonString);
+        static QJsonObject getJsonObjectFromString(const QString& jsonString);  // 将string转换为Json文件并保存
+        static void saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString& jsonString);
 
         // 不明定义
         qint64 totalBytes;     // 存放总大小信息

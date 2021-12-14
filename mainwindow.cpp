@@ -29,9 +29,8 @@ protected:
 
 // Init
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),    // 执行父类QMainWindow的构造函数
-    ui(new Ui::MainWindow)  // 创建一个Ui::MainWindow类的对象
-{
+    QMainWindow(parent),        // 执行父类QMainWindow的构造函数
+    ui(new Ui::MainWindow) {    // 创建一个Ui::MainWindow类的对象
     ui->setupUi(this);  // 执行Ui::MainWindow类的setupUi()函数，实现窗口的生成与各种属性的设置、信号与槽的关联
     InitForm();
     InitVirtualStickControl();
@@ -63,9 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start(50);              // 开始计时，超时则发出timeout()信号，读取摄像头信息
     connect(timer, SIGNAL(timeout()), this, SLOT(readFarme()));  // 时间到，读取当前摄像头信息
 }
-void MainWindow::InitForm()
-{
-    QWebChannel *channel = new QWebChannel(this);
+void MainWindow::InitForm() {
+    auto *channel = new QWebChannel(this);
     bridgeins = bridge::instance(); // 返回bridge对象
     channel->registerObject("bridge", (QObject*)bridgeins); // 将bridgeins对象注册到channel
     ui->mapShow->page()->setWebChannel(channel);
@@ -74,8 +72,7 @@ void MainWindow::InitForm()
     // WayPoints初始化
     const QList<Light_t>& list = bridgeins->GetLightList();
     int nCount = list.count();
-    for(int i=0; i<nCount; i++)
-    {
+    for(int i=0; i<nCount; i++) {
         Light_t tLight = list[i];
         ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);   // 在WayPoints下拉菜单中添加信息
     }
@@ -109,8 +106,7 @@ void MainWindow::InitForm()
 
     //this->showMaximized();
 }
-void MainWindow::InitVirtualStickControl()
-{
+void MainWindow::InitVirtualStickControl() {
     tcpSocket_for_python_controller = new QTcpSocket(this);
     // 无人机虚拟控制
     connect(ui->virtualStickEnableBtn, SIGNAL(clicked()), this, SLOT(onEnableVirtualStickButton()));
@@ -168,28 +164,23 @@ void MainWindow::InitVirtualStickControl()
         qDebug()<<"=============start listening to coll pred==========";
     connect(&tcpServer_for_coll_pred, &QTcpServer::newConnection, this, &MainWindow::acceptConnection_for_coll_pred);
 }
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
 }
 
 // 无人机人工导航控制按钮
-void MainWindow::onTurnLeftButton()
-{
+void MainWindow::onTurnLeftButton() {
     manul_direction = 300;
 }
-void MainWindow::onTurnRightButton()
-{
+void MainWindow::onTurnRightButton() {
     manul_direction = 60;
 }
-void MainWindow::onGoStraightButton()
-{
+void MainWindow::onGoStraightButton() {
     manul_direction = 0;
 }
 
 // 刷新地图、GPS与无人机信息
-void MainWindow::on_GPSMapRefreshBtn_clicked()
-{
+void MainWindow::on_GPSMapRefreshBtn_clicked() {
     timer_1 = new QTimer(this);
     timer_1->start(100);
 
@@ -201,8 +192,7 @@ void MainWindow::on_GPSMapRefreshBtn_clicked()
     connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
     connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
 }
-void MainWindow::timeCountsFunction()
-{
+void MainWindow::timeCountsFunction() {
     // 设置GPS经纬度信息
     ui->GPSLongitudeLineEdit->setText(QString::number(server_->jsonGPS["longitude"].toDouble(), 10, 8));
     //qDebug() <<"\n->"<< server_->jsonGPS["altitude"].toString();
@@ -214,8 +204,7 @@ void MainWindow::timeCountsFunction()
     // 设置无人机电池信息
     ui->uavStatusBattery->setText(QString::number(server_->jsonBattery["BatteryEnergyRemainingPercent"].toDouble()));
 }
-void MainWindow::callJava()
-{
+void MainWindow::callJava() {
     QString strJs_ = "myFunction(%1, %2, ";
     strJs_ += QString::number(server_->jsonGPS["yaw"].toDouble(), 10, 1);
 //    strJs_ += QString::number(10.5, 10, 1);
@@ -231,18 +220,15 @@ void MainWindow::callJava()
 }
 
 // WayPoints
-void MainWindow::onBtnLightOn()
-{
+void MainWindow::onBtnLightOn() {
     QString strName = ui->wayPointsComboBox->currentData().toString();
     bridgeins->onLightOn(strName);
 }
-void MainWindow::onBtnLightOff()
-{
+void MainWindow::onBtnLightOff() {
     QString strName = ui->wayPointsComboBox->currentData().toString();
     bridgeins->onLightOff(strName);
 }
-void MainWindow::onBtnAddLight()
-{
+void MainWindow::onBtnAddLight() {
     // 根据导航点方向滑块生成Light_t对象
     Light_t tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()));
     // 向WayPoints下拉菜单中写入信息
@@ -250,19 +236,16 @@ void MainWindow::onBtnAddLight()
     ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
     bridgeins->onUpdateData();
 }
-void MainWindow::onGoButton()
-{
+void MainWindow::onGoButton() {
     sendWayPoint();
 }
-void MainWindow::sendWayPoint()
-{
+void MainWindow::sendWayPoint() {
     QList<Light_t> wayPointList = bridgeins->returnWayPointList();  // 获取所有的WayPoints信息
     QJsonObject jsonToSend;
     jsonToSend.insert("mission", 1);            //takeoff = 0, waypoint = 1
     jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
     jsonToSend.insert("way_point_num", wayPointList.size());
-    for(int i = 0; i < wayPointList.size(); i++)
-    {
+    for(int i = 0; i < wayPointList.size(); i++) {
         jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng - 0.0126);
         jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
     }
@@ -270,20 +253,16 @@ void MainWindow::sendWayPoint()
     //qDebug()<<str;
     server_->sendMessage(str);
 }
-void MainWindow::onClearAllPoint()
-{
-    if(ui->wayPointsComboBox->count()>=1)
-    {
+void MainWindow::onClearAllPoint() {
+    if(ui->wayPointsComboBox->count()>=1) {
         ui->wayPointsComboBox->clear();
         bridgeins->removeAllPoints();
     }
 }
-void MainWindow::onReleaseNavSlider()
-{
+void MainWindow::onReleaseNavSlider() {
     bridgeins->setNavPointRotate(int(ui->navigationPointDirectSlider->value()));
 }
-void MainWindow::onTakeoffButton()
-{
+void MainWindow::onTakeoffButton() {
     ui->wayPointsTakeOffBtn->setEnabled(false);
     ui->wayPointsLandBtn->setEnabled(true);
     QJsonObject jsonToSend;
@@ -304,8 +283,8 @@ void MainWindow::onLandButton() {
 void MainWindow::onSaveButton() {
     QJsonArray jsonArray;
     QList<Light_t> wayPointList = bridgeins->returnWayPointList();  // 获取所有的WayPoints信息
-    for (int i = 0; i < wayPointList.size(); ++i)
-        jsonArray.append(wayPointsToJson(wayPointList.at(i)));
+    for (const auto & i : wayPointList)
+        jsonArray.append(wayPointsToJson(i));
 
     QFile file(SAVE_WAYPOINTS_PATH);
     if (!file.open(QIODevice::ReadWrite)) {
@@ -320,7 +299,6 @@ void MainWindow::onSaveButton() {
     file.close();
 
     qDebug() << "save wayPoints to " << SAVE_WAYPOINTS_PATH;
-    return;
 }
 void MainWindow::onLoadButton() {
     QFile file(SAVE_WAYPOINTS_PATH);
@@ -328,7 +306,7 @@ void MainWindow::onLoadButton() {
         qDebug() << SAVE_WAYPOINTS_PATH << " open error";
         return;
     }
-    QJsonParseError jsonParserError;
+    QJsonParseError jsonParserError{};
     QJsonDocument jsonDocument = QJsonDocument::fromJson(file.readAll(), &jsonParserError);
 
     if (!jsonDocument.isNull() && jsonParserError.error == QJsonParseError::NoError) {
@@ -350,7 +328,7 @@ void MainWindow::onLoadButton() {
         return;
     }
 }
-QJsonObject MainWindow::wayPointsToJson(Light_t point) {
+QJsonObject MainWindow::wayPointsToJson(const Light_t& point) {
     QJsonObject jsonWayPoints;
     jsonWayPoints.insert("strName", point.strName);
     jsonWayPoints.insert("strDesc", point.strDesc);
@@ -360,7 +338,7 @@ QJsonObject MainWindow::wayPointsToJson(Light_t point) {
     jsonWayPoints.insert("rotation", point.rotation);
     return jsonWayPoints;
 }
-Light_t MainWindow::jsonToWayPoints(QJsonObject jsonWayPoints) {
+Light_t MainWindow::jsonToWayPoints(const QJsonObject& jsonWayPoints) {
     Light_t tLight;
     tLight.strName = jsonWayPoints.value("strName").toString();
     tLight.strDesc = jsonWayPoints.value("strDesc").toString();
@@ -372,15 +350,13 @@ Light_t MainWindow::jsonToWayPoints(QJsonObject jsonWayPoints) {
 }
 
 // 无人机虚拟控制
-void MainWindow::onEnableVirtualStickButton()
-{
+void MainWindow::onEnableVirtualStickButton() {
     ui->virtualStickEnableBtn->setEnabled(false);
     ui->virtualStickDisableBtn->setEnabled(true);
     virtualStickTimer->start(100);
     connect(virtualStickTimer, SIGNAL(timeout()), this, SLOT(sendVirtualStickCommand()));
 }
-void MainWindow::sendVirtualStickCommand()
-{
+void MainWindow::sendVirtualStickCommand() {
     QJsonObject jsonToSend_0;
     jsonToSend_0.insert("mission", 2);            //takeoff = 0, waypoint = 1, virtual stick = 2, disable virtual stick = 3
     jsonToSend_0.insert("yaw", double(ui->virtualStickYawSlider->value())/1000);
@@ -392,9 +368,8 @@ void MainWindow::sendVirtualStickCommand()
 //    qDebug()<<str;
     server_->sendMessage(str);
 }
-void MainWindow::onDisableVirtualStickButton()
-{
-    disconnect(virtualStickTimer, SIGNAL(timeout()),0,0);
+void MainWindow::onDisableVirtualStickButton() {
+    disconnect(virtualStickTimer, SIGNAL(timeout()),nullptr,nullptr);
     virtualStickTimer->stop();
     ui->virtualStickYawSlider->setValue(0);
     ui->virtualStickPitchSlider->setValue(0);
@@ -425,20 +400,16 @@ void MainWindow::onDisableVirtualStickButton()
     ui->virtualStickEnableBtn->setEnabled(true);
     ui->virtualStickDisableBtn->setEnabled(false);
 }
-void MainWindow::onReleaseYawSlider()
-{
+void MainWindow::onReleaseYawSlider() {
     ui->virtualStickYawSlider->setValue(0);
 }
-void MainWindow::onReleasePitchSlider()
-{
+void MainWindow::onReleasePitchSlider() {
     ui->virtualStickPitchSlider->setValue(0);
 }
-void MainWindow::onReleaseRollSlider()
-{
+void MainWindow::onReleaseRollSlider() {
     ui->virtualStickRollSlider->setValue(0);
 }
-void MainWindow::onSetRoll()
-{
+void MainWindow::onSetRoll() {
     setRollFlag = true;
     int rollInt;
 
@@ -452,8 +423,7 @@ void MainWindow::onSetRoll()
     ui->rollLabel->setText(QString::number(rollInt));
     ui->virtualStickRollSetBtn->setEnabled(false);
 }
-void MainWindow::onReleaseThrottleSlider()
-{
+void MainWindow::onReleaseThrottleSlider() {
     ui->virtualStickThrottleSlider->setValue(throttleBias);
 }
 void MainWindow::onVirtualStickResetButton() {
@@ -467,23 +437,21 @@ void MainWindow::onVirtualStickResetButton() {
     ui->virtualStickYawSlider->setValue(0);
     ui->virtualStickThrottleSlider->setValue(0);
 
-    ui->rollLabel->setText(0);
-    ui->pitchLabel->setText(0);
-    ui->yawLabel->setText(0);
-    ui->throttleLabel->setText(0);
+    ui->rollLabel->setText(nullptr);
+    ui->pitchLabel->setText(nullptr);
+    ui->yawLabel->setText(nullptr);
+    ui->throttleLabel->setText(nullptr);
 
-    ui->rollBiasLabel->setText(0);
-    ui->pitchBiasLabel->setText(0);
-    ui->yawBiasLabel->setText(0);
-    ui->throttleBiasLabel->setText(0);
+    ui->rollBiasLabel->setText(nullptr);
+    ui->pitchBiasLabel->setText(nullptr);
+    ui->yawBiasLabel->setText(nullptr);
+    ui->throttleBiasLabel->setText(nullptr);
 
     setRollFlag = false;
     ui->virtualStickRollSetBtn->setEnabled(true);
 }
-void MainWindow::keyPressEvent(QKeyEvent *e)
-{
-    switch(e->key())
-    {
+void MainWindow::keyPressEvent(QKeyEvent *e) {
+    switch(e->key()) {
         case Qt::Key_W :    // W 增加油门
             throttleBias++;
             ui->virtualStickThrottleSlider->setValue(throttleBias);
@@ -526,8 +494,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 /*********************************
 ********* 读取摄像头信息 ***********
 **********************************/
-void MainWindow::readFarme()
-{
+void MainWindow::readFarme() {
     cam >> frame;// 从摄像头中抓取并返回每一帧
     double radio = (double)ui->camZoomSlider->value()/1000;
     frame(cv::Rect(int((1-radio)/2*frame.size().width),int((1-radio)/2*frame.size().height),int(radio*frame.size().width),int(radio*frame.size().height))).copyTo(frame);
@@ -550,8 +517,7 @@ void MainWindow::readFarme()
 //    ui->deepImg->setPixmap(QPixmap("/home/wwh/2.jpg").scaled(320,160));
 
     QFile my_file(QFILE_CAR_DETECT_NUMBER); //将QFile与相关文件关联
-    if(!my_file.open(QIODevice::ReadOnly | QIODevice::Text)) //以只读和文本模式打开文件
-    {
+    if(!my_file.open(QIODevice::ReadOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
         qDebug() <<"Could not open file for Reading";
         return;
     }
@@ -563,22 +529,19 @@ void MainWindow::readFarme()
 /*******************************
 ***关闭摄像头，释放资源，必须释放***
 ********************************/
-void MainWindow::closeCamara()
-{
+void MainWindow::closeCamara() {
     timer->stop();         // 停止读取数据。
     cam.release();//释放内存；
 }
 
 // TCP dronet
-void MainWindow::acceptConnection_for_python_controller()
-{
+void MainWindow::acceptConnection_for_python_controller() {
     qDebug()<<"acceptConnection_for_python_controller";
     tcpSocket_for_python_controller = tcpServer_for_python_controller.nextPendingConnection();
     connect(bridgeins, &bridge::targetPointReceived, this, &MainWindow::onRecvTargetPoint);
     connect(tcpSocket_for_python_controller, &QTcpSocket::readyRead, this, &MainWindow::updateCommand_from_python_controller);
 }
-void MainWindow::onRecvTargetPoint(const QString msg)
-{
+void MainWindow::onRecvTargetPoint(const QString& msg) {
     QStringList lst;
     lst = msg.split(',');
     double next_point_direction = 0;
@@ -616,8 +579,7 @@ void MainWindow::onRecvTargetPoint(const QString msg)
     if(targetNum == QString("-1"))
         direction = 0;
 }
-void MainWindow::updateCommand_from_python_controller()
-{
+void MainWindow::updateCommand_from_python_controller() {
     if (ui->virtualStickDronetCheckBox->isChecked()) {  // 允许uav_dronet控制
         // 读取数据
         qint64 len = tcpSocket_for_python_controller->bytesAvailable();
@@ -640,14 +602,14 @@ void MainWindow::updateCommand_from_python_controller()
             rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_POLL_THRESHOLD);
         }
 
-        ui->virtualStickYawSlider->setValue(yawSliderReceive + yawBias);
+        ui->virtualStickYawSlider->setValue((int)yawSliderReceive + yawBias);
         ui->yawLabel->setText(QString::number(yawSliderReceive));
 
-        ui->virtualStickPitchSlider->setValue(pitchSliderReceive + pitchBias);
+        ui->virtualStickPitchSlider->setValue((int)pitchSliderReceive + pitchBias);
         ui->pitchLabel->setText(QString::number(pitchSliderReceive));
 
         if (!setRollFlag) {
-            ui->virtualStickRollSlider->setValue(rollSliderReceive + rollBias);
+            ui->virtualStickRollSlider->setValue((int)rollSliderReceive + rollBias);
             ui->rollLabel->setText(QString::number(rollSliderReceive));
         }
     } else {    // 禁止uav_dronet控制
@@ -656,11 +618,11 @@ void MainWindow::updateCommand_from_python_controller()
         ui->virtualStickPitchSlider->setValue(pitchBias);
         if (!setRollFlag) {
             ui->virtualStickRollSlider->setValue(rollBias);
-            ui->rollLabel->setText(0);
+            ui->rollLabel->setText(nullptr);
         }
 
-        ui->yawLabel->setText(0);
-        ui->pitchLabel->setText(0);
+        ui->yawLabel->setText(nullptr);
+        ui->pitchLabel->setText(nullptr);
     }
     // 250954973
 
@@ -682,8 +644,7 @@ void MainWindow::updateCommand_from_python_controller()
     QString sWriteData = QString::number(direction);
     tcpSocket_for_python_controller->write(sWriteData.toUtf8());
 }
-void MainWindow::onRecvdMsg(QString msg)
-{
+void MainWindow::onRecvdMsg(const QString& msg) {
     qDebug()<<QString("Received message：%1").arg(msg);
     QStringList lst;
     lst = msg.split(',');
@@ -731,15 +692,15 @@ void MainWindow::sendCollPredCommand() {
     server_->sendMessage(str);
 }
 void MainWindow::onDisableCollButton() {
-    disconnect(collPredTimer, SIGNAL(timeout()),0,0);
+    disconnect(collPredTimer, SIGNAL(timeout()),nullptr,nullptr);
     collPredTimer->stop();
 
-    QJsonObject jsonToSend_1;
-    jsonToSend_1.insert("mission", 6);
-    jsonToSend_1.insert("isCollFlag", isCollFlag);
-    QString str  = QString(QJsonDocument(jsonToSend_1).toJson());
-//    qDebug()<<str;
-    server_->sendMessage(str);
+    // 发送mission 6
+//    QJsonObject jsonToSend_1;
+//    jsonToSend_1.insert("mission", 6);
+//    jsonToSend_1.insert("isCollFlag", isCollFlag);
+//    QString str  = QString(QJsonDocument(jsonToSend_1).toJson());
+//    server_->sendMessage(str);
 
     ui->collControlEnableBtn->setEnabled(true);
     ui->collControlDisableBtn->setEnabled(false);
@@ -749,12 +710,10 @@ void MainWindow::onSetCollThreshold() {
 }
 
 // Car detection
-void MainWindow::on_carDetectBtn_clicked()
-{
+void MainWindow::on_carDetectBtn_clicked() {
 
     QFile my_file(QFILE_CAR_DETECT_TRACK);  //将QFile与相关文件关联
-   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text))    //以只读和文本模式打开文件
-   {
+   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
        qDebug() <<"Could not open file for Writing";
        return;
    }
@@ -763,11 +722,9 @@ void MainWindow::on_carDetectBtn_clicked()
    in << str << "\n";
    my_file.close(); //关闭文件
 }
-void MainWindow::on_carDetectTrackCarBtn_clicked()
-{
+void MainWindow::on_carDetectTrackCarBtn_clicked() {
     QFile my_file(QFILE_CAR_DETECT_TRACK);//将QFile与相关文件关联
-   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text))//以只读和文本模式打开文件
-   {
+   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
        qDebug() <<"Could not open file for Writing";
        return;
    }
@@ -776,11 +733,9 @@ void MainWindow::on_carDetectTrackCarBtn_clicked()
    in << str << "\n";
    my_file.close(); //关闭文件
 }
-void MainWindow::on_carDetectWaitBtn_clicked()
-{
+void MainWindow::on_carDetectWaitBtn_clicked() {
     QFile my_file(QFILE_CAR_DETECT_TRACK);//将QFile与相关文件关联
-   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text))//以只读和文本模式打开文件
-   {
+   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
        qDebug() <<"Could not open file for Writing";
        return;
    }

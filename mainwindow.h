@@ -27,11 +27,11 @@
 // 摄像头数据读取目标
 #define CAM_LOAD_PC_CAMERA      0
 #define CAM_LOAD_DRONE_CAMERA   2
-#define CAM_LOAD_PC_VIDEO       "../../dataset/dronet test video/1.mp4"
+#define CAM_LOAD_PC_VIDEO       "../../dataset/dronet test video/all copy.mp4"
 // 摄像头读取选择
-#define CAM_LOAD    CAM_LOAD_PC_VIDEO
+#define CAM_LOAD    CAM_LOAD_DRONE_CAMERA
 // 摄像头显示选择
-#define CAM_SHOW_DETECT_CAMERA_FLAG false
+#define CAM_SHOW_DETECT_CAMERA_FLAG true
 #define CAM_SHOW_DETECT_CAMERA      "../../dataset/hostData/detece result/show_realTimeImg.jpg"
 
 // 摄像头数据保存路径
@@ -97,10 +97,10 @@ private:
     QTcpServer tcpServer_for_python_controller;     // TCP python控制server
     QTcpSocket *tcpSocket_for_python_controller;    // TCP python控制socket
     void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
-    void onRecvTargetPoint(const QString msg);      // 根据TCP接收到的信息计算目标点方位并设置方向值
+    void onRecvTargetPoint(const QString& msg);     // 根据TCP接收到的信息计算目标点方位并设置方向值
     void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
     void sendWayPoint();                            // 向TCP发送所有的WayPoints信息
-    void onRecvdMsg(const QString msg);             // 接受信息并设置经纬度信息
+    void onRecvdMsg(const QString& msg);            // 接受信息并设置经纬度信息
 
     // TCP coll pred
     QTcpServer tcpServer_for_coll_pred;     // TCP python控制server
@@ -142,8 +142,8 @@ private slots:  // 槽声明区
     void onLandButton();    // 向TCP发送降落命令
     void onSaveButton();    // 保存WayPoints信息
     void onLoadButton();    // 读取WayPoints信息
-    QJsonObject wayPointsToJson(Light_t point); // wayPoints转换为Json
-    Light_t jsonToWayPoints(QJsonObject jsonWayPoints); // Json转换为wayPoints
+    static QJsonObject wayPointsToJson(const Light_t& point); // wayPoints转换为Json
+    static Light_t jsonToWayPoints(const QJsonObject& jsonWayPoints); // Json转换为wayPoints
 
     // 无人机虚拟控制
     void onEnableVirtualStickButton();  // 允许无人机虚拟控制
