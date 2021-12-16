@@ -317,6 +317,7 @@ void MainWindow::onLoadButton() {
             QJsonObject jsonWayPoint = array.at(i).toObject();
             Light_t wayPoints = jsonToWayPoints(jsonWayPoint);
             bridgeins->m_lightList.append(wayPoints);
+            bridgeins->s_count++;
             ui->wayPointsComboBox->addItem(wayPoints.strDesc, wayPoints.strName);
             ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
             bridgeins->onUpdateData();

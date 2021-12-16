@@ -29,6 +29,7 @@ public:
     // Init
     static bridge* instance();  // 返回bridge对象
     // WayPoints
+    int s_count = 1;                        // WayPoints数目
     Light_t AddLight(int rot);              // 根据导航旋转信息生成Light_t对象
     void newPoint(double lng, double lat);  // 设置经纬度信息
     QList<Light_t> returnWayPointList();    // 返回所有的WayPoints的list

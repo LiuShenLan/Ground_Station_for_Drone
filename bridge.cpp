@@ -17,7 +17,6 @@ bridge::bridge()
 // WayPoints
 Light_t	bridge::AddLight(int rot)
 {
-    static int s_count = 1; // WayPoints数目
     Light_t tLight;
     tLight.strName = QString("Light%1").arg(s_count);
     tLight.strDesc = QString("Light Description %1").arg(s_count);
@@ -42,6 +41,7 @@ QList<Light_t> bridge::returnWayPointList()
 void bridge::removeAllPoints()
 {
     m_lightList.clear();
+    s_count = 1;
     emit removePoints();    // 发射removePoints信号
 }
 void bridge::setNavPointRotate(int rot)
