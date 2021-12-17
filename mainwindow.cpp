@@ -667,11 +667,13 @@ void MainWindow::update_coll_pred() {
     QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
 
     qint64 len = tcpSocket_for_coll_pred->bytesAvailable();
-    QByteArray alldate = tcpSocket_for_coll_pred->read(len);
+    QByteArray alldate = tcpSocket_for_coll_pred->read(coll_pre_receive_length);
+    if (len > coll_pre_receive_length)
+        tcpSocket_for_coll_pred->read(len - coll_pre_receive_length);
     QString utf8str = utf8codec->toUnicode(alldate);
     collPred = utf8str.toDouble();
     isCollFlag = collPred >= collThreshold;
-    ui->collPredLabel->setText(QString::number(collPred, 'f', 7));
+    ui->collPredLabel->setText(QString::number(collPred, 'f', 10));
     if (isCollFlag)
         ui->collFlagLabel->setText("true");
     else

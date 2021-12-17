@@ -105,6 +105,7 @@ private:
     // TCP coll pred
     QTcpServer tcpServer_for_coll_pred;     // TCP python控制server
     QTcpSocket *tcpSocket_for_coll_pred;    // TCP python控制socket
+    qint64 coll_pre_receive_length = 12;    // TCP socket收到的coll pre数据长度(防止数据接受出错)
     void acceptConnection_for_coll_pred();  // TCP 接受信息并设置虚拟控制与方向数值
     void update_coll_pred();                // 接受coll pred数据并发送
     QTimer* collPredTimer;                  // 100ms定时器 向无人机发送障碍预测信息
