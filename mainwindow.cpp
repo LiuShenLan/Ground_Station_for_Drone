@@ -78,8 +78,6 @@ void MainWindow::InitForm() {
     }
     ui->wayPointsComboBox->setCurrentIndex(0);
     connect(ui->wayPointsAddBtn, SIGNAL(clicked()), this, SLOT(onBtnAddLight()));
-//    connect(ui->btnLightOn, SIGNAL(clicked()), this, SLOT(onBtnLightOn()));
-//    connect(ui->btnLightOff, SIGNAL(clicked()), this, SLOT(onBtnLightOff()));
     connect(ui->wayPointsGoBtn, SIGNAL(clicked()), this, SLOT(onGoButton()));
     connect(ui->wayPointsClearBtn, SIGNAL(clicked()), this, SLOT(onClearAllPoint()));
 
@@ -99,8 +97,6 @@ void MainWindow::InitForm() {
     connect(ui->manualDirectTurnLeftBtn,SIGNAL(clicked()), this, SLOT(onTurnLeftButton()));
     connect(ui->manualDirectTurnRightBtn,SIGNAL(clicked()), this, SLOT(onTurnRightButton()));
     connect(ui->manualDirectGoStraightBtn,SIGNAL(clicked()), this, SLOT(onGoStraightButton()));
-
-    //this->showMaximized();
 }
 void MainWindow::InitVirtualStickControl() {
     tcpSocket_for_python_controller = new QTcpSocket(this);
@@ -148,6 +144,8 @@ void MainWindow::InitVirtualStickControl() {
     connect(ui->collControlEnableBtn, SIGNAL(clicked()), this, SLOT(onEnableCollButton()));
     connect(ui->collControlDisableBtn, SIGNAL(clicked()), this, SLOT(onDisableCollButton()));
     connect(ui->collThresholdSetBtn, SIGNAL(clicked()), this, SLOT(onSetCollThreshold()));
+    connect(ui->collSendTrueBtn, SIGNAL(clicked()), this, SLOT(onCollSendTrueButton()));
+    connect(ui->collSendFalseBtn, SIGNAL(clicked()), this, SLOT(onCollSendFalseButton()));
     collPredTimer = new QTimer(this);   // 实例化定时器
     ui->collControlDisableBtn->setEnabled(false);
 
@@ -216,14 +214,6 @@ void MainWindow::callJava() {
 }
 
 // WayPoints
-void MainWindow::onBtnLightOn() {
-    QString strName = ui->wayPointsComboBox->currentData().toString();
-    bridgeins->onLightOn(strName);
-}
-void MainWindow::onBtnLightOff() {
-    QString strName = ui->wayPointsComboBox->currentData().toString();
-    bridgeins->onLightOff(strName);
-}
 void MainWindow::onBtnAddLight() {
     // 根据导航点方向滑块生成Light_t对象
     Light_t tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()));
@@ -264,7 +254,7 @@ void MainWindow::onTakeoffButton() {
     QJsonObject jsonToSend;
     jsonToSend.insert("mission", 0);
     QString str = QString(QJsonDocument(jsonToSend).toJson());
-    qDebug()<<str;https://www.douyu.com/88660
+    qDebug()<<str;
     server_->sendMessage(str);
 }
 void MainWindow::onLandButton() {
@@ -668,7 +658,7 @@ void MainWindow::update_coll_pred() {
 void MainWindow::onEnableCollButton() {
     ui->collControlEnableBtn->setEnabled(false);
     ui->collControlDisableBtn->setEnabled(true);
-    collPredTimer->start(100);
+    collPredTimer->start(500);
     connect(collPredTimer, SIGNAL(timeout()), this, SLOT(sendCollPredCommand()));
 }
 void MainWindow::sendCollPredCommand() {
@@ -677,7 +667,6 @@ void MainWindow::sendCollPredCommand() {
     jsonToSend_0.insert("isCollFlag", isCollFlag);
 
     QString str = QString(QJsonDocument(jsonToSend_0).toJson());
-//    qDebug()<<str;
     server_->sendMessage(str);
 }
 void MainWindow::onDisableCollButton() {
@@ -697,4 +686,19 @@ void MainWindow::onDisableCollButton() {
 void MainWindow::onSetCollThreshold() {
     collThreshold = ui->collThresholdLineEdit->text().toDouble();
 }
+void MainWindow::onCollSendTrueButton() {
+	QJsonObject jsonToSend_0;
+	jsonToSend_0.insert("mission", 5);
+	jsonToSend_0.insert("isCollFlag", true);
 
+	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
+	server_->sendMessage(str);
+}
+void MainWindow::onCollSendFalseButton() {
+	QJsonObject jsonToSend_0;
+	jsonToSend_0.insert("mission", 5);
+	jsonToSend_0.insert("isCollFlag", false);
+
+	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
+	server_->sendMessage(str);
+}

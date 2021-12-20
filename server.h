@@ -55,14 +55,6 @@ namespace Ui{
 
         static QJsonObject getJsonObjectFromString(const QString& jsonString);  // 将string转换为Json文件并保存
         static void saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString& jsonString);
-
-        // 不明定义
-        qint64 totalBytes;     // 存放总大小信息
-        QString fileName;      // 存放文件名
-        QByteArray inBlock;    // 数据缓冲区
-        QCheckBox *ifHostIp;
-    //    void responseToCheckBox();
-    //    void displayError(QAbstractSocket::SocketError socketError);
     };
 
 } //namespace Ui

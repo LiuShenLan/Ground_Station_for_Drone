@@ -29,7 +29,7 @@
 #define CAM_LOAD_DRONE_CAMERA   2
 #define CAM_LOAD_PC_VIDEO       "../../dataset/dronet test video/all copy.mp4"
 // 摄像头读取选择
-#define CAM_LOAD    CAM_LOAD_PC_VIDEO
+#define CAM_LOAD    CAM_LOAD_DRONE_CAMERA
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG true
 #define CAM_SHOW_DETECT_CAMERA      "../../dataset/hostData/detece result/show_realTimeImg.jpg"
@@ -125,8 +125,6 @@ private slots:  // 槽声明区
     void callJava();    // 调用JAVA程序在地图上显示导航点
 
     // WayPoints
-    void onBtnLightOn();    // 将WayPoints下拉菜单中显示的nValue设置为1
-    void onBtnLightOff();   // 将WayPoints下拉菜单中显示的nValue设置为0
     void onBtnAddLight();   // 根据导航点方向滑块添加WayPoints
     void onGoButton();      // 向TCP发送所有的WayPoints信息
     void onClearAllPoint(); // 移除所有WayPoints信息
@@ -154,6 +152,8 @@ private slots:  // 槽声明区
     void sendCollPredCommand(); // 向TCP发送无人机障碍预测信息
     void onDisableCollButton(); // 禁止无人机障碍预测
     void onSetCollThreshold();  // 设置障碍预测阈值
+	void onCollSendTrueButton();	// 发送无人机障碍true预测
+	void onCollSendFalseButton();	// 允许无人机障碍false预测
 
     // 摄像头
     void readFarme();   // 读取摄像头信息

@@ -59,8 +59,6 @@ namespace Ui {
                 this, &Server::acceptConnection_for_receive);
         connect(&tcpServer_for_send, &QTcpServer::newConnection,
                 this, &Server::acceptConnection_for_send);
-        totalBytes = 0;
-
     }
 
     // TCP

@@ -55,6 +55,12 @@
             <height>320</height>
            </size>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="title">
            <string>Virtual stick</string>
           </property>
@@ -380,19 +386,6 @@
             <string>Turn right</string>
            </property>
           </widget>
-          <widget class="QLabel" name="label_9">
-           <property name="geometry">
-            <rect>
-             <x>40</x>
-             <y>90</y>
-             <width>67</width>
-             <height>17</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Nav point</string>
-           </property>
-          </widget>
           <widget class="QPushButton" name="manualDirectGoStraightBtn">
            <property name="geometry">
             <rect>
@@ -406,46 +399,50 @@
             <string>Go straight</string>
            </property>
           </widget>
-          <widget class="QSlider" name="navigationPointDirectSlider">
-           <property name="geometry">
-            <rect>
-             <x>120</x>
-             <y>90</y>
-             <width>160</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
           <widget class="QLabel" name="label_7">
            <property name="geometry">
             <rect>
-             <x>40</x>
+             <x>26</x>
              <y>40</y>
-             <width>67</width>
-             <height>17</height>
+             <width>81</width>
+             <height>20</height>
             </rect>
            </property>
            <property name="text">
-            <string>Zoom</string>
+            <string>Cam Zoom</string>
            </property>
           </widget>
           <widget class="QWidget" name="verticalLayoutWidget">
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>120</y>
-             <width>311</width>
+             <y>80</y>
+             <width>321</width>
              <height>91</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>                          collision prediction</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
               <item>
                <widget class="QLabel" name="collPredLabel">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>coll pred</string>
                 </property>
@@ -453,6 +450,12 @@
               </item>
               <item>
                <widget class="QPushButton" name="collControlEnableBtn">
+                <property name="maximumSize">
+                 <size>
+                  <width>80</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Enable coll</string>
                 </property>
@@ -460,8 +463,27 @@
               </item>
               <item>
                <widget class="QPushButton" name="collControlDisableBtn">
+                <property name="maximumSize">
+                 <size>
+                  <width>80</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Disable coll</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="collSendTrueBtn">
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Send true</string>
                 </property>
                </widget>
               </item>
@@ -471,20 +493,38 @@
              <layout class="QHBoxLayout" name="horizontalLayout_12">
               <item>
                <widget class="QLabel" name="collStopLabel">
+                <property name="maximumSize">
+                 <size>
+                  <width>35</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>Stop: </string>
+                 <string>Stop:</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLabel" name="collFlagLabel">
+                <property name="maximumSize">
+                 <size>
+                  <width>40</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>Coll flag</string>
+                 <string>cflag</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLineEdit" name="collThresholdLineEdit">
+                <property name="maximumSize">
+                 <size>
+                  <width>30</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>0.5</string>
                 </property>
@@ -492,8 +532,27 @@
               </item>
               <item>
                <widget class="QPushButton" name="collThresholdSetBtn">
+                <property name="maximumSize">
+                 <size>
+                  <width>80</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>threshold Set</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="collSendFalseBtn">
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Send false</string>
                 </property>
                </widget>
               </item>
@@ -644,7 +703,7 @@
           <item>
            <widget class="QPushButton" name="GPSMapRefreshBtn">
             <property name="text">
-             <string>Map_Refresh</string>
+             <string>Map Refresh</string>
             </property>
            </widget>
           </item>
@@ -694,7 +753,7 @@
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string> GPSHeight </string>
+             <string>Height </string>
             </property>
            </widget>
           </item>
@@ -717,6 +776,24 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <item>
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Nav point</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="navigationPointDirectSlider">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
                <widget class="QComboBox" name="wayPointsComboBox"/>
@@ -736,7 +813,11 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="wayPointsHeightLineEdit"/>
+               <widget class="QLineEdit" name="wayPointsHeightLineEdit">
+                <property name="text">
+                 <string>5.0</string>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="wayPointsGoBtn">
