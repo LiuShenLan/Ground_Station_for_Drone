@@ -100,10 +100,6 @@ void MainWindow::InitForm() {
     connect(ui->manualDirectTurnRightBtn,SIGNAL(clicked()), this, SLOT(onTurnRightButton()));
     connect(ui->manualDirectGoStraightBtn,SIGNAL(clicked()), this, SLOT(onGoStraightButton()));
 
-    // 不明定时器
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
-    m_timer.start(500);
-
     //this->showMaximized();
 }
 void MainWindow::InitVirtualStickControl() {
@@ -516,16 +512,6 @@ void MainWindow::readFarme() {
     ui->camShow->setPixmap(QPixmap::fromImage(image));  // 显示图片
 
 //    ui->deepImg->setPixmap(QPixmap("/home/wwh/2.jpg").scaled(320,160));
-
-    QFile my_file(QFILE_CAR_DETECT_NUMBER); //将QFile与相关文件关联
-    if(!my_file.open(QIODevice::ReadOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
-        qDebug() <<"Could not open file for Reading";
-        return;
-    }
-    QTextStream outText(&my_file);  //将QTextStream与特定文件关联
-    QString number = outText.readAll();  //读出QTextStream对象中所有内容
-    my_file.close(); //关闭文件
-    ui->carDetectNumberLineEdit->setText(number);
 }
 /*******************************
 ***关闭摄像头，释放资源，必须释放***
@@ -712,44 +698,3 @@ void MainWindow::onSetCollThreshold() {
     collThreshold = ui->collThresholdLineEdit->text().toDouble();
 }
 
-// Car detection
-void MainWindow::on_carDetectBtn_clicked() {
-
-    QFile my_file(QFILE_CAR_DETECT_TRACK);  //将QFile与相关文件关联
-   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
-       qDebug() <<"Could not open file for Writing";
-       return;
-   }
-   QString str = "detect";
-   QTextStream in(&my_file);
-   in << str << "\n";
-   my_file.close(); //关闭文件
-}
-void MainWindow::on_carDetectTrackCarBtn_clicked() {
-    QFile my_file(QFILE_CAR_DETECT_TRACK);//将QFile与相关文件关联
-   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
-       qDebug() <<"Could not open file for Writing";
-       return;
-   }
-   QString str = "track";
-   QTextStream in(&my_file);
-   in << str << "\n";
-   my_file.close(); //关闭文件
-}
-void MainWindow::on_carDetectWaitBtn_clicked() {
-    QFile my_file(QFILE_CAR_DETECT_TRACK);//将QFile与相关文件关联
-   if(!my_file.open(QIODevice::WriteOnly | QIODevice::Text)) {  //以只读和文本模式打开文件
-       qDebug() <<"Could not open file for Writing";
-       return;
-   }
-   QString str = "wait";
-   QTextStream in(&my_file);
-   in << str << "\n";
-   my_file.close(); //关闭文件
-}
-
-// 不明函数
-void MainWindow::onTimeOut()
-{
-//	bridgeins->onUpdateStatus();
-}

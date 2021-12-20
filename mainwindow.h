@@ -29,7 +29,7 @@
 #define CAM_LOAD_DRONE_CAMERA   2
 #define CAM_LOAD_PC_VIDEO       "../../dataset/dronet test video/all copy.mp4"
 // 摄像头读取选择
-#define CAM_LOAD    CAM_LOAD_DRONE_CAMERA
+#define CAM_LOAD    CAM_LOAD_PC_VIDEO
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG true
 #define CAM_SHOW_DETECT_CAMERA      "../../dataset/hostData/detece result/show_realTimeImg.jpg"
@@ -44,10 +44,6 @@
 
 // WayPoints文件保存路径
 #define SAVE_WAYPOINTS_PATH   "../../dataset/hostData/wayPoints.json"
-
-// Car detect保存路径
-#define QFILE_CAR_DETECT_NUMBER "./Qfile/number.txt"
-#define QFILE_CAR_DETECT_TRACK  "./Qfile/detect_track.txt"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -117,10 +113,6 @@ private:
 
     int rollBias = 0, pitchBias = 0, yawBias = 0, throttleBias = 0; // 虚拟控制 键盘输入偏差
 
-    // 不明定义
-    QImage    *imag;
-    QTimer m_timer; // 500ms定时器 用途不明
-
 private slots:  // 槽声明区
     // 人工导航
     void onTurnLeftButton();    // 人工导航 左转按钮 Turn left
@@ -166,15 +158,6 @@ private slots:  // 槽声明区
     // 摄像头
     void readFarme();   // 读取摄像头信息
     void closeCamara(); // 关闭摄像头，释放资源，必须释放
-
-    // Car setection
-    void on_carDetectBtn_clicked();         // 向car detect track 文件写入"detect"
-    void on_carDetectTrackCarBtn_clicked(); // 向car detect track 文件写入"track"
-    void on_carDetectWaitBtn_clicked();     // 向car detect track 文件写入"wait"
-
-    // 不明函数
-    void onTimeOut();   // 空定时中断函数
-//    void paintEvent(QPaintEvent *event);
 };
 
 #endif // MAINWINDOW_H

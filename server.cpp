@@ -197,30 +197,4 @@ namespace Ui {
         file.close();
         rename(saveTempPath, saveRenamePath);
     }
-
-    // 不明定义
-//    void Server::responseToCheckBox()
-//    {
-//        if(ifHostIp->checkState() == Qt ::Unchecked)
-//        {
-//            setIpAddress->clear();
-//            setIpAddress->setEnabled(true);
-//        }
-//        else
-//        {
-//            setIpAddress->setText(tr("127.0.0.1"));
-//            setIpAddress->setEnabled(false);
-//        }
-//
-//
-//    }
-
-//    void Server::displayError(QAbstractSocket::SocketError socketError)
-//    {
-//        qDebug() << tcpServerConnection->errorString();
-//        tcpServerConnection->close();
-//        //ui->serverProgressBar->reset();
-//        //ui->serverStatusLabel->setText(tr("服务端就绪"));
-//
-//    }
 } //namespce Ui
