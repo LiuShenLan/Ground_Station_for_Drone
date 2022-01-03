@@ -24,6 +24,9 @@
 #define SAFE_MODE_PITCH_THRESHOLD   30.0
 #define SAFE_MODE_POLL_THRESHOLD    50.0
 
+// 障碍预测由前进到停止所需要的连续flag跳变阈值
+#define PRE_COLL_FLAG_IS_TRUE_COUNT_THRESHOLD	30
+
 // 摄像头数据读取目标
 #define CAM_LOAD_PC_CAMERA      0
 #define CAM_LOAD_DRONE_CAMERA   2
@@ -45,6 +48,8 @@
 // WayPoints文件保存路径
 #define SAVE_WAYPOINTS_PATH   "../../dataset/hostData/wayPoints.json"
 
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -58,15 +63,17 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    double fLng;  // 经度
-    double fLat;   // 纬度
-    double direction; // the map_direct, comes from the Baidu Map route plan
-    double manul_direction; // 手动控制 顺时针标记前进角度
+    double fLng;    // 经度
+    double fLat;    // 纬度
+    double direction;   // QT上位机显示前进方向无人机前进方向，从html地图地区或手动设置
+    double manul_direction; // 手动设置无人机前进方向，顺时针标记前进角度
     bool setRollFlag = false;
 
     double collPred = 1.0;      // coll 预测值
     double collThreshold = 0.5; // 障碍预测阈值
     bool isCollFlag = false;    // 前方是否是障碍
+	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
+	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数
 
 protected:
     void keyPressEvent(QKeyEvent *);    // 虚拟控制 键盘输入控制
@@ -90,21 +97,21 @@ private:
     QTimer* virtualStickTimer;  // 100ms定时器 向无人机发送虚拟控制信息
 
     // TCP dronet
-    QTcpServer tcpServer_for_python_controller;     // TCP python控制server
-    QTcpSocket *tcpSocket_for_python_controller;    // TCP python控制socket
+    QTcpServer tcpServer_for_python_controller;     // dronet TCP server
+    QTcpSocket *tcpSocket_for_python_controller;    // dronet TCP socket
     void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
-    void onRecvTargetPoint(const QString& msg);     // 根据TCP接收到的信息计算目标点方位并设置方向值
+    void onRecvTargetPoint(const QString& msg);     // 接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
     void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
     void sendWayPoint();                            // 向TCP发送所有的WayPoints信息
-    void onRecvdMsg(const QString& msg);            // 接受信息并设置经纬度信息
+    void onRecvdMsg(const QString& msg);            // 接收html确定的经纬度信息并设置WayPoints临时经纬度信息
 
     // TCP coll pred
-    QTcpServer tcpServer_for_coll_pred;     // TCP python控制server
-    QTcpSocket *tcpSocket_for_coll_pred;    // TCP python控制socket
+    QTcpServer tcpServer_for_coll_pred;     // coll pred TCP server
+    QTcpSocket *tcpSocket_for_coll_pred;    // coll pred TCP socket
     qint64 coll_pre_receive_length = 12;    // TCP socket收到的coll pre数据长度(防止数据接受出错)
     void acceptConnection_for_coll_pred();  // TCP 接受信息并设置虚拟控制与方向数值
     void update_coll_pred();                // 接受coll pred数据并发送
-    QTimer* collPredTimer;                  // 100ms定时器 向无人机发送障碍预测信息
+    QTimer* collPredTimer;                  // 定时器 向无人机发送障碍预测信息
 
     // 摄像头
     QTimer *timer;  // 50ms定时器 读取摄像头信息器
@@ -125,7 +132,7 @@ private slots:  // 槽声明区
     void callJava();    // 调用JAVA程序在地图上显示导航点
 
     // WayPoints
-    void onBtnAddLight();   // 根据导航点方向滑块添加WayPoints
+    void onBtnAddLight();   // 根据临时WayPoints经纬度信息添加WayPoints
     void onGoButton();      // 向TCP发送所有的WayPoints信息
     void onClearAllPoint(); // 移除所有WayPoints信息
     void onReleaseNavSlider();  // 设置导航点方向

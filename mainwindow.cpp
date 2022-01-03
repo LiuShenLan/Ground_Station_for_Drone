@@ -201,7 +201,6 @@ void MainWindow::timeCountsFunction() {
 void MainWindow::callJava() {
     QString strJs_ = "myFunction(%1, %2, ";
     strJs_ += QString::number(server_->jsonGPS["yaw"].toDouble(), 10, 1);
-//    strJs_ += QString::number(10.5, 10, 1);
     strJs_ += ")";
 //    QString strJs = strJs_
 //            .arg(ui->GPSLongitudeLineEdit->text().toDouble()*0.01+109.03525)
@@ -215,7 +214,7 @@ void MainWindow::callJava() {
 
 // WayPoints
 void MainWindow::onBtnAddLight() {
-    // 根据导航点方向滑块生成Light_t对象
+    // 根据根据临时WayPoints经纬度信息生成Light_t对象
     Light_t tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()));
     // 向WayPoints下拉菜单中写入信息
     ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
@@ -522,15 +521,15 @@ void MainWindow::onRecvTargetPoint(const QString& msg) {
     QStringList lst;
     lst = msg.split(',');
     double next_point_direction = 0;
-    QString targetNum = lst[0];
-    int targetRotation = lst[1].toInt();
+    QString targetNum = lst[0]; // WayPoints列表中的WayPoint的索引
+    int targetRotation = lst[1].toInt();    // WayPoint旋转角度
 //    bridgeins->onLightOn(targetNum);
-    double targetLng = lst[2].toDouble();
-    double targetLat = lst[3].toDouble();
-    int arrayListLength = lst[4].toInt();
+    double targetLng = lst[2].toDouble();   // WayPoint经度
+    double targetLat = lst[3].toDouble();   // WayPoint纬度
+    int arrayListLength = lst[4].toInt();   // WayPoints数目
     //qDebug()<<fixed<<qSetRealNumberPrecision(7)<<targetLng<<" "<<targetLat;
     //qDebug()<<(ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)<<" "<<(ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
-//    qDebug()<<((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125))/(targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
+    //qDebug()<<((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125))/(targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
     // 计算方位角
     // first quadrant
     if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))>0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))>0)
@@ -648,7 +647,23 @@ void MainWindow::update_coll_pred() {
         tcpSocket_for_coll_pred->read(len - coll_pre_receive_length);
     QString utf8str = utf8codec->toUnicode(alldate);
     collPred = utf8str.toDouble();
-    isCollFlag = collPred >= collThreshold;
+	bool thisCollFlag = (collPred >= collThreshold);	// 本次障碍预测的结果
+
+	// flag去抖
+	if (isCollFlagPre && !thisCollFlag) {	// 由停止到前进的跳变
+		++preCollFlagIsTrueCount;
+		if (preCollFlagIsTrueCount > PRE_COLL_FLAG_IS_TRUE_COUNT_THRESHOLD) {	// 接收到了足够的前进的预测结果
+			isCollFlag = thisCollFlag;	// 前进
+			preCollFlagIsTrueCount = 0;
+		} else
+			isCollFlag = isCollFlagPre;	// 停止
+	} else {
+		isCollFlag = thisCollFlag;		// 取本次结果
+		preCollFlagIsTrueCount = 0;
+	}
+	isCollFlagPre = isCollFlag;	// 保存本次预测结果
+
+	// 显示结果
     ui->collPredLabel->setText(QString::number(collPred, 'f', 10));
     if (isCollFlag)
         ui->collFlagLabel->setText("true");
@@ -698,7 +713,7 @@ void MainWindow::onCollSendFalseButton() {
 	QJsonObject jsonToSend_0;
 	jsonToSend_0.insert("mission", 5);
 	jsonToSend_0.insert("isCollFlag", false);
-
+ 
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
 }

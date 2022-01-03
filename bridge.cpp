@@ -97,7 +97,7 @@ void bridge::onUpdateData()
 // 发射信号
 void bridge::jsSendMsg(const QString& msg)
 {
-    emit toRecvMsg(msg);
+    emit toRecvMsg(msg);    // 用于mainwindow.cpp line:93，调用MainWindow::onRecvdMsg函数
 }
 void bridge::jsSendTargetPoint(const QString &msg)
 {
