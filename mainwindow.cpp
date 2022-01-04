@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->camZoomSlider->setMaximum(1000);
     ui->camZoomSlider->setMinimum(0);
     ui->camZoomSlider->setValue(1000);
-    ui->navigationPointDirectSlider->setMaximum(365);
+    ui->navigationPointDirectSlider->setMaximum(360);
     ui->navigationPointDirectSlider->setMinimum(0);
     ui->navigationPointDirectSlider->setValue(0);
     connect(ui->navigationPointDirectSlider, SIGNAL(sliderMoved(int)), this, SLOT(onReleaseNavSlider()));
@@ -83,7 +83,6 @@ void MainWindow::InitForm() {
 
     connect(ui->wayPointsTakeOffBtn, SIGNAL(clicked()), this, SLOT(onTakeoffButton()));
     connect(ui->wayPointsLandBtn, SIGNAL(clicked()), this, SLOT(onLandButton()));
-    ui->wayPointsLandBtn->setEnabled(false);
     connect(ui->wayPointsSaveBtn, SIGNAL(clicked()), this, SLOT(onSaveButton()));
     connect(ui->wayPointsLoadBtn, SIGNAL(clicked()), this, SLOT(onLoadButton()));
 
@@ -248,8 +247,6 @@ void MainWindow::onReleaseNavSlider() {
     bridgeins->setNavPointRotate(int(ui->navigationPointDirectSlider->value()));
 }
 void MainWindow::onTakeoffButton() {
-    ui->wayPointsTakeOffBtn->setEnabled(false);
-    ui->wayPointsLandBtn->setEnabled(true);
     QJsonObject jsonToSend;
     jsonToSend.insert("mission", 0);
     QString str = QString(QJsonDocument(jsonToSend).toJson());
@@ -257,8 +254,6 @@ void MainWindow::onTakeoffButton() {
     server_->sendMessage(str);
 }
 void MainWindow::onLandButton() {
-    ui->wayPointsLandBtn->setEnabled(false);
-    ui->wayPointsTakeOffBtn->setEnabled(true);
     QJsonObject jsonToSend;
     jsonToSend.insert("mission", 4);
     QString str = QString(QJsonDocument(jsonToSend).toJson());
@@ -702,6 +697,13 @@ void MainWindow::onSetCollThreshold() {
     collThreshold = ui->collThresholdLineEdit->text().toDouble();
 }
 void MainWindow::onCollSendTrueButton() {
+    // 断开障碍预测数据发送
+    disconnect(collPredTimer, SIGNAL(timeout()),nullptr,nullptr);
+    collPredTimer->stop();
+    ui->collControlEnableBtn->setEnabled(true);
+    ui->collControlDisableBtn->setEnabled(false);
+
+    // 发送true
 	QJsonObject jsonToSend_0;
 	jsonToSend_0.insert("mission", 5);
 	jsonToSend_0.insert("isCollFlag", true);
@@ -710,6 +712,13 @@ void MainWindow::onCollSendTrueButton() {
 	server_->sendMessage(str);
 }
 void MainWindow::onCollSendFalseButton() {
+    // 断开障碍预测数据发送
+    disconnect(collPredTimer, SIGNAL(timeout()),nullptr,nullptr);
+    collPredTimer->stop();
+    ui->collControlEnableBtn->setEnabled(true);
+    ui->collControlDisableBtn->setEnabled(false);
+
+    // 发送false
 	QJsonObject jsonToSend_0;
 	jsonToSend_0.insert("mission", 5);
 	jsonToSend_0.insert("isCollFlag", false);
