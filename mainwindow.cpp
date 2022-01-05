@@ -234,9 +234,36 @@ void MainWindow::sendWayPoint() {
         jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
         jsonToSend.insert(QString::number(i)+"head", (int) -90);
     }
+
+	// 根据相邻wayPoints朝向计算并发送无人机朝向
+//	int n = wayPointList.size();
+//	jsonToSend.insert(QString::number(0)+"Lng", wayPointList.at(0).fLng - 0.0126);
+//	jsonToSend.insert(QString::number(0)+"Lat", wayPointList.at(0).fLat - 0.0062);
+//	jsonToSend.insert(QString::number(0)+"head", (int) 0);
+//	for (int i = 1; i < n; ++i) {
+//		jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng - 0.0126);
+//		jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
+//		int head = wayPointList.at(i).rotation - wayPointList.at(i-1).rotation;
+//		if (head > 180)
+//			head -= 360;
+//		else if (head < -180)
+//			head += 180;
+//		jsonToSend.insert(QString::number(i)+"head", head);
+//	}
+
     QString str = QString(QJsonDocument(jsonToSend).toJson());
     //qDebug()<<str;
     server_->sendMessage(str);
+}
+void MainWindow::onRecvdMsg(const QString& msg) {
+	qDebug()<<QString("Received message：%1").arg(msg);
+	QStringList lst;
+	lst = msg.split(',');
+	qDebug()<<lst;
+	fLng = lst[0].toDouble();
+	fLat = lst[1].toDouble();
+	qDebug()<<fixed<<qSetRealNumberPrecision(7)<<fLng<<" "<<fLat;   // 设置实数精度
+	bridgeins->newPoint(fLng,fLat);
 }
 void MainWindow::onClearAllPoint() {
     if(ui->wayPointsComboBox->count()>=1) {
@@ -246,20 +273,6 @@ void MainWindow::onClearAllPoint() {
 }
 void MainWindow::onReleaseNavSlider() {
     bridgeins->setNavPointRotate(int(ui->navigationPointDirectSlider->value()));
-}
-void MainWindow::onTakeoffButton() {
-    QJsonObject jsonToSend;
-    jsonToSend.insert("mission", 0);
-    QString str = QString(QJsonDocument(jsonToSend).toJson());
-    qDebug()<<str;
-    server_->sendMessage(str);
-}
-void MainWindow::onLandButton() {
-    QJsonObject jsonToSend;
-    jsonToSend.insert("mission", 4);
-    QString str = QString(QJsonDocument(jsonToSend).toJson());
-    qDebug()<<str;
-    server_->sendMessage(str);
 }
 void MainWindow::onSaveButton() {
     QJsonArray jsonArray;
@@ -329,6 +342,22 @@ Light_t MainWindow::jsonToWayPoints(const QJsonObject& jsonWayPoints) {
     tLight.nValue = jsonWayPoints.value("nValue").toInt();
     tLight.rotation = jsonWayPoints.value("rotation").toInt();
     return tLight;
+}
+
+// 无人机起降控制
+void MainWindow::onTakeoffButton() {
+	QJsonObject jsonToSend;
+	jsonToSend.insert("mission", 0);
+	QString str = QString(QJsonDocument(jsonToSend).toJson());
+	qDebug()<<str;
+	server_->sendMessage(str);
+}
+void MainWindow::onLandButton() {
+	QJsonObject jsonToSend;
+	jsonToSend.insert("mission", 4);
+	QString str = QString(QJsonDocument(jsonToSend).toJson());
+	qDebug()<<str;
+	server_->sendMessage(str);
 }
 
 // 无人机虚拟控制
@@ -615,16 +644,6 @@ void MainWindow::updateCommand_from_python_controller() {
     // 发送信息
     QString sWriteData = QString::number(direction);
     tcpSocket_for_python_controller->write(sWriteData.toUtf8());
-}
-void MainWindow::onRecvdMsg(const QString& msg) {
-    qDebug()<<QString("Received message：%1").arg(msg);
-    QStringList lst;
-    lst = msg.split(',');
-    qDebug()<<lst;
-    fLng = lst[0].toDouble();
-    fLat = lst[1].toDouble();
-    qDebug()<<fixed<<qSetRealNumberPrecision(7)<<fLng<<" "<<fLat;   // 设置实数精度
-    bridgeins->newPoint(fLng,fLat);
 }
 
 // TCP coll pred

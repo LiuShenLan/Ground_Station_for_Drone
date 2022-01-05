@@ -32,7 +32,7 @@
 #define CAM_LOAD_DRONE_CAMERA   2
 #define CAM_LOAD_PC_VIDEO       "../../dataset/dronet test video/all copy.mp4"
 // 摄像头读取选择
-#define CAM_LOAD    CAM_LOAD_DRONE_CAMERA
+#define CAM_LOAD    CAM_LOAD_PC_CAMERA
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG true
 #define CAM_SHOW_DETECT_CAMERA      "../../dataset/hostData/detece result/show_realTimeImg.jpg"
@@ -76,8 +76,7 @@ public:
 	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数
 
 protected:
-    void keyPressEvent(QKeyEvent *);    // 虚拟控制 键盘输入控制
-//    void keyReleaseEvent(QKeyEvent *);
+    void keyPressEvent(QKeyEvent *);    // 无人机虚拟控制，键盘输入控制dronet
 
 private:
     Ui::MainWindow *ui;
@@ -102,6 +101,8 @@ private:
     void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
     void onRecvTargetPoint(const QString& msg);     // 接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
     void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
+
+	// WayPoints
     void sendWayPoint();                            // 向TCP发送所有的WayPoints信息
     void onRecvdMsg(const QString& msg);            // 接收html确定的经纬度信息并设置WayPoints临时经纬度信息
 
@@ -121,7 +122,7 @@ private:
     int rollBias = 0, pitchBias = 0, yawBias = 0, throttleBias = 0; // 虚拟控制 键盘输入偏差
 
 private slots:  // 槽声明区
-    // 人工导航
+	// 无人机人工导航控制
     void onTurnLeftButton();    // 人工导航 左转按钮 Turn left
     void onTurnRightButton();   // 人工导航 右转按钮 Turn right
     void onGoStraightButton();  // 人工导航 直行按钮 Go straight
@@ -136,12 +137,14 @@ private slots:  // 槽声明区
     void onGoButton();      // 向TCP发送所有的WayPoints信息
     void onClearAllPoint(); // 移除所有WayPoints信息
     void onReleaseNavSlider();  // 设置导航点方向
-    void onTakeoffButton(); // 向TCP发送起飞命令
-    void onLandButton();    // 向TCP发送降落命令
     void onSaveButton();    // 保存WayPoints信息
     void onLoadButton();    // 读取WayPoints信息
     static QJsonObject wayPointsToJson(const Light_t& point); // wayPoints转换为Json
     static Light_t jsonToWayPoints(const QJsonObject& jsonWayPoints); // Json转换为wayPoints
+
+	// 无人机起降控制
+	void onTakeoffButton(); // 向TCP发送起飞命令
+	void onLandButton();    // 向TCP发送降落命令
 
     // 无人机虚拟控制
     void onEnableVirtualStickButton();  // 允许无人机虚拟控制
