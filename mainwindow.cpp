@@ -232,6 +232,7 @@ void MainWindow::sendWayPoint() {
     for(int i = 0; i < wayPointList.size(); i++) {
         jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng - 0.0126);
         jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
+        jsonToSend.insert(QString::number(i)+"head", (int) -90);
     }
     QString str = QString(QJsonDocument(jsonToSend).toJson());
     //qDebug()<<str;
