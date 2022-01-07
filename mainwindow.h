@@ -17,6 +17,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/video/video.hpp>
 
+#include <cmath>
+
 #include "bridge.h"
 
 // 安全模式最大速度
@@ -74,6 +76,15 @@ public:
     bool isCollFlag = false;    // 前方是否是障碍
 	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
 	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数
+
+	// GPS坐标系相互转换
+	// 无人机使用WGS84坐标，上位机html地图使用BD09坐标
+	QVector<double> WGS84ToBD09(double lng, double lat);	// WGS84坐标转BD09坐标
+	QVector<double> BD09ToWGS84(double lng, double lat);	// BD09坐标转WGS84坐标
+	static double transformLat(double lng, double lat);	// 坐标转换辅助函数
+	static double transformLng(double lng, double lat);	// 坐标转换辅助函数
+	const double transformMagicNumberA = 6378245.0;
+	const double transformMagicNumberB = 0.00669342162296594323;
 
 protected:
     void keyPressEvent(QKeyEvent *);    // 无人机虚拟控制，键盘输入控制dronet

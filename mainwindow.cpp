@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"  // Qt编译生成的与UI文件mainwindow.ui对应的类定义文件
 
 #include <QDebug>
-#include <math.h>
+#include <cmath>
 
 //#inMainWindowclude<cv.h>
 #include<opencv2/opencv.hpp>
@@ -734,4 +734,70 @@ void MainWindow::onCollSendFalseButton() {
  
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
+}
+
+// GPS坐标系相互转换
+QVector<double> MainWindow::WGS84ToBD09(double lng, double lat) {
+	//第一次转换
+	double dlat = transformLat(lng - 105.0, lat - 35.0);
+	double dlng = transformLng(lng - 105.0, lat - 35.0);
+	double radlat = lat / 180.0 * M_PI;
+	double magic = sin(radlat);
+	magic = 1 - transformMagicNumberB * magic * magic;
+	double sqrtmagic = sqrt(magic);
+	dlat = (dlat * 180.0) / ((transformMagicNumberA * (1 - transformMagicNumberB)) / (magic * sqrtmagic) * M_PI);
+	dlng = (dlng * 180.0) / (transformMagicNumberA / sqrtmagic * cos(radlat) * M_PI);
+	double mglat = lat + dlat;
+	double mglng = lng + dlng;
+
+	//第二次转换
+	double z = sqrt(mglng * mglng + mglat * mglat) + 0.00002 * sin(mglat * M_PI * 3000.0 / 180.0);
+	double theta = atan2(mglat, mglng) + 0.000003 * cos(mglng * M_PI * 3000.0 / 180.0);
+	double bd_lng = z * cos(theta) + 0.0065;
+	double bd_lat = z * sin(theta) + 0.006;
+
+	QVector<double> res(2);
+	res[0] = bd_lng;
+	res[1] = bd_lat;
+	return res;
+}
+QVector<double> MainWindow::BD09ToWGS84(double lng, double lat) {
+	// BD09转GCJ02
+	double x = lng - 0.0065;
+	double y = lat - 0.006;
+	double z = sqrt(x * x + y * y) - 0.00002 * sin(y * M_PI * 3000.0 / 180.0);
+	double theta = atan2(y, x) - 0.000003 * cos(x * M_PI * 3000.0 / 180.0);
+	double gcj02_lng = z * cos(theta);
+	double gcj02_lat = z * sin(theta);
+
+	// GCJ02转WGS84
+	double dlat = transformLat(gcj02_lng - 105.0, gcj02_lat - 35.0);
+	double dlng = transformLng(gcj02_lng - 105.0, gcj02_lat - 35.0);
+	double radlat = gcj02_lat / 180.0 * M_PI;
+	double magic = sin(radlat);
+	magic = 1 - transformMagicNumberB * magic * magic;
+	double sqrtmagic = sqrt(magic);
+	dlat = (dlat * 180.0) / ((transformMagicNumberA * (1 - transformMagicNumberB)) / (magic * sqrtmagic) * M_PI);
+	dlng = (dlng * 180.0) / (transformMagicNumberA / sqrtmagic * cos(radlat) * M_PI);
+	double mglat = gcj02_lat + dlat;
+	double mglng = gcj02_lng + dlng;
+
+	QVector<double> res(2);
+	res[0] = mglng;
+	res[1] = mglat;
+	return res;
+}
+double MainWindow::transformLat(double lng, double lat) {
+	double ret= -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * sqrt(abs(lng));
+	ret += (20.0 * sin(6.0 * lng * M_PI) + 20.0 * sin(2.0 * lng * M_PI)) * 2.0 / 3.0;
+	ret += (20.0 * sin(lat * M_PI) + 40.0 * sin(lat / 3.0 * M_PI)) * 2.0 / 3.0;
+	ret += (160.0 * sin(lat / 12.0 * M_PI) + 320 * sin(lat * M_PI / 30.0)) * 2.0 / 3.0;
+	return ret;
+}
+double MainWindow::transformLng(double lng, double lat) {
+	double ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * sqrt(abs(lng));
+	ret += (20.0 * sin(6.0 * lng * M_PI) + 20.0 * sin(2.0 * lng * M_PI)) * 2.0 / 3.0;
+	ret += (20.0 * sin(lng * M_PI) + 40.0 * sin(lng / 3.0 * M_PI)) * 2.0 / 3.0;
+	ret += (150.0 * sin(lng / 12.0 * M_PI) + 300.0 * sin(lng / 30.0 * M_PI)) * 2.0 / 3.0;
+	return ret;
 }
