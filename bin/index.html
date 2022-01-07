@@ -56,12 +56,8 @@
 
     //设置marker图标为飞机
     var vectorPlane = new BMap.Marker(new BMap.Point(point.lng + 0.04, point.lat - 0.03), {
-        // 初始化小飞机Symbol
-        icon: new BMap.Symbol(BMap_Symbol_SHAPE_PLANE, {
-            scale: 1,
-            fillColor: 'lightgreen',
-            fillOpacity: 0.8,
-            rotation: 0
+        icon: new BMap.Icon("plane.png", new BMap.Size(15, 15), {
+            offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)
         })
     });
 
@@ -146,8 +142,8 @@
 
     // 确定WayPoints显示图标：箭头/绿色圆形
     function addMarker(point, poi, index, rott) {
-        var myIcon = new BMap.Icon(poi.value == 0 ? "nav_point_small.png" : "circle_green.PNG",
-            new BMap.Size(32, 32),
+        var myIcon = new BMap.Icon(poi.value == 0 ? "nav_point.png" : "circle_green.PNG",
+            new BMap.Size(9, 15),
             {offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)
         }); // 显示图标选择
 
