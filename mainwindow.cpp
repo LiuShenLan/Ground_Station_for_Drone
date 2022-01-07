@@ -229,27 +229,16 @@ void MainWindow::sendWayPoint() {
     jsonToSend.insert("mission", 1);            //takeoff = 0, waypoint = 1
     jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
     jsonToSend.insert("way_point_num", wayPointList.size());
-    for(int i = 0; i < wayPointList.size(); i++) {
-        jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng - 0.0126);
-        jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
-        jsonToSend.insert(QString::number(i)+"head", (int) -90);
-    }
 
-	// 根据相邻wayPoints朝向计算并发送无人机朝向
-//	int n = wayPointList.size();
-//	jsonToSend.insert(QString::number(0)+"Lng", wayPointList.at(0).fLng - 0.0126);
-//	jsonToSend.insert(QString::number(0)+"Lat", wayPointList.at(0).fLat - 0.0062);
-//	jsonToSend.insert(QString::number(0)+"head", (int) 0);
-//	for (int i = 1; i < n; ++i) {
-//		jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng - 0.0126);
-//		jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
-//		int head = wayPointList.at(i).rotation - wayPointList.at(i-1).rotation;
-//		if (head > 180)
-//			head -= 360;
-//		else if (head < -180)
-//			head += 180;
-//		jsonToSend.insert(QString::number(i)+"head", head);
-//	}
+	// 根据wayPoints朝向计算并发送无人机朝向
+	int n = wayPointList.size();
+	for (int i = 0; i < n; ++i) {
+		jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng - 0.0126);
+		jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
+		int head = wayPointList.at(i).rotation;
+		head = head > 180 ? head - 360 : head;
+		jsonToSend.insert(QString::number(i)+"head", head);
+	}
 
     QString str = QString(QJsonDocument(jsonToSend).toJson());
     //qDebug()<<str;
