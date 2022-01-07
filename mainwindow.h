@@ -65,17 +65,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    double fLng;    // 经度
-    double fLat;    // 纬度
-    double direction;   // QT上位机显示前进方向无人机前进方向，从html地图地区或手动设置
-    double manul_direction; // 手动设置无人机前进方向，顺时针标记前进角度
-    bool setRollFlag = false;
-
-    double collPred = 1.0;      // coll 预测值
-    double collThreshold = 0.5; // 障碍预测阈值
-    bool isCollFlag = false;    // 前方是否是障碍
-	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
-	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数
 
 	// GPS坐标系相互转换
 	// 无人机使用WGS84坐标，上位机html地图使用BD09坐标
@@ -86,32 +75,18 @@ public:
 	const double transformMagicNumberA = 6378245.0;
 	const double transformMagicNumberB = 0.00669342162296594323;
 
-protected:
-    void keyPressEvent(QKeyEvent *);    // 无人机虚拟控制，键盘输入控制dronet
-
 private:
-    Ui::MainWindow *ui;
+	// Init
+	Ui::MainWindow *ui;
     Ui::Server *server_;
     QDockWidget* dock_server_;
     bridge *bridgeins;
-
-    // Init
     void InitForm();    // 窗口初始化
     void InitVirtualStickControl(); // 无人机虚拟控制初始化
 
     // 地图显示
     QTimer* timer_1;    // 100ms定时器 读取GPS与无人机信息并显示
     QTimer* timer_2;    // 200ms定时器 调用JAVA程序 在地图上显示导航点
-
-    // 虚拟控制
-    QTimer* virtualStickTimer;  // 100ms定时器 向无人机发送虚拟控制信息
-
-    // TCP dronet
-    QTcpServer tcpServer_for_python_controller;     // dronet TCP server
-    QTcpSocket *tcpSocket_for_python_controller;    // dronet TCP socket
-    void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
-    void onRecvTargetPoint(const QString& msg);     // 接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
-    void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
 
 	// WayPoints
     void sendWayPoint();                            // 向TCP发送所有的WayPoints信息
@@ -121,6 +96,11 @@ private:
     QTcpServer tcpServer_for_coll_pred;     // coll pred TCP server
     QTcpSocket *tcpSocket_for_coll_pred;    // coll pred TCP socket
     qint64 coll_pre_receive_length = 12;    // TCP socket收到的coll pre数据长度(防止数据接受出错)
+	double collPred = 1.0;      // coll 预测值
+	double collThreshold = 0.5; // 障碍预测阈值
+	bool isCollFlag = false;    // 前方是否是障碍
+	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
+	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数
     void acceptConnection_for_coll_pred();  // TCP 接受信息并设置虚拟控制与方向数值
     void update_coll_pred();                // 接受coll pred数据并发送
     QTimer* collPredTimer;                  // 定时器 向无人机发送障碍预测信息
@@ -130,14 +110,24 @@ private:
     cv::VideoCapture cam;   // 从 摄像头/本地视频 读取图片
     cv::Mat frame;  // 图片帧
 
-    int rollBias = 0, pitchBias = 0, yawBias = 0, throttleBias = 0; // 虚拟控制 键盘输入偏差
+	// 虚拟控制
+	QTimer* virtualStickTimer;  // 100ms定时器 向无人机发送虚拟控制信息
+	void keyPressEvent(QKeyEvent *);    // 无人机虚拟控制，键盘输入控制dronet
+	int rollBias = 0, pitchBias = 0, yawBias = 0, throttleBias = 0; // 虚拟控制 键盘输入偏差
+
+	// 手动控制
+	double direction;   // QT上位机显示前进方向无人机前进方向，从html地图地区或手动设置
+	double manul_direction; // 手动设置无人机前进方向，顺时针标记前进角度
+
+	// TCP dronet
+	bool setRollFlag = false;	// 手动设置dronet最大前进速度
+	QTcpServer tcpServer_for_python_controller;     // dronet TCP server
+	QTcpSocket *tcpSocket_for_python_controller;    // dronet TCP socket
+	void acceptConnection_for_python_controller();  // TCP 接受信息并设置虚拟控制与方向数值
+	void onRecvTargetPoint(const QString& msg);     // 接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
+	void updateCommand_from_python_controller();    // 接受python socket数据并设置虚拟控制与方向信息
 
 private slots:  // 槽声明区
-	// 无人机人工导航控制
-    void onTurnLeftButton();    // 人工导航 左转按钮 Turn left
-    void onTurnRightButton();   // 人工导航 右转按钮 Turn right
-    void onGoStraightButton();  // 人工导航 直行按钮 Go straight
-
     // 刷新地图、GPS与无人机信息
     void on_GPSMapRefreshBtn_clicked();   // 刷新地图、GPS与无人机信息
     void timeCountsFunction();  // 读取GPS与无人机信息并显示
@@ -153,21 +143,6 @@ private slots:  // 槽声明区
     static QJsonObject wayPointsToJson(const Light_t& point); // wayPoints转换为Json
     static Light_t jsonToWayPoints(const QJsonObject& jsonWayPoints); // Json转换为wayPoints
 
-	// 无人机起降控制
-	void onTakeoffButton(); // 向TCP发送起飞命令
-	void onLandButton();    // 向TCP发送降落命令
-
-    // 无人机虚拟控制
-    void onEnableVirtualStickButton();  // 允许无人机虚拟控制
-    void sendVirtualStickCommand();     // 向TCP发送无人机虚拟控制信息
-    void onDisableVirtualStickButton(); // 禁止无人机虚拟控制
-    void onReleaseYawSlider();          // 清除虚拟控制航向数值
-    void onReleasePitchSlider();        // 清除虚拟控制俯仰数值
-    void onReleaseRollSlider();         // 清除虚拟控制横滚数值
-    void onSetRoll();                   // 设置Roll滑块信息
-    void onReleaseThrottleSlider();     // 清除虚拟控制油门数值
-    void onVirtualStickResetButton();   // 重置虚拟控制
-
     // 无人机障碍预测
     void onEnableCollButton();  // 允许无人机障碍预测
     void sendCollPredCommand(); // 向TCP发送无人机障碍预测信息
@@ -179,6 +154,26 @@ private slots:  // 槽声明区
     // 摄像头
     void readFarme();   // 读取摄像头信息
     void closeCamara(); // 关闭摄像头，释放资源，必须释放
+
+	// 无人机起降控制
+	void onTakeoffButton(); // 向TCP发送起飞命令
+	void onLandButton();    // 向TCP发送降落命令
+
+	// 无人机虚拟控制
+	void onEnableVirtualStickButton();  // 允许无人机虚拟控制
+	void sendVirtualStickCommand();     // 向TCP发送无人机虚拟控制信息
+	void onDisableVirtualStickButton(); // 禁止无人机虚拟控制
+	void onReleaseYawSlider();          // 清除虚拟控制航向数值
+	void onReleasePitchSlider();        // 清除虚拟控制俯仰数值
+	void onReleaseRollSlider();         // 清除虚拟控制横滚数值
+	void onSetRoll();                   // 设置Roll滑块信息
+	void onReleaseThrottleSlider();     // 清除虚拟控制油门数值
+	void onVirtualStickResetButton();   // 重置虚拟控制
+
+	// 无人机人工导航控制
+	void onTurnLeftButton();    // 人工导航 左转按钮 Turn left
+	void onTurnRightButton();   // 人工导航 右转按钮 Turn right
+	void onGoStraightButton();  // 人工导航 直行按钮 Go straight
 };
 
 #endif // MAINWINDOW_H

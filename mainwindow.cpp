@@ -249,10 +249,10 @@ void MainWindow::onRecvdMsg(const QString& msg) {
 	QStringList lst;
 	lst = msg.split(',');
 	qDebug()<<lst;
-	fLng = lst[0].toDouble();
-	fLat = lst[1].toDouble();
-	qDebug()<<fixed<<qSetRealNumberPrecision(7)<<fLng<<" "<<fLat;   // 设置实数精度
-	bridgeins->newPoint(fLng,fLat);
+//	fLng = lst[0].toDouble();	经度
+//	fLat = lst[1].toDouble();	维度
+	qDebug()<<fixed<<qSetRealNumberPrecision(7)<<lst[0].toDouble()<<" "<<lst[1].toDouble();   // 设置实数精度
+	bridgeins->newPoint(lst[0].toDouble(),lst[1].toDouble());
 }
 void MainWindow::onClearAllPoint() {
     if(ui->wayPointsComboBox->count()>=1) {

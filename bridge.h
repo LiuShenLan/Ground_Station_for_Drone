@@ -42,9 +42,9 @@ private:
     bridge();   // 空构造函数
 	void SetLightValue(const QString& strName, int nValue); // 将WayPoints中的strName为strName的WayPoints的nValue设置为nValue
 signals:    // 信号声明区
-    void sigUpdateLight();
-    void removePoints();
-	void sigLightStatus(const QString& strName, int nvalue);
+    void sigUpdateLight();	// 调用js程序，在地图中显示WayPoints
+    void removePoints();	// 调用js程序，清除地图中显示的WayPoints
+	void sigLightStatus(const QString& strName, int nvalue);	// 将WayPoints中的strName为name的WayPoints的nValue设置为value
     void toRecvMsg(const QString& msg);             //收到数据
     void targetPointReceived(const QString& msg);   // TCP 接收到目标点信息
     void rotateNavPoint(int rot);                   // 旋转导航点方向
@@ -53,7 +53,7 @@ public slots:   // 槽声明区
     void onLightOn(const QString& strName);    // 将WayPoints中的strName的nValue设置为1
 	void onLightOff(const QString& strName);   // 将WayPoints中的strName的nValue设置为0
     QVariantList GetLightData();        // 返回WayPoints list的map形式
-	void onUpdateData();                // WayPoints更新数据
+	void onUpdateData();                // 调用js程序，在地图中显示WayPoints
     // 发射信号
     void jsSendMsg(const QString& msg); // 发射toRecvMsg信号，其中msg为在html中点击确定的经纬度信息
     void jsSendTargetPoint(const QString& msg); // 发射targetPointReceived信号，即调用MainWindow::onRecvTargetPoint函数
