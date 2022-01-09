@@ -2,197 +2,153 @@
 #include "bridge.h"
 
 namespace Ui {
-    // Init
-    Server::Server(QWidget* parent)
-    {
-        setWindowFlags(Qt::Window);
-        setWindowTitle("Log");
-        resize(320, 640);
+	// Init
+	Server::Server(QWidget* parent) {
+		setWindowFlags(Qt::Window);
+		setWindowTitle("Log");
+		resize(320, 640);
 
-        auto* grid = new QGridLayout(this);  // 网格布局
-        grid->setContentsMargins(5, 10, 5, 5);  // 设置内容边距
+		auto* grid = new QGridLayout(this);	// 网格布局
+		grid->setContentsMargins(5, 10, 5, 5);	// 设置内容边距
 
-        auto* upper_button_layout = new QHBoxLayout();   // 水平布局
+		auto* upper_button_layout = new QHBoxLayout();	// 水平布局
 
-        setIpAddress = new QLineEdit(); // 单行文本编辑器
-        upper_button_layout->addWidget(setIpAddress);
+		// 获取主机所有可能的ip地址
+		ipAllList = QNetworkInterface::allAddresses();	// 返回主机上找到的所有的IP地址
+		foreach (QHostAddress address, ipAllList)
+			if(address.protocol() == QAbstractSocket::IPv4Protocol) // 使用IPv4地址
+				qDebug() <<"发现IPv4地址 IP Address: "<< address.toString();
 
-    //    ifHostIp = new QCheckBox(tr("Host IP"),this); //check box button is useless
-    //    upper_button_layout->addWidget(ifHostIp);
-    //    connect(ifHostIp, &QCheckBox::stateChanged, this, &Server::responseToCheckBox);
+		auto* lower_button_layout = new QHBoxLayout();
 
-        /******To get possible host ip address******/
-        ipList = QNetworkInterface::allAddresses(); // 返回主机上找到的所有的IP地址
-        foreach (QHostAddress address, ipList)
-        {
-            if(address.protocol() == QAbstractSocket::IPv4Protocol) //我们使用IPv4地址
-                qDebug() <<"IP Address: "<<address.toString();
-    //            setIpAddress->setText(QString::fromStdString(address.toString()));
-        }
+		// listen按钮
+		MyUXListenBtn = new QPushButton(tr("listen"), this);
+		connect(MyUXListenBtn, &QPushButton::released, this, &Server::onMyUXListenBtn);
+		lower_button_layout->addWidget(MyUXListenBtn);
+		// clear按钮
+		auto* MyUXClearBtn = new QPushButton(tr("Clear"), this);
+		connect(MyUXClearBtn, &QPushButton::released, this, &Server::onMyUXClearBtn);
 
+		lower_button_layout->addWidget(MyUXClearBtn);
+		grid->addLayout(lower_button_layout, 1, 0, Qt::AlignLeft);
+		grid->addLayout(upper_button_layout, 0, 0, Qt::AlignLeft);
 
-        auto* lower_button_layout = new QHBoxLayout();
+		// MyUX信息显示区域初始化
+		MyUXTextEdit = new QTextEdit(this);
+		MyUXTextEdit->setObjectName(QStringLiteral("MyUXTextEdit"));
+		MyUXTextEdit->setReadOnly(true);
+		grid->addWidget(MyUXTextEdit, 2, 0, 1, 2);
 
-        // listen按钮
-        save_log_button = new QPushButton(tr("listen"), this);
-        connect(save_log_button, &QPushButton::released, this, &Server::startListening);
-        lower_button_layout->addWidget(save_log_button);
-        // clear按钮
-        auto* clear_button = new QPushButton(tr("Clear"), this);
-        connect(clear_button, &QPushButton::released, this, &Server::clear);
-        lower_button_layout->addWidget(clear_button);
+		// MyUX TCP链接初始化
+		tcpServerConnectionMyUXReceive = new QTcpSocket(this);
+		tcpServerConnectionMyUXSend = new QTcpSocket(this);
+		tcpSocketMyUXSendList = new QList<QTcpSocket*>;
+		connect(&tcpServerMyUXReceive, &QTcpServer::newConnection, this, &Server::acceptConnectionMyUXReceive);
+		connect(&tcpServerMyUXSend, &QTcpServer::newConnection, this, &Server::acceptConnectionMyUXSend);
+	}
 
-        grid->addLayout(lower_button_layout, 1, 0, Qt::AlignLeft);
+	// TCP
+	void Server::sendMessage(const QString& information) {
+		qDebug() << "向MuUX发送数据";
+		QByteArray message = information.toLocal8Bit();  // 将字符串的本地8位表示作为QByteArray返回
+		for(auto i : *tcpSocketMyUXSendList)
+			i->write(message);
+	}
 
-        grid->addLayout(upper_button_layout, 0, 0, Qt::AlignLeft);
+	// lsiten
+	void Server::onMyUXListenBtn() {
+		 if (!tcpServerMyUXReceive.isListening() && !tcpServerMyUXReceive.listen(QHostAddress::Any, 6666)) {
+			 // QHostAddress::Any = 4 	双any-address栈，与该地址绑定的socket将侦听IPv4和IPv6接口。
+			 // tcpServerMyUXReceive没有正在监听传入链接并且没有监听6666端口
+			 qDebug() << "MyUX接收数据TCP端口未监听" << tcpServerMyUXReceive.errorString();
+			 close();
+			 return;
+		 }
+		 if(tcpServerMyUXReceive.isListening()) {
+			 MyUXListenBtn->setEnabled(false);
+			 qDebug() <<"============== 开始监听MyUX数据接收TCP端口 ==============";
+		 }
+		 if (!tcpServerMyUXSend.isListening() && !tcpServerMyUXSend.listen(QHostAddress::Any, 6665)) {
+			 // QHostAddress::Any = 4 	双any-address栈，与该地址绑定的socket将侦听IPv4和IPv6接口。
+			 // tcpServer_for_send没有正在监听传入链接并且没有监听6665端口
+			 qDebug() << "MyUX发送数据TCP端口未监听" << tcpServerMyUXSend.errorString();
+			 close();
+			 return;
+		 }
+		 if(tcpServerMyUXSend.isListening())
+			 qDebug() <<"============== 开始监听MyUX数据发送TCP端口，可以开始向MyUX发送数据 ==============";
+	}
+	void Server::onMyUXClearBtn() {
+		MyUXTextEdit->clear();
+	}
+	void Server::acceptConnectionMyUXReceive() {
+		qDebug() << "============== 接收MyUX数据TCP连接成功 ==============";
+		tcpServerConnectionMyUXReceive = tcpServerMyUXReceive.nextPendingConnection();
+		connect(tcpServerConnectionMyUXReceive, &QTcpSocket::readyRead, this, &Server::updateServerProgress);
+	}
+	void Server::updateServerProgress() {
+		qDebug() << "MyUX TCP socket 接收数据成功";
+		// 时间
+		QDateTime time = QDateTime::currentDateTime();
+		QString str = time.toString("\n[ hh:mm:ss ]"); // 时间信息，设置显示格式
 
-        textEdit = new QTextEdit(this);
-        textEdit->setObjectName(QStringLiteral("textEdit"));
-        textEdit->setReadOnly(true);
-        grid->addWidget(textEdit, 2, 0, 1, 2);
+		// 读取数据
+		qint64 len = tcpServerConnectionMyUXReceive->bytesAvailable();
+		QByteArray alldata = tcpServerConnectionMyUXReceive->read(len);
+		//开始转换编码
+		QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
+		QString utf8str = utf8codec->toUnicode(alldata.mid(2));
 
+		json = getJsonObjectFromString(utf8str);
 
-        tcpServerConnection_for_receive = new QTcpSocket(this);
-        tcpServerConnection_for_send = new QTcpSocket(this);
-        socket_list = new QList<QTcpSocket*>;
-        connect(&tcpServer_for_receive, &QTcpServer::newConnection,
-                this, &Server::acceptConnection_for_receive);
-        connect(&tcpServer_for_send, &QTcpServer::newConnection,
-                this, &Server::acceptConnection_for_send);
-    }
+		if(json.contains("GPS"))
+			jsonGPS = json["GPS"].toObject();
 
-    // TCP
-    void Server::sendMessage(const QString& infomation)
-    {
-        qDebug() << "send data to socket";
-        QByteArray message = infomation.toLocal8Bit();  // 将字符串的本地8位表示作为QByteArray返回
-    //    QDataStream out(&message, QIODevice::WriteOnly);
-    //    out.setVersion(QDataStream::Qt_DefaultCompiledVersion);
-    //    out<<infomation.toLocal8Bit();
-        //qDebug()<<message;
-        for(auto i : *socket_list)
-            i->write(message);
-    }
+		if(json.contains("Gimbal"))
+			jsonGimbal = json["Gimbal"].toObject();
 
-    // lsiten
-    void Server::startListening()
-    {
-        //   if (!tcpServer.listen(QHostAddress::LocalHost, 6666)) {
-         if (!tcpServer_for_receive.isListening() && !tcpServer_for_receive.listen(QHostAddress::Any, 6666))  //QHostAddress::Any = 4 	双any-address栈，与该地址绑定的socket将侦听IPv4和IPv6接口。
-         {  // tcpServer_for_receive没有正在监听传入链接并且没有监听6666端口
-               qDebug() <<"error_in_sever_for_receive"<< tcpServer_for_receive.errorString();
-               close();
-               return;
-         }
-         if(tcpServer_for_receive.isListening())
-         {
-             save_log_button->setEnabled(false);
-             qDebug() <<"=============start listening==========";
-         }
-         if (!tcpServer_for_send.isListening() && !tcpServer_for_send.listen(QHostAddress::Any, 6665))  //QHostAddress::Any = 4 	双any-address栈，与该地址绑定的socket将侦听IPv4和IPv6接口。
-         {  // tcpServer_for_send没有正在监听传入链接并且没有监听6665端口
-               qDebug() <<"error_in_sever_for_send"<< tcpServer_for_send.errorString();
-               close();
-               return;
-         }
-         if(tcpServer_for_send.isListening())
-         {
-             qDebug() <<"=============ok for send==========";
-         }
-    }
-    void Server::updateServerProgress()
-    {
-        qDebug() << "read data form socket";
-        // 时间
-        QDateTime time = QDateTime::currentDateTime();
-        QString str = time.toString("\n[ hh:mm:ss ]"); // 时间信息，设置显示格式
-        //qDebug()<<str;
+		if(json.contains("Battery0"))
+			jsonBattery = json["Battery0"].toObject();
 
-        // 读取数据
-        qint64 len = tcpServerConnection_for_receive->bytesAvailable();
-        //qDebug()<<"socket data len:"<< len;
-        QByteArray alldata = tcpServerConnection_for_receive->read(len);
-        //开始转换编码
-        QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
-        QString utf8str = utf8codec->toUnicode(alldata.mid(2));
-//        qDebug()<<"hex:["<<alldata.toHex().toUpper()<<"]";
-//        qDebug()<<"utf-8 ["<< (utf8str) << "]";
+		//显示数据到状态栏上
+		MyUXTextEdit->insertPlainText(str);		// 显示时间
+		MyUXTextEdit->insertPlainText(utf8str);	// 显示信息
+		MyUXTextEdit->insertPlainText(tr("\n"));
 
+		//自动滚动到最底
+		MyUXScrollBar = MyUXTextEdit->verticalScrollBar();
+		if (MyUXScrollBar)
+			MyUXScrollBar->setSliderPosition(MyUXScrollBar->maximum());
+	}
+	void Server::acceptConnectionMyUXSend() {
+		qDebug() << "============== 发送MyUX数据TCP连接成功 ==============";
+		tcpServerConnectionMyUXSend = tcpServerMyUXSend.nextPendingConnection();
+		tcpSocketMyUXSendList->append(tcpServerConnectionMyUXSend);
+		qDebug() <<"============== 发现MyUX数据发送目标 ==============";
+	}
 
-        json = getJsonObjectFromString(utf8str);
+	QJsonObject Server::getJsonObjectFromString(const QString& jsonString) {
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toLocal8Bit().data());
+		if( jsonDocument.isNull() )
+			qDebug()<< "Server::getJsonObjectFromString 转换失败，请检查string "<< jsonString.toLocal8Bit().data();
+		QJsonObject jsonObject = jsonDocument.object();
 
-        if(json.contains("GPS")){
-            jsonGPS = json["GPS"].toObject();
-//            qDebug()<<"\n->"<< jsonGPS["altitude"].toDouble();
-        }
+//		saveUAVStatus(SAVE_JSON_TEMP_PATH, SAVE_JSON_RENAME_PATH, jsonString);  // 保存QJson文件
 
-        if(json.contains("Gimbal")){
-            jsonGimbal = json["Gimbal"].toObject();
-        }
-        if(json.contains("Battery0")){
-            jsonBattery = json["Battery0"].toObject();
-        }
+		return jsonObject;
+	}
+	void Server::saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString& jsonString){
+		// 删除已存在文件
+		if(access(saveTempPath,F_OK))
+			remove(saveTempPath);
 
-        //显示到lesten状态栏上
-        textEdit->insertPlainText(str);//在标签上显示时间
-        textEdit->insertPlainText(utf8str);
-        textEdit->insertPlainText(tr("\n"));
+		QByteArray byteArray = jsonString.toLocal8Bit();
 
+		QFile file(saveTempPath);
 
-        //自动滚动到最底
-        scrollbar = textEdit->verticalScrollBar();
-        if (scrollbar)
-            scrollbar->setSliderPosition(scrollbar->maximum());
-
-//        QString ser = "test,test,test,test,test,test\n";
-//        sendMessage(ser);
-    }
-    void Server::acceptConnection_for_receive()
-    {
-        qDebug() << "============== tcpServer receive connect ==============";
-        tcpServerConnection_for_receive = tcpServer_for_receive.nextPendingConnection();
-        connect(tcpServerConnection_for_receive, &QTcpSocket::readyRead,
-                this, &Server::updateServerProgress);
-        //    connect(tcpServerConnection, SIGNAL(error(QAbstractSocket::SocketError)),
-        //            this, SLOT(displayError(QAbstractSocket::SocketError)));
-        //  ui->serverStatusLabel->setText(tr("接受连接"));
-        //  关闭服务器，不再进行监听
-        //  tcpServer.close();
-    }
-    void Server::acceptConnection_for_send()
-    {
-        qDebug() << "============== tcpServer send connect ==============";
-        tcpServerConnection_for_send = tcpServer_for_send.nextPendingConnection();
-        socket_list->append(tcpServerConnection_for_send);
-        qDebug() <<"============== found send target=========";
-    }
-    void Server::clear(){
-        textEdit->clear();
-    }
-
-    QJsonObject Server::getJsonObjectFromString(const QString& jsonString){
-        QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonString.toLocal8Bit().data());
-        if( jsonDocument.isNull() ){
-            qDebug()<< "===> please check the string "<< jsonString.toLocal8Bit().data();
-        }
-        QJsonObject jsonObject = jsonDocument.object();
-
-        saveUAVStatus(SAVE_JSON_TEMP_PATH, SAVE_JSON_RENAME_PATH, jsonString);  // 保存QJson文件
-
-        return jsonObject;
-    }
-    void Server::saveUAVStatus(const char* saveTempPath, const char* saveRenamePath, const QString& jsonString){
-        // 删除已存在文件
-        if(access(saveTempPath,F_OK))
-            remove(saveTempPath);
-
-        QByteArray byteArray = jsonString.toLocal8Bit();
-
-        QFile file(saveTempPath);
-
-        file.open(QIODevice::WriteOnly);
-        file.write(byteArray);
-        file.close();
-        rename(saveTempPath, saveRenamePath);
-    }
+		file.open(QIODevice::WriteOnly);
+		file.write(byteArray);
+		file.close();
+		rename(saveTempPath, saveRenamePath);
+	}
 } //namespce Ui

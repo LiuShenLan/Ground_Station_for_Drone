@@ -18,8 +18,8 @@ Please refer to the UAVPatrol project webpage: http://www.yfan.site/UAVPatrol.ht
 |mission|3|禁止虚拟控制|
 |mission|4|降落|
 
-tcpServer_for_receive port: 6666
+tcpServerMyUXReceive port: 6666
 
-tcpServer_for_send port: 6665
+tcpServerMyUXSend port: 6665
 
-tcpServer_for_python_controller port: 5555
+tcpServerDronet port: 5555
