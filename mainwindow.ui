@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1124</width>
-    <height>707</height>
+    <width>1158</width>
+    <height>774</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -28,7 +28,7 @@
         <property name="minimumSize">
          <size>
           <width>640</width>
-          <height>320</height>
+          <height>360</height>
          </size>
         </property>
         <property name="baseSize">
@@ -701,68 +701,80 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QPushButton" name="GPSMapRefreshBtn">
-            <property name="text">
-             <string>Map Refresh</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Lat</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="GPSLatitudeLineEdit">
-            <property name="minimumSize">
-             <size>
-              <width>60</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>29.6169</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Lng</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="GPSLongitudeLineEdit">
-            <property name="minimumSize">
-             <size>
-              <width>60</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>106.4988</string>
-            </property>
-            <property name="cursorPosition">
-             <number>8</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Height </string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="GPSHeight">
-            <property name="text">
-             <string>000.0</string>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_21">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Lng</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="GPSLongitudeLineEdit">
+                <property name="minimumSize">
+                 <size>
+                  <width>60</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>117.02295264532911</string>
+                </property>
+                <property name="cursorPosition">
+                 <number>18</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="GPSMapRefreshBtn">
+                <property name="text">
+                 <string>Map Refresh</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Lat </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="GPSLatitudeLineEdit">
+                <property name="minimumSize">
+                 <size>
+                  <width>60</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>36.649037739371316</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Height </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="GPSHeight">
+                <property name="text">
+                 <string>000.0</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>

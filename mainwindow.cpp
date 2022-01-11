@@ -1,10 +1,9 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"  // Qt编译生成的与UI文件mainwindow.ui对应的类定义文件
+#include "ui_mainwindow.h"
 
 #include <QDebug>
 #include <cmath>
 
-//#inMainWindowclude<cv.h>
 #include<opencv2/opencv.hpp>
 
 #include <QCoreApplication>
@@ -31,7 +30,7 @@ protected:
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),		// 执行父类QMainWindow的构造函数
 	ui(new Ui::MainWindow) {	// 创建一个Ui::MainWindow类的对象
-	ui->setupUi(this);  // 执行Ui::MainWindow类的setupUi()函数，实现窗口的生成与各种属性的设置、信号与槽的关联
+	ui->setupUi(this);	// 执行Ui::MainWindow类的setupUi()函数，实现窗口的生成与各种属性的设置、信号与槽的关联
 	InitForm();
 	InitVirtualStickControl();
 
@@ -60,21 +59,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	timer = new QTimer(this);
 	timer->start(50);	// 开始计时，超时则发出timeout()信号，读取摄像头信息
-	connect(timer, SIGNAL(timeout()), this, SLOT(readFarme()));  // 时间到，读取当前摄像头信息
+	connect(timer, SIGNAL(timeout()), this, SLOT(readFarme()));	// 时间到，读取当前摄像头信息
 }
 void MainWindow::InitForm() {
+	// html地图相关初始化
 	auto *channel = new QWebChannel(this);
 	bridgeins = bridge::instance(); // 返回bridge对象
-	channel->registerObject("bridge", (QObject*)bridgeins); // 将bridgeins对象注册到channel
+	channel->registerObject("bridge", (QObject*)bridgeins);	// 将bridgeins对象注册到channel
 	ui->mapShow->page()->setWebChannel(channel);
 	ui->mapShow->page()->load(QUrl::fromLocalFile(qApp->applicationDirPath() + "/bin/index.html"));
 
 	// WayPoints初始化
-	const QList<wayPoint>& list = bridgeins->GetLightList();
-	int nCount = list.count();
+	const QList<wayPoint>& wayPointsList = bridgeins->GetLightList();
+	int nCount = wayPointsList.count();
 	for(int i=0; i<nCount; i++) {
-		wayPoint tLight = list[i];
-		ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);   // 在WayPoints下拉菜单中添加信息
+		wayPoint tLight = wayPointsList[i];
+		ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);	// 在WayPoints下拉菜单中添加信息
 	}
 	ui->wayPointsComboBox->setCurrentIndex(0);
 	connect(ui->wayPointsAddBtn, SIGNAL(clicked()), this, SLOT(onBtnAddLight()));
@@ -87,10 +87,10 @@ void MainWindow::InitForm() {
 	connect(ui->wayPointsLoadBtn, SIGNAL(clicked()), this, SLOT(onLoadButton()));
 
 	// GPS Data初始化
-	ui->GPSLatitudeLineEdit->setMinimumWidth(10);
-	ui->GPSLongitudeLineEdit->setMinimumWidth(10);
+	ui->GPSLatitudeLineEdit->setMinimumWidth(18);
+	ui->GPSLongitudeLineEdit->setMinimumWidth(18);
 	connect(bridgeins, &bridge::toRecvMsg, this, &MainWindow::onRecvdMsg);
-	connect(ui->GPSMapRefreshBtn, SIGNAL(clicked()), this, SLOT(on_GPSMapRefreshBtn_clicked()));
+	connect(ui->GPSMapRefreshBtn, SIGNAL(clicked()), this, SLOT(onGPSMapRefreshBtn()));
 
 	// 无人机方向控制
 	connect(ui->manualDirectTurnLeftBtn,SIGNAL(clicked()), this, SLOT(onTurnLeftButton()));
@@ -98,13 +98,13 @@ void MainWindow::InitForm() {
 	connect(ui->manualDirectGoStraightBtn,SIGNAL(clicked()), this, SLOT(onGoStraightButton()));
 }
 void MainWindow::InitVirtualStickControl() {
-	tcpSocketDronet = new QTcpSocket(this);
 	// 无人机虚拟控制
+	tcpSocketDronet = new QTcpSocket(this);
 	connect(ui->virtualStickEnableBtn, SIGNAL(clicked()), this, SLOT(onEnableVirtualStickButton()));
 	connect(ui->virtualStickDisableBtn, SIGNAL(clicked()), this, SLOT(onDisableVirtualStickButton()));
 	connect(ui->virtualStickRollSetBtn, SIGNAL(clicked()), this, SLOT(onSetRoll()));
 	connect(ui->virtualStickResetBtn, SIGNAL(clicked()), this, SLOT(onVirtualStickResetButton()));
-	virtualStickTimer = new QTimer(this);   // 实例化定时器
+	virtualStickTimer = new QTimer(this);	// 实例化定时器
 	ui->virtualStickDisableBtn->setEnabled(false);
 	// 虚拟控制滑块
 	ui->virtualStickYawSlider->setMaximum(1000);
@@ -131,12 +131,12 @@ void MainWindow::InitVirtualStickControl() {
 
 	// TCP dronet
 	if(!tcpServerDronet.isListening() && !tcpServerDronet.listen(QHostAddress::LocalHost, 5555)) {
-		qDebug() << "error_in_sever_for_receive" << tcpServerDronet.errorString();
+		qDebug() << "dronet接收数据TCP端口未监听" << tcpServerDronet.errorString();
 		close();
 		return;
 	}
 	if(tcpServerDronet.isListening())
-		qDebug()<<"=============start listening to dronet==========";
+		qDebug()<<"============== 开始监听dronet数据接收TCP端口 ==============";
 	connect(&tcpServerDronet, &QTcpServer::newConnection, this, &MainWindow::acceptConnectionDrenet);
 
 	// TCP coll pred
@@ -149,12 +149,12 @@ void MainWindow::InitVirtualStickControl() {
 	ui->collControlDisableBtn->setEnabled(false);
 
 	if(!tcpServerCollPred.isListening() && !tcpServerCollPred.listen(QHostAddress::LocalHost, 5556)) {
-		qDebug() << "error_in_sever_for_receive" << tcpServerCollPred.errorString();
+		qDebug() << "coll pred接收数据TCP端口未监听" << tcpServerCollPred.errorString();
 		close();
 		return;
 	}
 	if(tcpServerCollPred.isListening())
-		qDebug()<<"=============start listening to coll pred==========";
+		qDebug()<<"============== 开始监听coll pred数据接收TCP端口 ==============";
 	connect(&tcpServerCollPred, &QTcpServer::newConnection, this, &MainWindow::acceptConnectionCollPred);
 }
 MainWindow::~MainWindow() {
@@ -173,7 +173,7 @@ void MainWindow::onGoStraightButton() {
 }
 
 // 刷新地图、GPS与无人机信息
-void MainWindow::on_GPSMapRefreshBtn_clicked() {
+void MainWindow::onGPSMapRefreshBtn() {
 	timer_1 = new QTimer(this);
 	timer_1->start(100);
 
@@ -182,14 +182,16 @@ void MainWindow::on_GPSMapRefreshBtn_clicked() {
 
 	bridgeins->setNavPointRotate(int(ui->navigationPointDirectSlider->value()));
 
+	/**
+	 * 室内测试注释掉下一行代码
+	 * **/
 	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
 	connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
 }
 void MainWindow::timeCountsFunction() {
 	// 设置GPS经纬度信息
-	ui->GPSLongitudeLineEdit->setText(QString::number(server_->jsonGPS["longitude"].toDouble(), 10, 8));
-	//qDebug() <<"\n->"<< server_->jsonGPS["altitude"].toString();
-	ui->GPSLatitudeLineEdit->setText(QString::number(server_->jsonGPS["latitude"].toDouble(), 10, 8));
+	ui->GPSLongitudeLineEdit->setText(QString::number(server_->jsonGPS["longitude"].toDouble(), 10, 14));
+	ui->GPSLatitudeLineEdit->setText(QString::number(server_->jsonGPS["latitude"].toDouble(), 10, 14));
 	ui->GPSHeight->setText(QString::number(server_->jsonGPS["altitude"].toDouble()));
 	// 设置无人机速度信息
 	ui->uavStatusVelocityH->setText(QString::number(sqrt(pow(server_->jsonGPS["velocityY"].toDouble(),2)+pow(server_->jsonGPS["velocityX"].toDouble(), 2))));
@@ -201,14 +203,15 @@ void MainWindow::callJava() {
 	QString strJs_ = "myFunction(%1, %2, ";
 	strJs_ += QString::number(server_->jsonGPS["yaw"].toDouble(), 10, 1);
 	strJs_ += ")";
+
 //	QString strJs = strJs_
 //			.arg(ui->GPSLongitudeLineEdit->text().toDouble()*0.01+109.03525)
 //			.arg(ui->GPSLatitudeLineEdit->text().toDouble()*0.01+26.6564);
-	QString strJs = strJs_
-			.arg(ui->GPSLongitudeLineEdit->text().toDouble()+0.0126,0,10,8)
-			.arg(ui->GPSLatitudeLineEdit->text().toDouble()+0.0062,0,10,8);
+
+	QVector<double> gps = WGS84ToBD09(ui->GPSLongitudeLineEdit->text().toDouble(),
+									  ui->GPSLatitudeLineEdit->text().toDouble());
+	QString strJs = strJs_.arg(gps[0],0,'f',10).arg(gps[1],0,'f',10);
 	ui->mapShow->page()->runJavaScript(strJs);
-	//qDebug()<<strJs;
 }
 
 // WayPoints
@@ -224,7 +227,7 @@ void MainWindow::onGoButton() {
 	sendWayPoint();
 }
 void MainWindow::sendWayPoint() {
-	QList<wayPoint> wayPointList = bridgeins->returnWayPointList();  // 获取所有的WayPoints信息
+	QList<wayPoint> wayPointList = bridgeins->returnWayPointList();  // 所有WayPoints的list	WGS84坐标系
 	QJsonObject jsonToSend;
 	jsonToSend.insert("mission", 1);
 	jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
@@ -233,29 +236,28 @@ void MainWindow::sendWayPoint() {
 	// 根据wayPoints朝向计算并发送无人机朝向
 	int n = wayPointList.size();
 	for (int i = 0; i < n; ++i) {
-		jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng - 0.0126);
-		jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat - 0.0062);
+		jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng);
+		jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat);
 		int head = wayPointList.at(i).rotation;
 		head = head > 180 ? head - 360 : head;
 		jsonToSend.insert(QString::number(i)+"head", head);
 	}
 
 	QString str = QString(QJsonDocument(jsonToSend).toJson());
-	//qDebug()<<str;
 	server_->sendMessage(str);
 }
 void MainWindow::onRecvdMsg(const QString& msg) {
-	qDebug()<<QString("Received message：%1").arg(msg);
-	QStringList lst;
-	lst = msg.split(',');
-	qDebug()<<lst;
+	// 将msg由BD09坐标系转换为WSG84坐标系
+	qDebug()<<QString("接收到html地图数据(BD09)：%1").arg(msg);
+	QStringList lst = msg.split(',');
 //	fLng = lst[0].toDouble();	经度
 //	fLat = lst[1].toDouble();	维度
-	qDebug()<<fixed<<qSetRealNumberPrecision(7)<<lst[0].toDouble()<<" "<<lst[1].toDouble();   // 设置实数精度
-	bridgeins->newPoint(lst[0].toDouble(),lst[1].toDouble());
+	QVector<double> gps = BD09ToWGS84(lst[0].toDouble(), lst[1].toDouble());
+	qDebug() << "转换到WSG84: " << gps[0] << gps[1];
+	bridgeins->newPoint(gps[0],gps[1]);
 }
 void MainWindow::onClearAllPoint() {
-	if(ui->wayPointsComboBox->count()>=1) {
+	if(ui->wayPointsComboBox->count() >= 1) {
 		ui->wayPointsComboBox->clear();
 		bridgeins->removeAllPoints();
 	}
@@ -521,7 +523,7 @@ void MainWindow::closeCamara() {
 
 // TCP dronet
 void MainWindow::acceptConnectionDrenet() {
-	qDebug()<<"acceptConnectionDrenet";
+	qDebug()<<"============== 接收dronet数据TCP连接成功 ==============";
 	tcpSocketDronet = tcpServerDronet.nextPendingConnection();
 	connect(bridgeins, &bridge::targetPointReceived, this, &MainWindow::onRecvTargetPoint);
 	connect(tcpSocketDronet, &QTcpSocket::readyRead, this, &MainWindow::updateCommand_from_python_controller);
@@ -733,66 +735,89 @@ void MainWindow::onCollSendFalseButton() {
 
 // GPS坐标系相互转换
 QVector<double> MainWindow::WGS84ToBD09(double lng, double lat) {
+	/**
 	//第一次转换
 	double dlat = transformLat(lng - 105.0, lat - 35.0);
 	double dlng = transformLng(lng - 105.0, lat - 35.0);
-	double radlat = lat / 180.0 * M_PI;
+	double radlat = lat / 180.0 * transformMagicNumberPI;
 	double magic = sin(radlat);
-	magic = 1 - transformMagicNumberB * magic * magic;
+	magic = 1 - transformMagicNumberEE * magic * magic;
 	double sqrtmagic = sqrt(magic);
-	dlat = (dlat * 180.0) / ((transformMagicNumberA * (1 - transformMagicNumberB)) / (magic * sqrtmagic) * M_PI);
-	dlng = (dlng * 180.0) / (transformMagicNumberA / sqrtmagic * cos(radlat) * M_PI);
+	dlat = (dlat * 180.0) / ((transformMagicNumberA * (1 - transformMagicNumberEE)) / (magic * sqrtmagic) * transformMagicNumberPI);
+	dlng = (dlng * 180.0) / (transformMagicNumberA / sqrtmagic * cos(radlat) * transformMagicNumberPI);
 	double mglat = lat + dlat;
 	double mglng = lng + dlng;
 
 	//第二次转换
-	double z = sqrt(mglng * mglng + mglat * mglat) + 0.00002 * sin(mglat * M_PI * 3000.0 / 180.0);
-	double theta = atan2(mglat, mglng) + 0.000003 * cos(mglng * M_PI * 3000.0 / 180.0);
+	double z = sqrt(mglng * mglng + mglat * mglat) + 0.00002 * sin(mglat * transformMagicNumberX_PI);
+	double theta = atan2(mglat, mglng) + 0.000003 * cos(mglng * transformMagicNumberX_PI);
 	double bd_lng = z * cos(theta) + 0.0065;
 	double bd_lat = z * sin(theta) + 0.006;
-
+	 **/
 	QVector<double> res(2);
-	res[0] = bd_lng;
-	res[1] = bd_lat;
-	return res;
+	res = WGS84ToGCJ02(lng, lat);
+	return GCJ02ToBD09(res[0], res[1]);
 }
 QVector<double> MainWindow::BD09ToWGS84(double lng, double lat) {
-	// BD09转GCJ02
+	QVector<double> res(2);
+	res = BD09ToGCJ02(lng, lat);
+	return GCJ02ToWGS84(res[0], res[1]);
+}
+QVector<double> MainWindow::BD09ToGCJ02(double lng, double lat) {
 	double x = lng - 0.0065;
 	double y = lat - 0.006;
-	double z = sqrt(x * x + y * y) - 0.00002 * sin(y * M_PI * 3000.0 / 180.0);
-	double theta = atan2(y, x) - 0.000003 * cos(x * M_PI * 3000.0 / 180.0);
-	double gcj02_lng = z * cos(theta);
-	double gcj02_lat = z * sin(theta);
+	double z = sqrt(x * x + y * y) - 0.00002 * sin(y * transformMagicNumberX_PI);
+	double theta = atan2(y, x) - 0.000003 * cos(x * transformMagicNumberX_PI);
+	double gg_lng = z * cos(theta);
+	double gg_lat = z * sin(theta);
 
-	// GCJ02转WGS84
-	double dlat = transformLat(gcj02_lng - 105.0, gcj02_lat - 35.0);
-	double dlng = transformLng(gcj02_lng - 105.0, gcj02_lat - 35.0);
-	double radlat = gcj02_lat / 180.0 * M_PI;
+	return {gg_lng, gg_lat};
+}
+QVector<double> MainWindow::GCJ02ToBD09(double lng, double lat) {
+	double z = sqrt(lng * lng + lat * lat) + 0.00002 * sin(lat * transformMagicNumberX_PI);
+	double theta = atan2(lat, lng) + 0.000003 * cos(lng * transformMagicNumberX_PI);
+	double bd_lng = z * cos(theta) + 0.0065;
+	double bd_lat = z * sin(theta) + 0.006;
+	return {bd_lng, bd_lat};
+}
+QVector<double> MainWindow::WGS84ToGCJ02(double lng, double lat) {
+	double dlat = transformLat(lng - 105.0, lat - 35.0);
+	double dlng = transformLng(lng - 105.0, lat - 35.0);
+	double radlat = lat / 180.0 * transformMagicNumberPI;
 	double magic = sin(radlat);
-	magic = 1 - transformMagicNumberB * magic * magic;
+	magic = 1 - transformMagicNumberEE * magic * magic;
 	double sqrtmagic = sqrt(magic);
-	dlat = (dlat * 180.0) / ((transformMagicNumberA * (1 - transformMagicNumberB)) / (magic * sqrtmagic) * M_PI);
-	dlng = (dlng * 180.0) / (transformMagicNumberA / sqrtmagic * cos(radlat) * M_PI);
-	double mglat = gcj02_lat + dlat;
-	double mglng = gcj02_lng + dlng;
+	dlat = (dlat * 180.0) / ((transformMagicNumberA * (1 - transformMagicNumberEE)) / (magic * sqrtmagic) * transformMagicNumberPI);
+	dlng = (dlng * 180.0) / (transformMagicNumberA / sqrtmagic * cos(radlat) * transformMagicNumberPI);
+	double mglat = lat + dlat;
+	double mglng = lng + dlng;
+	return {mglng, mglat};
+}
+QVector<double> MainWindow::GCJ02ToWGS84(double lng, double lat) {
+	double dlat = transformLat(lng - 105.0, lat - 35.0);
+	double dlng = transformLng(lng - 105.0, lat - 35.0);
+	double radlat = lat / 180.0 * transformMagicNumberPI;
+	double magic = sin(radlat);
+	magic = 1 - transformMagicNumberEE * magic * magic;
+	double sqrtmagic = sqrt(magic);
+	dlat = (dlat * 180.0) / ((transformMagicNumberA * (1 - transformMagicNumberEE)) / (magic * sqrtmagic) * transformMagicNumberPI);
+	dlng = (dlng * 180.0) / (transformMagicNumberA / sqrtmagic * cos(radlat) * transformMagicNumberPI);
+	double mglat = lat + dlat;
+	double mglng = lng + dlng;
 
-	QVector<double> res(2);
-	res[0] = mglng;
-	res[1] = mglat;
-	return res;
+	return {lng * 2 - mglng, lat * 2 - mglat};
 }
 double MainWindow::transformLat(double lng, double lat) {
 	double ret= -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * sqrt(abs(lng));
-	ret += (20.0 * sin(6.0 * lng * M_PI) + 20.0 * sin(2.0 * lng * M_PI)) * 2.0 / 3.0;
-	ret += (20.0 * sin(lat * M_PI) + 40.0 * sin(lat / 3.0 * M_PI)) * 2.0 / 3.0;
-	ret += (160.0 * sin(lat / 12.0 * M_PI) + 320 * sin(lat * M_PI / 30.0)) * 2.0 / 3.0;
+	ret += (20.0 * sin(6.0 * lng * transformMagicNumberPI) + 20.0 * sin(2.0 * lng * transformMagicNumberPI)) * 2.0 / 3.0;
+	ret += (20.0 * sin(lat * transformMagicNumberPI) + 40.0 * sin(lat / 3.0 * transformMagicNumberPI)) * 2.0 / 3.0;
+	ret += (160.0 * sin(lat / 12.0 * transformMagicNumberPI) + 320 * sin(lat * transformMagicNumberPI / 30.0)) * 2.0 / 3.0;
 	return ret;
 }
 double MainWindow::transformLng(double lng, double lat) {
 	double ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * sqrt(abs(lng));
-	ret += (20.0 * sin(6.0 * lng * M_PI) + 20.0 * sin(2.0 * lng * M_PI)) * 2.0 / 3.0;
-	ret += (20.0 * sin(lng * M_PI) + 40.0 * sin(lng / 3.0 * M_PI)) * 2.0 / 3.0;
-	ret += (150.0 * sin(lng / 12.0 * M_PI) + 300.0 * sin(lng / 30.0 * M_PI)) * 2.0 / 3.0;
+	ret += (20.0 * sin(6.0 * lng * transformMagicNumberPI) + 20.0 * sin(2.0 * lng * transformMagicNumberPI)) * 2.0 / 3.0;
+	ret += (20.0 * sin(lng * transformMagicNumberPI) + 40.0 * sin(lng / 3.0 * transformMagicNumberPI)) * 2.0 / 3.0;
+	ret += (150.0 * sin(lng / 12.0 * transformMagicNumberPI) + 300.0 * sin(lng / 30.0 * transformMagicNumberPI)) * 2.0 / 3.0;
 	return ret;
 }

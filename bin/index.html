@@ -1,212 +1,225 @@
 <html lang="en">
 <head>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-    <meta content="initial-scale=1.0, user-scalable=no" name="viewport"/>   <!--使页面更好的在移动平台上展示-->
-    <script src="./qwebchannel.js"></script>
-    <style type="text/css">
-        body, html, #map {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            margin: 0;
-        }
-    </style>
-    <script src="http://api.map.baidu.com/getscript?v=2.0&ak=WiUtV0vfMqRuCVqducdBKyo2GO4dKeWV"
-            type="text/javascript"></script>    <!--引导百度地图API文件-->
-    <title>Baidu Map</title>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+	<meta content="initial-scale=1.0, user-scalable=no" name="viewport"/>	<!--使页面更好的在移动平台上展示-->
+	<script src="./qwebchannel.js"></script>
+	<style type="text/css">
+		body, html, #map {
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			margin: 0;
+		}
+	</style>
+<!--	<script src="http://api.map.baidu.com/getscript?v=2.0&ak=WiUtV0vfMqRuCVqducdBKyo2GO4dKeWV"-->
+<!--			type="text/javascript"></script>	&lt;!&ndash;引导百度地图API文件&ndash;&gt;-->
+	<script src="baiduMapAPI.js"
+	        type="text/javascript"></script>	<!--引导百度地图API文件-->
+	<title>Baidu Map</title>
 
 </head>
 <body>
-<div id="map"></div>    <!--创建地图容器元素-->
+<div id="map"></div>	<!--创建地图容器元素-->
 </body>
 </html>
 <script type="text/javascript">
-    var map = new BMap.Map("map", {minZoom: 5, maxZoom: 20, enableMapClick: false});    // 创建地图实例
-    var point = new BMap.Point(116.98, 36.6169);    // 中心点坐标(经度, 纬度)，使用百度BD09坐标
-    var arrayList = []; // QT上位机中WayPoints的经纬度信息
-    var rotList = [];   // QT上位机中WayPoints的旋转角度信息
-    var myPoint = new BMap.Point(0, 0);
-    var routePoints = [];
-    var currentRoutePointNum = -1;
+	const map = new BMap.Map("map", {minZoom: 5, maxZoom: 19, enableMapClick: false});	// 创建地图实例
+	const initPoint = new BMap.Point(117.0353942718, 36.6553807616);	// 初始化中心点坐标(经度, 纬度)，使用百度BD09坐标
+	let wayPointsAllList = [];	// QT上位机中WayPoints的经纬度信息
+	let wayPointsAllRotationList = [];		// QT上位机中WayPoints的旋转角度信息
+	let planePoint = new BMap.Point(0, 0);	// 无人机初始化坐标点
 
-    map.centerAndZoom(point, 12);   // 初始化地图，设置中心点坐标与地图级别
+	let routePoints = [];			// 无用变量
+	let currentRoutePointNum = -1;	// 无用变量
 
-    map.enableDragging(true);           // 启用拖动
-    map.enableScrollWheelZoom(true);    // 启用鼠标滚轮缩放
-    map.disableDoubleClickZoom(true);   // 禁用双击
-    var ctrlNav = new BMap.NavigationControl({  // 声明控件
-        anchor: BMAP_ANCHOR_TOP_LEFT,           // 控制控件在地图上的显示位置
-        type: BMAP_NAVIGATION_CONTROL_LARGE
-    });
-    map.addControl(ctrlNav);// 添加控件
-    map.addControl(new BMap.MapTypeControl());  //添加地图类型控件
+	// 地图初始化
+	map.centerAndZoom(initPoint, 19);	// 初始化地图，设置中心点坐标与地图级别
+	map.enableDragging(true);			// 启用拖动
+	map.enableScrollWheelZoom(true);	// 启用鼠标滚轮缩放
+	map.disableDoubleClickZoom(true);	// 禁用双击
+	const ctrlNav = new BMap.NavigationControl({	// 声明控件
+		anchor: BMAP_ANCHOR_TOP_LEFT,	// 控制控件在地图上的显示位置
+		type: BMAP_NAVIGATION_CONTROL_LARGE
+	});
+	map.addControl(ctrlNav);	// 添加控件
+	map.addControl(new BMap.MapTypeControl());	//添加地图类型控件
 
-    //设置marker图标为水滴，即添加waypoints时调整方向时的图案
-    var vectorMarker = new BMap.Marker(new BMap.Point(point.lng, point.lat - 0.03), {
-        // 指定Marker的icon属性为Symbol
-        // 初始化方向向下的开放式箭头
-        icon: new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_CLOSED_ARROW, {
-            scale: 1,
-            strokeWeight: 1,
-            rotation: 180,
-            fillColor: 'gold',
-            fillOpacity: 0.8
-        })
-    });
+	// 添加wayPoints时图标初始化
+	const wayPointSetMarker = new BMap.Marker(new BMap.Point(initPoint.lng, initPoint.lat), {
+		// 指定Marker的icon属性为Symbol
+		// 初始化方向向下的开放式箭头
+		icon: new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_CLOSED_ARROW, {
+			scale: 1,
+			strokeWeight: 1,
+			rotation: 180,
+			fillColor: 'gold',
+			fillOpacity: 0.8
+		})
+	});
+	map.addOverlay(wayPointSetMarker);	// 将wayPoint设置图标添加到地图中
+	wayPointSetMarker.hide();
 
-    //设置marker图标为飞机
-    var vectorPlane = new BMap.Marker(new BMap.Point(point.lng + 0.04, point.lat - 0.03), {
-        icon: new BMap.Icon("plane.png", new BMap.Size(15, 15), {
-            offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)
-        })
-    });
+	// 无人机图标初始化
+	const vectorPlane = new BMap.Marker(new BMap.Point(initPoint.lng, initPoint.lat), {
+		icon: new BMap.Icon("plane.png", new BMap.Size(15, 15), {
+			offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)
+		})
+	});
+	map.addOverlay(vectorPlane);
 
-    map.addOverlay(vectorMarker);   // 将标注添加到地图中
-    vectorMarker.hide();
-    map.addOverlay(vectorPlane);
+	// 单击获取点击的经纬度并发送到QT上位机添加为WayPoints  BD09坐标系
+	map.addEventListener("click", function (e) {
+		window.bridge.jsSendMsg(e.point.lng + "," + e.point.lat);
+		wayPointSetMarker.setPosition(e.point);
+		wayPointSetMarker.show();
+	});
 
-    // 单击获取点击的经纬度并发送到QT上位机添加为WayPoints
-    map.addEventListener("click", function (e) {
-        window.bridge.jsSendMsg(e.point.lng + "," + e.point.lat);
-        vectorMarker.setPosition(e.point);
-        vectorMarker.show();
-    });
+	new QWebChannel(qt.webChannelTransport, function (channel) {
+		window.bridge = channel.objects.bridge;
 
-    new QWebChannel(qt.webChannelTransport, function (channel) {
-        window.bridge = channel.objects.bridge;
+		// 返回WayPoints list的map形式
+		window.bridge.GetLightData(function (returnValue) {initMarker(returnValue);});
 
-        // 返回WayPoints list的map形式
-        window.bridge.GetLightData(function (returnValue) {initMarker(returnValue);});
+		// 由QT上位机中的WayPoints中的add按钮和load按钮调用
+		window.bridge.sigUpdateLight.connect(function () {
+			wayPointSetMarker.hide();
+			window.bridge.GetLightData(function (returnValue) {initMarker(returnValue);});
+		});
 
-        // 由QT上位机中的WayPoints中的add按钮和load按钮调用
-        window.bridge.sigUpdateLight.connect(function () {
-            vectorMarker.hide();
-            window.bridge.GetLightData(function (returnValue) {initMarker(returnValue);});
-        });
+		// 由QT上位机中的WayPoints中的clear按钮调用
+		window.bridge.removePoints.connect(function () {
+			// 清除所有显示图标
+			map.clearOverlays();
+			map.addOverlay(wayPointSetMarker);
+			wayPointSetMarker.hide();
 
-        // 由QT上位机中的WayPoints中的clear按钮调用
-        window.bridge.removePoints.connect(function () {
-            map.clearOverlays();
+			// 显示无人机
+			map.addOverlay(vectorPlane);
 
-            map.addOverlay(vectorMarker);
-            vectorMarker.hide();
+			// 全部变量重置
+			wayPointsAllList = [];
+			routePoints = [];
+			wayPointsAllRotationList = [];
+			currentRoutePointNum = -1;
+		});
 
-            map.addOverlay(vectorPlane);
+		// 由QT上位机中的bridge::onLightOn和bridge::onLightOff调用
+		// 将WayPoints中的strName为name的WayPoints的nValue设置为value
+		// 将特定的wayPoint设置为开灯/关灯
+		window.bridge.sigLightStatus.connect(function (name, value) {
+			const lays = map.getOverlays();
+			for (let i = 0; i < lays.length; i++) {
+				const marker = lays[i];
+				if (marker.getTitle() === name) {
+					const myIcon = new BMap.Icon(value === 0 ? "nav_point.png" : "circle_green.png",
+							new BMap.Size(9, 15),
+							{offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)}
+					);
+					marker.setIcon(myIcon);
+				}
+			}
+		});
 
-            arrayList = [];
-            routePoints = [];
-            rotList = [];
-            currentRoutePointNum = -1;
-        });
+		// 由QT上位机中的bridge::setNavPointRotate调用
+		// rot为设置WayPoints时旋转方向设置滑块的数值
+		window.bridge.rotateNavPoint.connect(function (rot) {
+			wayPointSetMarker.setRotation(rot);
+		});
 
-        // 由QT上位机中的bridge::onLightOn和bridge::onLightOff调用
-        // 将WayPoints中的strName为name的WayPoints的nValue设置为value
-        window.bridge.sigLightStatus.connect(function (name, value) {
-            var lays = map.getOverlays();
-            for (var i = 0; i < lays.length; i++) {
-                var marker = lays[i];
-                if (marker.getTitle() == name) {
-                    var myIcon = new BMap.Icon(value == 0 ? "nav_point.png" : "circle_green.png",
-                        new BMap.Size(40, 40),
-                        {offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)}
-                    );
-                    marker.setIcon(myIcon);
-                }
-            }
-        });
+	});
 
-        // 由QT上位机中的bridge::setNavPointRotate调用
-        // rot为设置WayPoints时旋转方向设置滑块的数值
-        window.bridge.rotateNavPoint.connect(function (rot) {
-            vectorMarker.setRotation(rot);
-        });
+	// 初始化并显示wayPoints
+	function initMarker(markerArr) {
+		// makerArr: WayPoints的map形式，从bridge::GetLightData读入
+		for (let i = 0; i < markerArr.length; i++) {
+			const wayPoint = markerArr[i].point.split(",");
+			const lng = wayPoint[0];
+			const lat = wayPoint[1];
+			const rotation = wayPoint[2];
+			if (i + 1 === markerArr.length) {	// 将收到的WayPoints的最后一个元素添加到全局变量中
+				wayPointsAllList.push(new BMap.Point(lng, lat));
+				wayPointsAllRotationList.push(rotation);
+			}
+			const marker = addMarker(new window.BMap.Point(lng, lat), markerArr[i], rotation);	// 初始化并显示wayPoint图标
+			addInfoWindow(marker, markerArr[i]);	// wayPoint显示图标鼠标点击事件初始化
+		}
+	}
 
-    });
+	// 初始化并显示wayPoint图标
+	function addMarker(point, poi, rotation) {
+		// 初始化显示图标
+		const myIcon = new BMap.Icon(poi.value === 0 ? "nav_point.png" : "circle_green.PNG",
+				new BMap.Size(9, 15),
+				{offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)}); // 显示图标选择
+		const marker = new BMap.Marker(point, {icon: myIcon});
 
+		// 显示图标
+		marker.setTitle(poi.name);
+		map.addOverlay(marker);
+		marker.setRotation(rotation);
+		return marker;
+	}
 
-    function initMarker(markerArr) {
-        // makerArr: WayPoints的map形式，从bridge::GetLightData读入
-        for (var i = 0; i < markerArr.length; i++) {
-            var p = markerArr[i].point.split(",");
-            var p0 = p[0];
-            var p1 = p[1];
-            var rott = p[2];
-            if (i + 1 == markerArr.length) {    // 将收到的WayPoints的最后一个元素添加到全局变量中
-                arrayList.push(new BMap.Point(p0, p1));
-                rotList.push(rott);
-            }
-            var marker = addMarker(new window.BMap.Point(p0, p1), markerArr[i], i, rott);   // 确定WayPoints显示图标
-            addInfoWindow(marker, markerArr[i]);    // WayPoints详细信息初始化?
-        }
-    }
+	// wayPoint箭头左键详情右键开关灯初始化
+	function addInfoWindow(marker, poi) {
+		// marker: wayPoints显示箭头    poi: QT上位机wayPointsAllListMap
 
-    // 确定WayPoints显示图标：箭头/绿色圆形
-    function addMarker(point, poi, index, rott) {
-        var myIcon = new BMap.Icon(poi.value == 0 ? "nav_point.png" : "circle_green.PNG",
-            new BMap.Size(9, 15),
-            {offset: new BMap.Size(0, 0), imageOffset: new BMap.Size(0, 0)
-        }); // 显示图标选择
+		// 初始化描述框
+		const title = '<div style="color:#CE5521;">' + poi.description + '</div>';
+		const html = [];  // WayPoints描述信息
+		const wayPoint = poi.point.split(",");
+		const lng = wayPoint[0];
+		const lat = wayPoint[1];
+		html.push('<table>');
+		html.push('<tr style="vertical-align:top;line-height:25px;font-size:12px;"><td style="white-space:nowrap;word-break:keep-all;">Name</td><td>' + poi.name + '</td></tr>');
+		html.push('<tr style="vertical-align:top;line-height:25px;font-size:12px;"><td style="white-space:nowrap;word-break:keep-all;">Description</td><td>' + poi.description + '</td></tr>');
+		html.push('<tr style="vertical-align:top;line-height:25px;font-size:12px;"><td style="white-space:nowrap;word-break:keep-all;">Point</td><td>' + lng + "," + lat + '</td></tr>');
+		html.push('</tr></table>');
+		const infoWindow = new BMap.InfoWindow(html.join(""), {title: title, width: 60});
+		// 添加鼠标点击事件
+		const openInfoWinFun = function () {marker.openInfoWindow(infoWindow);};
+		marker.addEventListener("click", openInfoWinFun);
 
-        var marker = new BMap.Marker(point, {icon: myIcon});
-        marker.setTitle(poi.name);
-        map.addOverlay(marker);
-        marker.setRotation(rott);
-        return marker;
-    }
+		// wayPoints箭头右键菜单初始化
+		const menuFunc = function () {
+			const markerMenu = new BMap.ContextMenu();
+			const onMarker = function (e, ee, marker) {
+				bridge.onLightOn(marker.getTitle());	// 将WayPoints中的strName为marker.getTitle的WayPoints的nValue设置为1
+			};
+			const offMarker = function (e, ee, marker) {
+				bridge.onLightOff(marker.getTitle());   // 将WayPoints中的strName为marker.getTitle的WayPoints的nValue设置为0
+			};
+			markerMenu.addItem(new BMap.MenuItem('亮灯', onMarker.bind(marker)));
+			markerMenu.addItem(new BMap.MenuItem('关灯', offMarker.bind(marker)));
+			marker.addContextMenu(markerMenu);
+		};
+		marker.addEventListener("rightclick", menuFunc);
+		return openInfoWinFun;
+	}
 
-    // WayPoints详细信息初始化?
-    function addInfoWindow(marker, poi) {
-        var title = '<div style="color:#CE5521;">' + poi.description + '</div>';
-        var html = [];  // WayPoints描述信息
-        var p = poi.point.split(",");
-        var p0 = p[0] - 0.0125;
-        var p1 = p[1] - 0.0062;
-        html.push('<table>');
-        html.push('<tr style="vertical-align:top;line-height:25px;font-size:12px;"><td style="white-space:nowrap;word-break:keep-all;">Name</td><td>' + poi.name + '</td></tr>');
-        html.push('<tr style="vertical-align:top;line-height:25px;font-size:12px;"><td style="white-space:nowrap;word-break:keep-all;">Description</td><td>' + poi.description + '</td></tr>');
-        html.push('<tr style="vertical-align:top;line-height:25px;font-size:12px;"><td style="white-space:nowrap;word-break:keep-all;">Point</td><td>' + p0 + "," + p1 + '</td></tr>');
-        html.push('</tr></table>');
-        var infoWindow = new BMap.InfoWindow(html.join(""), {title: title, width: 60});
-        var openInfoWinFun = function () {
-            marker.openInfoWindow(infoWindow);
-        };
-        marker.addEventListener("click", openInfoWinFun);
-        var menuFunc = function () {
-            var markerMenu = new BMap.ContextMenu();
-            var onMarker = function (e, ee, marker) {
-                bridge.onLightOn(marker.getTitle());    // 将WayPoints中的strName为marker.getTitle的WayPoints的nValue设置为1
-            };
-            var offMarker = function (e, ee, marker) {
-                bridge.onLightOff(marker.getTitle());   // 将WayPoints中的strName为marker.getTitle的WayPoints的nValue设置为0
-            };
-            markerMenu.addItem(new BMap.MenuItem('亮灯', onMarker.bind(marker)));
-            markerMenu.addItem(new BMap.MenuItem('关灯', offMarker.bind(marker)));
-            marker.addContextMenu(markerMenu);
-        };
-        marker.addEventListener("rightclick", menuFunc);
-        return openInfoWinFun;
-    }
+	// 被QT上位机MainWindow::callJava调用的函数
+	function myFunction(lng, lat, rot) {
+		// lng, lat, rot: 无人机经纬度，旋转角度(朝向)   BD09坐标系
 
-    // 被QT上位机MainWindow::callJava调用的函数
-    function myFunction(lng, lat, rot) {
-        // lng, lat, rot: 无人机经纬度，旋转角度(朝向)
-        myPoint = new BMap.Point(lng, lat);
-        vectorPlane.setRotation(rot);
-        vectorPlane.setPosition(myPoint);
-        map.setCenter(myPoint);
-        var mark_ = 0;
-        for (var j = 0; j < arrayList.length; j++) {    // 遍历QT上位机中WayPoints的经纬度信息
-            if (Math.abs(lng - arrayList[j].lng) < 0.0005 && Math.abs(lat - arrayList[j].lat) < 0.0005) {   // 无人机位置与WayPoints距离在一定范围之内
-                mark_ = 1;
-                window.bridge.jsSendTargetPoint(j + "," + rotList[j] + "," + arrayList[j].lng + "," + arrayList[j].lat + "," + arrayList.length);
-                // QT上位机接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
-            }
-        }
-        if (mark_ == 0) // 没有距离无人机足够近的WayPoints
-            window.bridge.jsSendTargetPoint(-1 + "," + rot + "," + 0 + "," + 0 + "," + arrayList.length);
-    }
+		// 无人机显示初始化
+		planePoint = new BMap.Point(lng, lat);
+		vectorPlane.setRotation(rot);
+		vectorPlane.setPosition(planePoint);
+		map.setCenter(planePoint);
 
-    setTimeout(function () {
-        vectorMarker.hide();
-    }, 2000);
+		let mark_ = 0;
+		for (let j = 0; j < wayPointsAllList.length; j++) {	// 遍历QT上位机中WayPoints的经纬度信息
+			if (Math.abs(lng - wayPointsAllList[j].lng) < 0.0005 && Math.abs(lat - wayPointsAllList[j].lat) < 0.0005) {   // 无人机位置与WayPoints距离在一定范围之内
+				mark_ = 1;
+				window.bridge.jsSendTargetPoint(j + "," + wayPointsAllRotationList[j] + "," + wayPointsAllList[j].lng + "," + wayPointsAllList[j].lat + "," + wayPointsAllList.length);
+				// QT上位机接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
+			}
+		}
+		if (mark_ === 0) // 没有距离无人机足够近的WayPoints
+			window.bridge.jsSendTargetPoint(-1 + "," + rot + "," + 0 + "," + 0 + "," + wayPointsAllList.length);
+	}
+
+	setTimeout(function () {
+		wayPointSetMarker.hide();
+	}, 2000);
 </script>

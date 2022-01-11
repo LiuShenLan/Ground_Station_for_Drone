@@ -47,7 +47,7 @@ namespace Ui {
 		connect(&tcpServerMyUXSend, &QTcpServer::newConnection, this, &Server::acceptConnectionMyUXSend);
 	}
 
-	// TCP
+	// 向MyUX发送数据information
 	void Server::sendMessage(const QString& information) {
 		qDebug() << "向MuUX发送数据";
 		QByteArray message = information.toLocal8Bit();  // 将字符串的本地8位表示作为QByteArray返回

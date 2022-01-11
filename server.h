@@ -25,7 +25,7 @@ namespace Ui{
 	{
 	public:
 		QJsonObject json;		// 总信息
-		QJsonObject jsonGPS;	// 无人机GPS信息
+		QJsonObject jsonGPS;	// 无人机GPS信息	WGS84坐标系
 		QJsonObject jsonGimbal;	// 无人机状态信息
 		QJsonObject jsonBattery;	// 无人机电池信息
 

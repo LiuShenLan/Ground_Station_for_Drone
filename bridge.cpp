@@ -9,9 +9,7 @@ bridge* bridge::instance() {
 	static bridge s_obj;
 	return &s_obj;
 }
-bridge::bridge(){
-	;
-}
+bridge::bridge(){}
 
 // WayPoints
 wayPoint bridge::AddLight(int rot) {
@@ -61,13 +59,18 @@ void bridge::onLightOff(const QString& strName) {
 QVariantList bridge::GetLightData() {
 	int nCount = wayPointsAllList.count();
 	QVariantList markerList;
-	
+
 	for(int i=0; i<nCount; i++) {
 		wayPoint tLight = wayPointsAllList[i];
 		QVariantMap map;
+		QVector<double> gps = MainWindow::WGS84ToBD09(tLight.fLng, tLight.fLat);
+
 		map.insert("name", tLight.strName);
 		map.insert("description", tLight.strDesc);
-		map.insert("point", QString("%1,%2,%3").arg(tLight.fLng, 0, 10, 10).arg(tLight.fLat, 0, 10, 10).arg(tLight.rotation));
+		map.insert("point", QString("%1,%2,%3")
+			.arg(gps[0], 0, 'f', 14)
+			.arg(gps[1], 0, 'f', 14)
+			.arg(tLight.rotation));
 		map.insert("value", tLight.nValue);
 		markerList << map;
 	}

@@ -32,7 +32,7 @@
 // 摄像头数据读取目标
 #define CAM_LOAD_PC_CAMERA		0
 #define CAM_LOAD_DRONE_CAMERA	2
-#define CAM_LOAD_PC_VIDEO		"../../dataset/dronet test video/all copy.mp4"
+#define CAM_LOAD_PC_VIDEO		"../../dataset/video/all copy.mp4"
 // 摄像头读取选择
 #define CAM_LOAD	CAM_LOAD_DRONE_CAMERA
 // 摄像头显示选择
@@ -50,7 +50,11 @@
 // WayPoints文件保存路径
 #define SAVE_WAYPOINTS_PATH	"../../dataset/hostData/wayPoints.json"
 
-
+// 坐标系转换魔法数
+//#define transformMagicNumberX_PI	3.14159265358979324*3000.0/180.0
+//#define transformMagicNumberPI		3.1415926535897932384626
+//#define transformMagicNumberA		6378245.0
+//#define transformMagicNumberEE		0.00669342162296594323
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -68,12 +72,18 @@ public:
 
 	// GPS坐标系相互转换
 	// 无人机使用WGS84坐标，上位机html地图使用BD09坐标
-	QVector<double> WGS84ToBD09(double lng, double lat);	// WGS84坐标转BD09坐标
-	QVector<double> BD09ToWGS84(double lng, double lat);	// BD09坐标转WGS84坐标
+	static QVector<double> WGS84ToBD09(double lng, double lat);	// WGS84坐标转BD09坐标
+	static QVector<double> BD09ToWGS84(double lng, double lat);	// BD09坐标转WGS84坐标
+	static QVector<double> BD09ToGCJ02(double lng, double lat);	// BD09坐标转GCJ02坐标
+	static QVector<double> GCJ02ToBD09(double lng, double lat);	// GCJ02坐标转BD09坐标
+	static QVector<double> WGS84ToGCJ02(double lng, double lat);// WGS84坐标转GCJ02坐标
+	static QVector<double> GCJ02ToWGS84(double lng, double lat);// GCJ02坐标转WGS84坐标
 	static double transformLat(double lng, double lat);	// 坐标转换辅助函数
 	static double transformLng(double lng, double lat);	// 坐标转换辅助函数
-	const double transformMagicNumberA = 6378245.0;
-	const double transformMagicNumberB = 0.00669342162296594323;
+	static constexpr double transformMagicNumberX_PI = 3.14159265358979324 * 3000.0 / 180.0;
+	static constexpr double transformMagicNumberPI = 3.1415926535897932384626;
+	static constexpr double transformMagicNumberA = 6378245.0;
+	static constexpr double transformMagicNumberEE = 0.00669342162296594323;
 
 private:
 	// Init
@@ -89,8 +99,8 @@ private:
 	QTimer* timer_2;	// 200ms定时器 调用JAVA程序 在地图上显示导航点
 
 	// WayPoints
-	void sendWayPoint();	// 向TCP发送所有的WayPoints信息
-	void onRecvdMsg(const QString& msg);	// 接收html确定的经纬度信息并设置WayPoints临时经纬度信息
+	void sendWayPoint();	// 向MyUX发送所有的WayPoints信息
+	void onRecvdMsg(const QString& msg);	// 接收html确定的经纬度信息并设置WayPoints临时经纬度信息(将wayPoints坐标由BD09转换为WGS84)
 
 	// TCP coll pred
 	QTcpServer tcpServerCollPred;	// coll pred TCP server
@@ -102,7 +112,7 @@ private:
 	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
 	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数
 	void acceptConnectionCollPred();	// TCP 接受信息并设置虚拟控制与方向数值
-	void update_coll_pred();	// 接受coll pred数据并发送
+	void update_coll_pred();	// 接受coll pred数据并更新flag
 	QTimer* collPredTimer;		// 定时器 向无人机发送障碍预测信息
 
 	// 摄像头
@@ -129,9 +139,9 @@ private:
 
 private slots:  // 槽声明区
 	// 刷新地图、GPS与无人机信息
-	void on_GPSMapRefreshBtn_clicked();	// 刷新地图、GPS与无人机信息
+	void onGPSMapRefreshBtn();	// 刷新地图、GPS与无人机信息
 	void timeCountsFunction();	// 读取GPS与无人机信息并显示
-	void callJava();	// 调用JAVA程序在地图上显示导航点
+	void callJava();	// 调用JAVA程序在地图上显示导航点(将无人机坐标由WGS84转换为BD09)
 
 	// WayPoints
 	void onBtnAddLight();	// 根据临时WayPoint经纬度信息添加WayPoints
