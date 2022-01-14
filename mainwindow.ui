@@ -28,7 +28,7 @@
         <property name="minimumSize">
          <size>
           <width>640</width>
-          <height>360</height>
+          <height>480</height>
          </size>
         </property>
         <property name="baseSize">
