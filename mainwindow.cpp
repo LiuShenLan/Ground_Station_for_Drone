@@ -185,7 +185,7 @@ void MainWindow::onGPSMapRefreshBtn() {
 	/**
 	 * 室内测试注释掉下一行代码
 	 * **/
-	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
+//	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
 	connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
 }
 void MainWindow::timeCountsFunction() {
@@ -248,12 +248,15 @@ void MainWindow::sendWayPoint() {
 }
 void MainWindow::onRecvdMsg(const QString& msg) {
 	// 将msg由BD09坐标系转换为WSG84坐标系
-	qDebug()<<QString("接收到html地图数据(BD09)：%1").arg(msg);
 	QStringList lst = msg.split(',');
 //	fLng = lst[0].toDouble();	经度
 //	fLat = lst[1].toDouble();	维度
 	QVector<double> gps = BD09ToWGS84(lst[0].toDouble(), lst[1].toDouble());
-	qDebug() << "转换到WSG84: " << gps[0] << gps[1];
+	QString log = "接收到html地图数据(BD09)：%1 | 转换到WSG84: %2, %3";
+	QString logShow = log.arg(msg)
+						.arg(gps[0], 0, 'f', 10)
+						.arg(gps[1], 0, 'f', 10);
+	qDebug() << logShow;
 	bridgeins->newPoint(gps[0],gps[1]);
 }
 void MainWindow::onClearAllPoint() {
