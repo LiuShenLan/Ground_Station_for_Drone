@@ -185,7 +185,7 @@ void MainWindow::onGPSMapRefreshBtn() {
 	/**
 	 * 室内测试注释掉下一行代码
 	 * **/
-//	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
+	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
 	connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
 }
 void MainWindow::timeCountsFunction() {
