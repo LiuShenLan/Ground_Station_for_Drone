@@ -3,6 +3,9 @@ The interface can visualize the system status and enable the user to give sparse
 
 Please refer to the UAVPatrol project webpage: http://www.yfan.site/UAVPatrol.html.
 
+# environmet
+
+use opencv-4.5.1 & Qt5.12.11
 
 ### Note
 

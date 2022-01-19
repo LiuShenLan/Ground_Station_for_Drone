@@ -677,7 +677,7 @@ void MainWindow::update_coll_pred() {
 void MainWindow::onEnableCollButton() {
 	ui->collControlEnableBtn->setEnabled(false);
 	ui->collControlDisableBtn->setEnabled(true);
-	collPredTimer->start(500);
+	collPredTimer->start(100);
 	connect(collPredTimer, SIGNAL(timeout()), this, SLOT(sendCollPredCommand()));
 }
 void MainWindow::sendCollPredCommand() {
