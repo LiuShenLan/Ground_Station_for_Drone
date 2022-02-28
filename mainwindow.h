@@ -50,12 +50,6 @@
 // WayPoints文件保存路径
 #define SAVE_WAYPOINTS_PATH	"../../dataset/hostData/wayPoints.json"
 
-// 坐标系转换魔法数
-//#define transformMagicNumberX_PI	3.14159265358979324*3000.0/180.0
-//#define transformMagicNumberPI		3.1415926535897932384626
-//#define transformMagicNumberA		6378245.0
-//#define transformMagicNumberEE		0.00669342162296594323
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
 	class MainWindow;
@@ -107,7 +101,7 @@ private:
 	QTcpSocket *tcpSocketCollPred;	// coll pred TCP socket
 	qint64 coll_pre_receive_length = 12;	// TCP socket收到的coll pre数据长度(防止数据接受出错)
 	double collPred = 1.0;		// coll 预测值
-	double collThreshold = 0.5;	// 障碍预测阈值
+	double collThreshold = 0.97;// 障碍预测阈值
 	bool isCollFlag = false;	// 前方是否是障碍
 	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
 	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数

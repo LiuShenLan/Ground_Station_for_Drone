@@ -145,6 +145,7 @@ void MainWindow::InitVirtualStickControl() {
 	connect(ui->collThresholdSetBtn, SIGNAL(clicked()), this, SLOT(onSetCollThreshold()));
 	connect(ui->collSendTrueBtn, SIGNAL(clicked()), this, SLOT(onCollSendTrueButton()));
 	connect(ui->collSendFalseBtn, SIGNAL(clicked()), this, SLOT(onCollSendFalseButton()));
+	ui->collStopRadioBtn->setChecked(true);
 	collPredTimer = new QTimer(this);   // 实例化定时器
 	ui->collControlDisableBtn->setEnabled(false);
 
@@ -682,11 +683,15 @@ void MainWindow::onEnableCollButton() {
 }
 void MainWindow::sendCollPredCommand() {
 	QJsonObject jsonToSend_0;
-	jsonToSend_0.insert("mission", 5);
+	if (ui->collStopRadioBtn->isChecked())
+		jsonToSend_0.insert("mission", 6);
+	else
+		jsonToSend_0.insert("mission", 5);
 	jsonToSend_0.insert("isCollFlag", isCollFlag);
 
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
+	qDebug() << str;
 }
 void MainWindow::onDisableCollButton() {
 	disconnect(collPredTimer, SIGNAL(timeout()),nullptr,nullptr);
