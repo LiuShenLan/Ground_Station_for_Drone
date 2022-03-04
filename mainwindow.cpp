@@ -85,6 +85,8 @@ void MainWindow::InitForm() {
 	connect(ui->wayPointsLandBtn, SIGNAL(clicked()), this, SLOT(onLandButton()));
 	connect(ui->wayPointsSaveBtn, SIGNAL(clicked()), this, SLOT(onSaveButton()));
 	connect(ui->wayPointsLoadBtn, SIGNAL(clicked()), this, SLOT(onLoadButton()));
+	connect(ui->wayPointsContinueBtn, SIGNAL(clicked()), this, SLOT(onContinueBtn()));
+	connect(ui->wayPointsBackBtn, SIGNAL(clicked()), this, SLOT(onBackBtn()));
 
 	// GPS Data初始化
 	ui->GPSLatitudeLineEdit->setMinimumWidth(18);
@@ -145,7 +147,8 @@ void MainWindow::InitVirtualStickControl() {
 	connect(ui->collThresholdSetBtn, SIGNAL(clicked()), this, SLOT(onSetCollThreshold()));
 	connect(ui->collSendTrueBtn, SIGNAL(clicked()), this, SLOT(onCollSendTrueButton()));
 	connect(ui->collSendFalseBtn, SIGNAL(clicked()), this, SLOT(onCollSendFalseButton()));
-	ui->collStopRadioBtn->setChecked(true);
+	connect(ui->collHoverCheckBox, SIGNAL(stateChanged(int)), this, SLOT(collHoverCheckBoxStateChange(int)));
+	ui->collAvoidanceRadioBtn->setChecked(true);
 	collPredTimer = new QTimer(this);   // 实例化定时器
 	ui->collControlDisableBtn->setEnabled(false);
 
@@ -338,6 +341,53 @@ wayPoint MainWindow::jsonToWayPoints(const QJsonObject& jsonWayPoints) {
 	tLight.rotation = jsonWayPoints.value("rotation").toInt();
 	return tLight;
 }
+void MainWindow::onContinueBtn() {
+	QList<wayPoint> wayPointList = bridgeins->returnWayPointList();  // 所有WayPoints的list	WGS84坐标系
+	int wayPointsNextIndex = server_->jsonGimbal["wayPointsNextIndex"].toInt();
+
+
+	QJsonObject jsonToSend;
+	jsonToSend.insert("mission", 1);
+	jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
+	jsonToSend.insert("way_point_num", wayPointList.size() - wayPointsNextIndex);
+
+	// 根据wayPoints朝向计算并发送无人机朝向
+	int n = wayPointList.size();
+	for (int i = wayPointsNextIndex; i < n; ++i) {
+		jsonToSend.insert(QString::number(i - wayPointsNextIndex)+"Lng", wayPointList.at(i).fLng);
+		jsonToSend.insert(QString::number(i - wayPointsNextIndex)+"Lat", wayPointList.at(i).fLat);
+		int head = wayPointList.at(i).rotation;
+		head = head > 180 ? head - 360 : head;
+		jsonToSend.insert(QString::number(i - wayPointsNextIndex)+"head", head);
+	}
+
+	QString str = QString(QJsonDocument(jsonToSend).toJson());
+	server_->sendMessage(str);
+}
+void MainWindow::onBackBtn() {
+	QList<wayPoint> wayPointList = bridgeins->returnWayPointList();  // 所有WayPoints的list	WGS84坐标系
+	int wayPointsNextIndex = server_->jsonGimbal["wayPointsNextIndex"].toInt();
+
+	QJsonObject jsonToSend;
+	jsonToSend.insert("mission", 7);
+	jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
+	jsonToSend.insert("way_point_num", wayPointsNextIndex);
+
+	// 根据wayPoints朝向计算并发送无人机朝向
+	int n = wayPointList.size();
+	for (int i = wayPointsNextIndex - 1; i >= 0; --i) {
+		jsonToSend.insert(QString::number(wayPointsNextIndex - 1 - i)+"Lng", wayPointList.at(i).fLng);
+		jsonToSend.insert(QString::number(wayPointsNextIndex - 1 - i)+"Lat", wayPointList.at(i).fLat);
+		int head = wayPointList.at(i).rotation;
+		head = head > 180 ? head - 360 : head;	// 将存储wayPoints朝向转换到发送格式
+		head = head >= 0 ? head - 180 : head + 180;	// 朝向取反
+		jsonToSend.insert(QString::number(wayPointsNextIndex - 1 - i)+"head", head);
+	}
+
+	QString str = QString(QJsonDocument(jsonToSend).toJson());
+	server_->sendMessage(str);
+}
+
 
 // 无人机起降控制
 void MainWindow::onTakeoffButton() {
@@ -676,6 +726,7 @@ void MainWindow::update_coll_pred() {
 		ui->collFlagLabel->setText("false");
 }
 void MainWindow::onEnableCollButton() {
+	collIsSending = true;
 	ui->collControlEnableBtn->setEnabled(false);
 	ui->collControlDisableBtn->setEnabled(true);
 	collPredTimer->start(100);
@@ -683,17 +734,23 @@ void MainWindow::onEnableCollButton() {
 }
 void MainWindow::sendCollPredCommand() {
 	QJsonObject jsonToSend_0;
-	if (ui->collStopRadioBtn->isChecked())
+	if (ui->collHoverCheckBox->isChecked()) {	// 悬停
 		jsonToSend_0.insert("mission", 6);
-	else
-		jsonToSend_0.insert("mission", 5);
-	jsonToSend_0.insert("isCollFlag", isCollFlag);
+		jsonToSend_0.insert("isCollFlag", true);
+	} else {
+		if (ui->collStopRadioBtn->isChecked())
+			jsonToSend_0.insert("mission", 6);
+		else
+			jsonToSend_0.insert("mission", 5);
+		jsonToSend_0.insert("isCollFlag", isCollFlag);
+	}
 
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
 	qDebug() << str;
 }
 void MainWindow::onDisableCollButton() {
+	collIsSending = false;
 	disconnect(collPredTimer, SIGNAL(timeout()),nullptr,nullptr);
 	collPredTimer->stop();
 
@@ -739,6 +796,11 @@ void MainWindow::onCollSendFalseButton() {
  
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
+}
+
+void MainWindow::collHoverCheckBoxStateChange(int state) {
+	if (state == Qt::Checked && !collIsSending)
+		onEnableCollButton();
 }
 
 // GPS坐标系相互转换

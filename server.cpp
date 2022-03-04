@@ -49,7 +49,7 @@ namespace Ui {
 
 	// 向MyUX发送数据information
 	void Server::sendMessage(const QString& information) {
-		qDebug() << "向MuUX发送数据";
+//		qDebug() << "向MuUX发送数据";
 		QByteArray message = information.toLocal8Bit();  // 将字符串的本地8位表示作为QByteArray返回
 		for(auto i : *tcpSocketMyUXSendList)
 			i->write(message);
@@ -87,7 +87,7 @@ namespace Ui {
 		connect(tcpServerConnectionMyUXReceive, &QTcpSocket::readyRead, this, &Server::updateServerProgress);
 	}
 	void Server::updateServerProgress() {
-		qDebug() << "MyUX TCP socket 接收数据成功";
+//		qDebug() << "MyUX TCP socket 接收数据成功";
 		// 时间
 		QDateTime time = QDateTime::currentDateTime();
 		QString str = time.toString("\n[ hh:mm:ss ]"); // 时间信息，设置显示格式

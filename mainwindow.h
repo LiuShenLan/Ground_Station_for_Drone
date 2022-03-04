@@ -104,6 +104,7 @@ private:
 	double collThreshold = 0.97;// 障碍预测阈值
 	bool isCollFlag = false;	// 前方是否是障碍
 	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
+	bool collIsSending = false;	// 是否正在发送障碍预测
 	int preCollFlagIsTrueCount = 0;	// 障碍预测之前连续全部都是False的次数
 	void acceptConnectionCollPred();	// TCP 接受信息并设置虚拟控制与方向数值
 	void update_coll_pred();	// 接受coll pred数据并更新flag
@@ -144,6 +145,8 @@ private slots:  // 槽声明区
 	void onReleaseNavSlider();	// 设置导航点方向
 	void onSaveButton();	// 保存WayPoints信息
 	void onLoadButton();	// 读取WayPoints信息
+	void onContinueBtn();	// wayPoints断点续航
+	void onBackBtn();		// 返航按钮
 	static QJsonObject wayPointsToJson(const wayPoint& point);	// wayPoints转换为Json
 	static wayPoint jsonToWayPoints(const QJsonObject& jsonWayPoints);	// Json转换为wayPoints
 
@@ -154,6 +157,7 @@ private slots:  // 槽声明区
 	void onSetCollThreshold();	// 设置障碍预测阈值
 	void onCollSendTrueButton();	// 发送无人机障碍true预测
 	void onCollSendFalseButton();	// 允许无人机障碍false预测
+	void collHoverCheckBoxStateChange(int);	// 悬停选择框
 
 	// 摄像头
 	void readFarme();	// 读取摄像头信息
