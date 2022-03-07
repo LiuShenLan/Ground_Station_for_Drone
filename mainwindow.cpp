@@ -78,6 +78,7 @@ void MainWindow::InitForm() {
 	}
 	ui->wayPointsComboBox->setCurrentIndex(0);
 	connect(ui->wayPointsAddBtn, SIGNAL(clicked()), this, SLOT(onBtnAddLight()));
+	connect(ui->wayPointsAddCurBtn, SIGNAL(clicked()), this, SLOT(onBtnAddCurLight()));
 	connect(ui->wayPointsGoBtn, SIGNAL(clicked()), this, SLOT(onGoButton()));
 	connect(ui->wayPointsClearBtn, SIGNAL(clicked()), this, SLOT(onClearAllPoint()));
 
@@ -222,6 +223,20 @@ void MainWindow::callJava() {
 void MainWindow::onBtnAddLight() {
 	// 根据根据临时WayPoint经纬度信息生成wayPoint对象
 	wayPoint tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()));
+	// 向WayPoints下拉菜单中写入信息
+	ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
+	ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
+	bridgeins->onUpdateData();
+}
+void MainWindow::onBtnAddCurLight() {
+	// 读取并添加无人机当前位置
+	double lng = ui->GPSLongitudeLineEdit->text().toDouble();
+	double lat = ui->GPSLatitudeLineEdit->text().toDouble();
+	int rotation = server_->jsonGPS["yaw"].toInt();
+	bridgeins->newPoint(lng, lat);
+
+	// 根据根据临时WayPoint经纬度信息生成wayPoint对象
+	wayPoint tLight = bridgeins->AddLight(rotation);
 	// 向WayPoints下拉菜单中写入信息
 	ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
 	ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);

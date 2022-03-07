@@ -152,7 +152,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>reset</string>
+            <string>Reset</string>
            </property>
           </widget>
           <widget class="QLabel" name="pitchLabel">
@@ -847,9 +847,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="wayPointsClearBtn">
+               <widget class="QPushButton" name="wayPointsAddCurBtn">
                 <property name="text">
-                 <string>Clear</string>
+                 <string>Add Cur</string>
                 </property>
                </widget>
               </item>
@@ -882,6 +882,13 @@
                <widget class="QPushButton" name="wayPointsLoadBtn">
                 <property name="text">
                  <string>Load</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="wayPointsClearBtn">
+                <property name="text">
+                 <string>Clear</string>
                 </property>
                </widget>
               </item>

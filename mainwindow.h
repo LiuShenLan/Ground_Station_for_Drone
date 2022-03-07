@@ -140,6 +140,7 @@ private slots:  // 槽声明区
 
 	// WayPoints
 	void onBtnAddLight();	// 根据临时WayPoint经纬度信息添加WayPoints
+	void onBtnAddCurLight();// 根据无人机当前位置添加WayPoints
 	void onGoButton();		// 向TCP发送所有的WayPoints信息
 	void onClearAllPoint();	// 移除所有WayPoints信息
 	void onReleaseNavSlider();	// 设置导航点方向
