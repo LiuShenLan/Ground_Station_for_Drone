@@ -37,7 +37,7 @@
 #define CAM_LOAD	CAM_LOAD_DRONE_CAMERA
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG	true
-#define CAM_SHOW_DETECT_CAMERA		"../../dataset/hostData/detece result/show_realTimeImg.jpg"
+#define CAM_SHOW_DETECT_CAMERA		"../../dataset/hostData/detectResult/show_realTimeImg.jpg"
 
 // 摄像头数据保存路径
 #define READ_FRAME_PIC_TEMP_PATH	"../../dataset/hostData/realTimeImg_temp.jpg"

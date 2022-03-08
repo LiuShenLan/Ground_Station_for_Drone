@@ -190,7 +190,7 @@ void MainWindow::onGPSMapRefreshBtn() {
 	/**
 	 * 室内测试注释掉下一行代码
 	 * **/
-	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
+//	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
 	connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
 }
 void MainWindow::timeCountsFunction() {
@@ -222,7 +222,7 @@ void MainWindow::callJava() {
 // WayPoints
 void MainWindow::onBtnAddLight() {
 	// 根据根据临时WayPoint经纬度信息生成wayPoint对象
-	wayPoint tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()));
+	wayPoint tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()), ui->wayPointsHeightLineEdit->text().toDouble());
 	// 向WayPoints下拉菜单中写入信息
 	ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
 	ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
@@ -236,7 +236,7 @@ void MainWindow::onBtnAddCurLight() {
 	bridgeins->newPoint(lng, lat);
 
 	// 根据根据临时WayPoint经纬度信息生成wayPoint对象
-	wayPoint tLight = bridgeins->AddLight(rotation);
+	wayPoint tLight = bridgeins->AddLight(rotation, ui->wayPointsHeightLineEdit->text().toDouble());
 	// 向WayPoints下拉菜单中写入信息
 	ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
 	ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
@@ -249,7 +249,6 @@ void MainWindow::sendWayPoint() {
 	QList<wayPoint> wayPointList = bridgeins->returnWayPointList();  // 所有WayPoints的list	WGS84坐标系
 	QJsonObject jsonToSend;
 	jsonToSend.insert("mission", 1);
-	jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
 	jsonToSend.insert("way_point_num", wayPointList.size());
 
 	// 根据wayPoints朝向计算并发送无人机朝向
@@ -257,12 +256,14 @@ void MainWindow::sendWayPoint() {
 	for (int i = 0; i < n; ++i) {
 		jsonToSend.insert(QString::number(i)+"Lng", wayPointList.at(i).fLng);
 		jsonToSend.insert(QString::number(i)+"Lat", wayPointList.at(i).fLat);
+		jsonToSend.insert(QString::number(i)+"altitude", wayPointList.at(i).altitude);
 		int head = wayPointList.at(i).rotation;
 		head = head > 180 ? head - 360 : head;
 		jsonToSend.insert(QString::number(i)+"head", head);
 	}
 
 	QString str = QString(QJsonDocument(jsonToSend).toJson());
+	qDebug() << str;
 	server_->sendMessage(str);
 }
 void MainWindow::onRecvdMsg(const QString& msg) {
@@ -342,6 +343,7 @@ QJsonObject MainWindow::wayPointsToJson(const wayPoint& point) {
 	jsonWayPoints.insert("strDesc", point.strDesc);
 	jsonWayPoints.insert("fLng", point.fLng);
 	jsonWayPoints.insert("fLat", point.fLat);
+	jsonWayPoints.insert("altitude", point.altitude);
 	jsonWayPoints.insert("nValue", point.nValue);
 	jsonWayPoints.insert("rotation", point.rotation);
 	return jsonWayPoints;
@@ -352,6 +354,7 @@ wayPoint MainWindow::jsonToWayPoints(const QJsonObject& jsonWayPoints) {
 	tLight.strDesc = jsonWayPoints.value("strDesc").toString();
 	tLight.fLng = jsonWayPoints.value("fLng").toDouble();
 	tLight.fLat = jsonWayPoints.value("fLat").toDouble();
+	tLight.altitude = jsonWayPoints.value("altitude").toDouble();
 	tLight.nValue = jsonWayPoints.value("nValue").toInt();
 	tLight.rotation = jsonWayPoints.value("rotation").toInt();
 	return tLight;
@@ -363,7 +366,6 @@ void MainWindow::onContinueBtn() {
 
 	QJsonObject jsonToSend;
 	jsonToSend.insert("mission", 1);
-	jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
 	jsonToSend.insert("way_point_num", wayPointList.size() - wayPointsNextIndex);
 
 	// 根据wayPoints朝向计算并发送无人机朝向
@@ -371,6 +373,7 @@ void MainWindow::onContinueBtn() {
 	for (int i = wayPointsNextIndex; i < n; ++i) {
 		jsonToSend.insert(QString::number(i - wayPointsNextIndex)+"Lng", wayPointList.at(i).fLng);
 		jsonToSend.insert(QString::number(i - wayPointsNextIndex)+"Lat", wayPointList.at(i).fLat);
+		jsonToSend.insert(QString::number(i - wayPointsNextIndex)+"altitude", wayPointList.at(i).altitude);
 		int head = wayPointList.at(i).rotation;
 		head = head > 180 ? head - 360 : head;
 		jsonToSend.insert(QString::number(i - wayPointsNextIndex)+"head", head);
@@ -385,7 +388,6 @@ void MainWindow::onBackBtn() {
 
 	QJsonObject jsonToSend;
 	jsonToSend.insert("mission", 7);
-	jsonToSend.insert("altitude", ui->wayPointsHeightLineEdit->text().toDouble());
 	jsonToSend.insert("way_point_num", wayPointsNextIndex);
 
 	// 根据wayPoints朝向计算并发送无人机朝向
@@ -393,6 +395,7 @@ void MainWindow::onBackBtn() {
 	for (int i = wayPointsNextIndex - 1; i >= 0; --i) {
 		jsonToSend.insert(QString::number(wayPointsNextIndex - 1 - i)+"Lng", wayPointList.at(i).fLng);
 		jsonToSend.insert(QString::number(wayPointsNextIndex - 1 - i)+"Lat", wayPointList.at(i).fLat);
+		jsonToSend.insert(QString::number(wayPointsNextIndex - 1 - i)+"altitude", wayPointList.at(i).altitude);
 		int head = wayPointList.at(i).rotation;
 		head = head > 180 ? head - 360 : head;	// 将存储wayPoints朝向转换到发送格式
 		head = head >= 0 ? head - 180 : head + 180;	// 朝向取反

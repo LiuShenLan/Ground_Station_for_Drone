@@ -17,6 +17,7 @@ typedef struct
 	QString strDesc;	// 描述
 	double fLng;	// 经度
 	double fLat;	// 纬度
+	double altitude;// 高度
 	int nValue;		// 0:显示箭头   1:显示绿色圆形
 	int rotation;	// 旋转角度(朝向)
 }wayPoint;
@@ -35,7 +36,7 @@ private:
 	QList<wayPoint> wayPointsAllList;	// 所有WayPoints的list	WGS84坐标系
 	int wayPointsNum = 1;	// WayPoints数目
 
-	wayPoint AddLight(int rot);	// 根据临时WayPoint经纬度信息生成wayPoint对象并添加到wayPointsAllList中
+	wayPoint AddLight(int rot, double altitude);	// 根据临时WayPoint经纬度信息生成wayPoint对象并添加到wayPointsAllList中
 	void removeAllPoints();	// 移除所有WayPoints信息
 	void newPoint(double lng, double lat);	// 设置临时WayPoint经纬度信息	WGS84坐标系
 	void setNavPointRotate(int rot);	// 设置html地图中的选择WayPoints时显示的水滴的朝向
