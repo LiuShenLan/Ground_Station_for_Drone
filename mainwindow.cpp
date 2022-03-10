@@ -190,7 +190,7 @@ void MainWindow::onGPSMapRefreshBtn() {
 	/**
 	 * 室内测试注释掉下一行代码
 	 * **/
-//	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
+	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
 	connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
 }
 void MainWindow::timeCountsFunction() {
@@ -232,11 +232,12 @@ void MainWindow::onBtnAddCurLight() {
 	// 读取并添加无人机当前位置
 	double lng = ui->GPSLongitudeLineEdit->text().toDouble();
 	double lat = ui->GPSLatitudeLineEdit->text().toDouble();
-	int rotation = server_->jsonGPS["yaw"].toInt();
+	int rotation = static_cast<int>(server_->jsonGPS["yaw"].toDouble());
+	rotation = rotation < 0 ? rotation + 360 : rotation;
 	bridgeins->newPoint(lng, lat);
 
 	// 根据根据临时WayPoint经纬度信息生成wayPoint对象
-	wayPoint tLight = bridgeins->AddLight(rotation, ui->wayPointsHeightLineEdit->text().toDouble());
+	wayPoint tLight = bridgeins->AddLight((int)rotation, ui->wayPointsHeightLineEdit->text().toDouble());
 	// 向WayPoints下拉菜单中写入信息
 	ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
 	ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);

@@ -42,8 +42,8 @@ use opencv-4.5.1 & Qt5.12.11
 |mission|2|允许虚拟控制|
 |mission|3|禁止虚拟控制|
 |mission|4|降落|
-|mission|5|障碍预测(停止)|
-|mission|6|障碍预测(避障)|
+|mission|5|障碍预测(避障)|
+|mission|6|障碍预测(停止)|
 |mission|7|返航|
 
 ### mission 详细

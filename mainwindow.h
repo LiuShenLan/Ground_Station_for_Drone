@@ -34,7 +34,7 @@
 #define CAM_LOAD_DRONE_CAMERA	2
 #define CAM_LOAD_PC_VIDEO		"../../dataset/video/all copy.mp4"
 // 摄像头读取选择
-#define CAM_LOAD	CAM_LOAD_DRONE_CAMERA
+#define CAM_LOAD	CAM_LOAD_PC_CAMERA
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG	true
 #define CAM_SHOW_DETECT_CAMERA		"../../dataset/hostData/detectResult/show_realTimeImg.jpg"
