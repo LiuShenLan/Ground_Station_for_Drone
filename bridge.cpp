@@ -12,7 +12,7 @@ bridge* bridge::instance() {
 bridge::bridge(){}
 
 // WayPoints
-wayPoint bridge::AddLight(int rot, double altitude) {
+wayPoint bridge::AddLight(int rot, double altitude, bool takePhoto, bool turnLeft) {
 	wayPoint tLight;
 	tLight.strName = QString("Light%1").arg(wayPointsNum);
 	tLight.strDesc = QString("Light Description %1").arg(wayPointsNum);
@@ -21,6 +21,8 @@ wayPoint bridge::AddLight(int rot, double altitude) {
 	tLight.altitude = altitude;
 	tLight.nValue = 0;
 	tLight.rotation = rot;	// Nav point 导航点方向滑块数据
+	tLight.takePhoto = takePhoto;
+	tLight.turnLeft = turnLeft;
 	wayPointsAllList.append(tLight);
 	wayPointsNum++;
 	return tLight;

@@ -44,7 +44,6 @@ use opencv-4.5.1 & Qt5.12.11
 |mission|4|降落|
 |mission|5|障碍预测(避障)|
 |mission|6|障碍预测(停止)|
-|mission|7|返航|
 
 ### mission 详细
 |mission|key|value|备注|
@@ -74,10 +73,6 @@ use opencv-4.5.1 & Qt5.12.11
 |||||
 |mission5|mission|6|障碍预测(停止)|
 ||isCollFlag|bool|前方是否有障碍|
-|mission1|mission|7|发送WayPoints|
-||altitude|double|高度|
-||way_point_num|int|WayPoints数目|
-
 
 ## 通信端口号
 

@@ -34,14 +34,14 @@
 #define CAM_LOAD_DRONE_CAMERA	2
 #define CAM_LOAD_PC_VIDEO		"../../dataset/video/all copy.mp4"
 // 摄像头读取选择
-#define CAM_LOAD	CAM_LOAD_PC_CAMERA
+#define CAM_LOAD	CAM_LOAD_DRONE_CAMERA
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG	true
 #define CAM_SHOW_DETECT_CAMERA		"../../dataset/hostData/detectResult/show_realTimeImg.jpg"
 
 // 摄像头数据保存路径
-#define READ_FRAME_PIC_TEMP_PATH	"../../dataset/hostData/realTimeImg_temp.jpg"
-#define READ_FRAME_PIC_PATH			"../../dataset/hostData/realTimeImg.jpg"
+#define READ_FRAME_PIC_TEMP_PATH	"../../dataset/hostData/realTimeImg/realTimeImg_temp.jpg"
+#define READ_FRAME_PIC_PATH			"../../dataset/hostData/realTimeImg/realTimeImg.jpg"
 
 // 无人机信息Json文件保存路径
 #define SAVE_JSON_TEMP_PATH		"../../dataset/hostData/uav_temp.json"
