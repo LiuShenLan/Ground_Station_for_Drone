@@ -34,10 +34,10 @@
 #define CAM_LOAD_DRONE_CAMERA	2
 #define CAM_LOAD_PC_VIDEO		"../../dataset/video/all copy.mp4"
 // 摄像头读取选择
-#define CAM_LOAD	CAM_LOAD_DRONE_CAMERA
+#define CAM_LOAD	CAM_LOAD_DRONE_CAMERA	// TODO:
 // 摄像头显示选择
 #define CAM_SHOW_DETECT_CAMERA_FLAG	true
-#define CAM_SHOW_DETECT_CAMERA		"../../dataset/hostData/detectResult/show_realTimeImg.jpg"
+#define CAM_SHOW_DETECT_CAMERA		"../../dataset/hostData/realTimeImg/showRealTimeImg.jpg"
 
 // 摄像头数据保存路径
 #define READ_FRAME_PIC_TEMP_PATH	"../../dataset/hostData/realTimeImg/realTimeImg_temp.jpg"
@@ -114,6 +114,8 @@ private:
 	QTimer *timer;	// 50ms定时器 读取摄像头信息器
 	cv::VideoCapture cam;	// 从 摄像头/本地视频 读取图片
 	cv::Mat frame;	// 图片帧
+	int imgSaveFile;	// 摄像头保存文件
+	int imgShowFile;	// 上位机显示文件
 
 	// 虚拟控制
 	QTimer* virtualStickTimer;	// 100ms定时器 向无人机发送虚拟控制信息

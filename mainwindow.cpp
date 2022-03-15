@@ -9,6 +9,8 @@
 #include <QCoreApplication>
 #include <Python.h>
 
+#include <sys/file.h>
+
 class MySlider : public QSlider {
 public:
   explicit MySlider(QWidget *parent = 0);
@@ -56,6 +58,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	cam = cv::VideoCapture(CAM_LOAD);
 	if(!cam.isOpened())
 		std::cerr << "Can't open camera!" <<std::endl;
+
+	// 加载存储与显示图片文件
+	imgSaveFile = open(READ_FRAME_PIC_PATH, O_WRONLY);
+	if (CAM_SHOW_DETECT_CAMERA_FLAG)
+		imgShowFile = open(CAM_SHOW_DETECT_CAMERA, O_RDONLY);
 
 	timer = new QTimer(this);
 	timer->start(50);	// 开始计时，超时则发出timeout()信号，读取摄像头信息
@@ -188,9 +195,9 @@ void MainWindow::onGPSMapRefreshBtn() {
 	bridgeins->setNavPointRotate(int(ui->navigationPointDirectSlider->value()));
 
 	/**
-	 * shinei室内测试注释掉下一行代码
+	 * shinei室内测试注释掉下一行代码 TODO:
 	 * **/
-//	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction())); // disable if you want to test the map point.
+	connect(timer_1,SIGNAL(timeout()),this,SLOT(timeCountsFunction()));
 	connect(timer_2,SIGNAL(timeout()),this,SLOT(callJava()));
 }
 void MainWindow::timeCountsFunction() {
@@ -588,15 +595,27 @@ void MainWindow::readFarme() {
 	frame(cv::Rect(int((1-radio)/2*frame.size().width),int((1-radio)/2*frame.size().height),int(radio*frame.size().width),int(radio*frame.size().height))).copyTo(frame);
 //	cv::rectangle(frame,cvPoint(20,200),cvPoint(200,300),cvScalar(255,0,0),1,1,0);
 	//将抓取到的帧，转换为QImage格式。QImage::Format_RGB888不同的摄像头用不同的格式。
-	QImage image = QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888).rgbSwapped().scaled(640,360,Qt::KeepAspectRatioByExpanding);
-	cv::imwrite(READ_FRAME_PIC_TEMP_PATH,frame);
-	if(access(READ_FRAME_PIC_PATH,F_OK))
-		remove(READ_FRAME_PIC_PATH);
-	rename(READ_FRAME_PIC_TEMP_PATH, READ_FRAME_PIC_PATH);
+	QImage image = QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888).rgbSwapped().scaled(640,480,Qt::KeepAspectRatioByExpanding);
+
+	// 写文件，加锁
+	flock(imgSaveFile, LOCK_EX);
+	cv::imwrite(READ_FRAME_PIC_PATH,frame);
+	flock(imgSaveFile, LOCK_UN);
+
+//	cv::imwrite(READ_FRAME_PIC_TEMP_PATH,frame);
+//	if(access(READ_FRAME_PIC_PATH,F_OK))
+//		remove(READ_FRAME_PIC_PATH);
+//	rename(READ_FRAME_PIC_TEMP_PATH, READ_FRAME_PIC_PATH);
 
 	// 显示detect后的图片
 	if (CAM_SHOW_DETECT_CAMERA_FLAG) {
+		// 读文件，加锁
+		flock(imgShowFile, LOCK_EX);
 		frame = cv::imread(CAM_SHOW_DETECT_CAMERA, 1);	//读入一张本地图片
+		flock(imgShowFile, LOCK_UN);
+
+//		frame = cv::imread(CAM_SHOW_DETECT_CAMERA, 1);	//读入一张本地图片
+
 //		cv::cvtColor(frame,frame,cv::COLOR_BGR2RGB);//opencv读取图片按照BGR方式读取，为了正常显示，所以将BGR转为RGB
 		image = QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888).rgbSwapped().scaled(640,320,Qt::KeepAspectRatioByExpanding);
 	}
