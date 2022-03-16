@@ -74,7 +74,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Enable virtual</string>
+            <string>Enable Virtual</string>
            </property>
           </widget>
           <widget class="QSlider" name="virtualStickYawSlider">
@@ -178,7 +178,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Disable virtual</string>
+            <string>Disable Virtual</string>
            </property>
           </widget>
           <widget class="QSlider" name="virtualStickThrottleSlider">
@@ -282,7 +282,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>dronet direct</string>
+            <string>Direct</string>
            </property>
           </widget>
           <widget class="QLineEdit" name="virtualStickRollLineEdit">
@@ -305,7 +305,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>safe mode</string>
+            <string>Safe Mode</string>
            </property>
           </widget>
           <widget class="QPushButton" name="manualDirectTurnLeftBtn">
@@ -318,7 +318,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Turn left</string>
+            <string>Turn Left</string>
            </property>
           </widget>
           <widget class="QPushButton" name="manualDirectGoStraightBtn">
@@ -331,7 +331,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Go straight</string>
+            <string>Go Straight</string>
            </property>
           </widget>
           <widget class="QPushButton" name="manualDirectTurnRightBtn">
@@ -344,7 +344,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Turn right</string>
+            <string>Turn Right</string>
            </property>
           </widget>
           <widget class="QLabel" name="turnLabel">
@@ -370,7 +370,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Manul direct</string>
+            <string>Manul Direct</string>
            </property>
           </widget>
          </widget>
@@ -412,7 +412,7 @@
                <item>
                 <widget class="QLabel" name="label_9">
                  <property name="text">
-                  <string>Nav point</string>
+                  <string>Nav Point</string>
                  </property>
                 </widget>
                </item>
@@ -430,14 +430,14 @@
                <item>
                 <widget class="QCheckBox" name="wayPointsTurnLeftcheckBox">
                  <property name="text">
-                  <string>left</string>
+                  <string>Left</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="wayPointsTakePhotocheckBox">
                  <property name="text">
-                  <string>photo</string>
+                  <string>Photo</string>
                  </property>
                 </widget>
                </item>
@@ -758,7 +758,7 @@
          <property name="title">
           <string>Collision Prediction</string>
          </property>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -779,7 +779,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>coll pred</string>
+                <string>Coll Pred</string>
                </property>
               </widget>
              </item>
@@ -792,7 +792,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Enable coll</string>
+                <string>Enable Coll</string>
                </property>
               </widget>
              </item>
@@ -805,7 +805,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Disable coll</string>
+                <string>Disable Coll</string>
                </property>
               </widget>
              </item>
@@ -818,7 +818,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Send true</string>
+                <string>Send True</string>
                </property>
               </widget>
              </item>
@@ -874,7 +874,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>threshold Set</string>
+                <string>Threshold Set</string>
                </property>
               </widget>
              </item>
@@ -887,7 +887,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Send false</string>
+                <string>Send False</string>
                </property>
               </widget>
              </item>
@@ -911,21 +911,21 @@
                <item>
                 <widget class="QRadioButton" name="collStopRadioBtn">
                  <property name="text">
-                  <string>stop</string>
+                  <string>Stop</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QRadioButton" name="collAvoidanceRadioBtn">
                  <property name="text">
-                  <string>avoidance</string>
+                  <string>Avoidance</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="collHoverCheckBox">
                  <property name="text">
-                  <string>hover</string>
+                  <string>Hover</string>
                  </property>
                 </widget>
                </item>
