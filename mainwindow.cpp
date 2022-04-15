@@ -645,24 +645,28 @@ void MainWindow::onRecvTargetPoint(const QString& msg) {
 	QString targetNum = lst[0]; // WayPoints列表中的WayPoint的索引
 	int targetRotation = lst[1].toInt();	// WayPoint旋转角度
 //	bridgeins->onLightOn(targetNum);
-	double targetLng = lst[2].toDouble();   // WayPoint经度
-	double targetLat = lst[3].toDouble();   // WayPoint纬度
+	double lngBD09 = lst[2].toDouble();   // WayPoint经度，BD09坐标系
+	double latBD09 = lst[3].toDouble();   // WayPoint纬度，BD09坐标系
+	vector<double> temp = BD09ToWGS84(lngBD09, latBD09);    // WSG84坐标系
+
+	double targetLng = temp[0];   // WayPoint经度，WSG84坐标系
+	double targetLat = temp[1];   // WayPoint纬度，WSG84坐标系
 	int arrayListLength = lst[4].toInt();   // WayPoints数目
 	//qDebug()<<fixed<<qSetRealNumberPrecision(7)<<targetLng<<" "<<targetLat;
 	//qDebug()<<(ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)<<" "<<(ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
 	//qDebug()<<((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125))/(targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
 	// 计算方位角
 	// first quadrant
-	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))>0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))>0)
+	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())>0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())>0)
 		next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 	// second quadrant
-	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))<0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))>0)
+	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())>0)
 		next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 	// third quadrant
-	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))<0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))<0)
+	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
 		next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 	// forth quadrant
-	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))>0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))<0)
+	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())>0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
 		next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 
 	next_point_direction = (double)targetRotation;

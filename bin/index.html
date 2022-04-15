@@ -25,7 +25,7 @@
 <script type="text/javascript">
 	const map = new BMap.Map("map", {minZoom: 5, maxZoom: 19, enableMapClick: false});	// 创建地图实例
 	const initPoint = new BMap.Point(117.0353942718, 36.6553807616);	// 初始化中心点坐标(经度, 纬度)，使用百度BD09坐标
-	let wayPointsAllList = [];	// QT上位机中WayPoints的经纬度信息
+	let wayPointsAllList = [];	// QT上位机中WayPoints的经纬度信息，BD09坐标系
 	let wayPointsAllRotationList = [];		// QT上位机中WayPoints的旋转角度信息
 	let planePoint = new BMap.Point(0, 0);	// 无人机初始化坐标点
 
