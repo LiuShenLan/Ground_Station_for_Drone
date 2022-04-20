@@ -639,6 +639,7 @@ void MainWindow::acceptConnectionDrenet() {
 	connect(tcpSocketDronet, &QTcpSocket::readyRead, this, &MainWindow::updateCommand_from_python_controller);
 }
 void MainWindow::onRecvTargetPoint(const QString& msg) {
+	return;	// TODO
 	QStringList lst;
 	lst = msg.split(',');
 	double next_point_direction = 0;
@@ -691,10 +692,58 @@ void MainWindow::updateCommand_from_python_controller() {
 		//qDebug()<<"pthon_controller:"<<utf8str<<"\n";
 		QStringList control_command = utf8str.split(",");
 
-		// 设置虚拟控制滑块数值
-		double yawSliderReceive = control_command.at(0).toDouble();
-		double pitchSliderReceive = control_command.at(1).toDouble();
-		double rollSliderReceive = control_command.at(2).toDouble();
+		// TODO
+		double yawSliderReceive, pitchSliderReceive, rollSliderReceive;
+		if (!bridgeins->wayPointsAllList.empty()) {	// 有wayPoints
+			// 无人机当前位置，gps[0] = lng, gps[1] = lat
+			QVector<double> gps = WGS84ToBD09(server_->jsonGPS["longitude"].toDouble(), server_->jsonGPS["latitude"].toDouble());
+			double minDis = 100;
+			int minDisIndex = 0;
+			for (int i = 0; i < bridgeins->wayPointsAllList.size(); ++i) {
+				double lng = gps[0] - bridgeins->wayPointsAllList[i].fLng;
+				double lat = gps[1] - bridgeins->wayPointsAllList[i].fLat;
+				double dis = pow(lng, 2) + pow(lat, 2);
+				if (dis < minDis) {
+					minDis = dis;
+					minDisIndex = i;
+				}
+			}
+			if (minDis < 0.0002) {	// 靠近wayPoints，使用wayPoints的方向
+				double wayPointsRotation = bridgeins->wayPointsAllList[minDisIndex].rotation;	// wayPoints朝向
+				double uavRotation = server_->jsonGPS["yaw"].toDouble();
+				bool turnLeft;
+				if (uavRotation >= 0) {	// 无人机朝向东北~东南
+					double uavBackRotation = uavRotation - 180;
+					if (wayPointsRotation >= uavBackRotation && wayPointsRotation <= uavRotation)
+						turnLeft = true;
+					else
+						turnLeft = false;
+				} else {	// 无人机朝向西北~西南
+					double uavBackRotation = uavRotation + 180;
+					if (wayPointsRotation >= uavRotation && wayPointsRotation <= uavBackRotation)
+						turnLeft = false;
+					else
+						turnLeft = true;
+				}
+
+				// 设置虚拟控制滑块数值
+				if (turnLeft)
+					rollSliderReceive = -10;
+				else
+					rollSliderReceive = 10;
+			} else	// 远离WayPoints，不使用wayPoints的方向，设置虚拟控制滑块数值
+				rollSliderReceive = control_command.at(2).toDouble();
+		} else
+			rollSliderReceive = control_command.at(2).toDouble();
+
+		yawSliderReceive = control_command.at(0).toDouble();
+		pitchSliderReceive = control_command.at(1).toDouble();
+
+//		// 设置虚拟控制滑块数值
+//		double yawSliderReceive = control_command.at(0).toDouble();
+//		double pitchSliderReceive = control_command.at(1).toDouble();
+//		double rollSliderReceive = control_command.at(2).toDouble();
+
 		if (ui->virtualStickSafeModeCheckBox->isChecked()) {	// 安全模式，限制阈值
 			yawSliderReceive = std::max(yawSliderReceive, -SAFE_MODE_YAW_THRESHOLD);
 			yawSliderReceive = std::min(yawSliderReceive, SAFE_MODE_YAW_THRESHOLD);
@@ -743,8 +792,8 @@ void MainWindow::updateCommand_from_python_controller() {
 	if((direction>=270 && direction<=330))
 		ui->turnLabel->setText(tr("Turn left"));
 	// 发送信息
-	QString sWriteData = QString::number(direction);
-	tcpSocketDronet->write(sWriteData.toUtf8());
+//	QString sWriteData = QString::number(direction);
+//	tcpSocketDronet->write(sWriteData.toUtf8());
 }
 
 // TCP coll pred
