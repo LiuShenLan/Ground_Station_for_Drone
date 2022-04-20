@@ -209,7 +209,7 @@
 
 		let mark_ = 0;
 		for (let j = 0; j < wayPointsAllList.length; j++) {	// 遍历QT上位机中WayPoints的经纬度信息
-			if (Math.abs(lng - wayPointsAllList[j].lng) < 0.0005 && Math.abs(lat - wayPointsAllList[j].lat) < 0.0005) {   // 无人机位置与WayPoints距离在一定范围之内
+			if (Math.abs(lng - wayPointsAllList[j].lng) < 0.01 && Math.abs(lat - wayPointsAllList[j].lat) < 0.01) {   // 无人机位置与WayPoints距离在一定范围之内
 				mark_ = 1;
 				window.bridge.jsSendTargetPoint(j + "," + wayPointsAllRotationList[j] + "," + wayPointsAllList[j].lng + "," + wayPointsAllList[j].lat + "," + wayPointsAllList.length);
 				// QT上位机接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示

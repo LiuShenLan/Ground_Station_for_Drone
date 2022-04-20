@@ -279,7 +279,7 @@ void MainWindow::sendWayPoint() {
 	}
 
 	QString str = QString(QJsonDocument(jsonToSend).toJson());
-	qDebug() << str;
+//	qDebug() << str;
 	server_->sendMessage(str);
 }
 void MainWindow::onRecvdMsg(const QString& msg) {
@@ -647,7 +647,7 @@ void MainWindow::onRecvTargetPoint(const QString& msg) {
 //	bridgeins->onLightOn(targetNum);
 	double lngBD09 = lst[2].toDouble();   // WayPoint经度，BD09坐标系
 	double latBD09 = lst[3].toDouble();   // WayPoint纬度，BD09坐标系
-	vector<double> temp = BD09ToWGS84(lngBD09, latBD09);    // WSG84坐标系
+    QVector<double> temp = BD09ToWGS84(lngBD09, latBD09);    // WSG84坐标系
 
 	double targetLng = temp[0];   // WayPoint经度，WSG84坐标系
 	double targetLat = temp[1];   // WayPoint纬度，WSG84坐标系
@@ -656,20 +656,21 @@ void MainWindow::onRecvTargetPoint(const QString& msg) {
 	//qDebug()<<(ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)<<" "<<(ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
 	//qDebug()<<((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125))/(targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
 	// 计算方位角
+    QVector<double> gps = WGS84ToBD09(server_->jsonGPS["longitude"].toDouble(), server_->jsonGPS["latitude"].toDouble());
 	// first quadrant
-	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())>0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())>0)
-		next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
+	if((targetLng - gps[0])>0 && (targetLat - gps[1])>0)
+		next_point_direction = atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
 	// second quadrant
-	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())>0)
-		next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
+	if((targetLng - gps[0])<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())>0)
+		next_point_direction = 360 + atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
 	// third quadrant
-	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
-		next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
+	if((targetLng - gps[0])<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
+		next_point_direction = 360 + atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
 	// forth quadrant
-	if((targetLng - ui->GPSLongitudeLineEdit->text().toDouble())>0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
-		next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
+	if((targetLng - gps[0])>0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
+		next_point_direction = atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
 
-	next_point_direction = (double)targetRotation;
+//	next_point_direction = (double)targetRotation;
 	qDebug()<<next_point_direction<<":"<<targetNum<<","<<arrayListLength;//server_->jsonGPS["yaw"].toDouble();
 	direction = next_point_direction - server_->jsonGPS["yaw"].toDouble();
 	if(direction>180)
@@ -807,7 +808,7 @@ void MainWindow::sendCollPredCommand() {
 
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
-	qDebug() << str;
+//	qDebug() << str;
 }
 void MainWindow::onDisableCollButton() {
 	collIsSending = false;
