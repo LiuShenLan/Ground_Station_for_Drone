@@ -27,7 +27,7 @@
 #define SAFE_MODE_ROLL_THRESHOLD	50.0	// 前后平移
 
 // 沿路飞行转弯参数
-#define MIN_DISTANCE	0.0002	// 无人机当前位置与相邻wayPoints最小距离阈值
+#define MIN_DISTANCE	0.0000000025	// 无人机当前位置与相邻wayPoints最小距离阈值
 #define ROTATION_DIFF_THRESHOLD	10	// 无人机当前朝向与最靠近wayPoints朝向差距阈值，大于此阈值将会转向
 #define ROTATION_VALUE	10	// 转弯时滑块输出
 

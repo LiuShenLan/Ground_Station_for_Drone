@@ -695,62 +695,82 @@ void MainWindow::updateCommand_from_python_controller() {
 
 		// TODO
 		double yawSliderReceive, pitchSliderReceive, rollSliderReceive;
-		if (!bridgeins->wayPointsAllList.empty()) {	// 有wayPoints
-			// 无人机当前位置，gps[0] = lng, gps[1] = lat
-			QVector<double> gps = WGS84ToBD09(server_->jsonGPS["longitude"].toDouble(), server_->jsonGPS["latitude"].toDouble());
-			double minDis = 100;
-			int minDisIndex = 0;
-			for (int i = 0; i < bridgeins->wayPointsAllList.size(); ++i) {
-				double lng = gps[0] - bridgeins->wayPointsAllList[i].fLng;
-				double lat = gps[1] - bridgeins->wayPointsAllList[i].fLat;
-				double dis = pow(lng, 2) + pow(lat, 2);
-				if (dis < minDis) {
-					minDis = dis;
-					minDisIndex = i;
+		if (ui->manualDirectCheckBox->isChecked()) {	// 手动控制
+			yawSliderReceive = manul_direction;
+
+			if (manul_direction == 0)
+				ui->turnLabel->setText("Go straight");
+			else if (manul_direction < 0)
+				ui->turnLabel->setText("Turn left");
+			else
+				ui->turnLabel->setText("Turn right");
+		}
+		else {
+			if (!bridgeins->wayPointsAllList.empty()) {	// 有wayPoints
+				// 无人机当前位置，gps[0] = lng, gps[1] = lat
+				QVector<double> gps = WGS84ToBD09(server_->jsonGPS["longitude"].toDouble(), server_->jsonGPS["latitude"].toDouble());
+				double minDis = 100;
+				int minDisIndex = 0;
+				for (int i = 0; i < bridgeins->wayPointsAllList.size(); ++i) {
+					double lng = gps[0] - bridgeins->wayPointsAllList[i].fLng;
+					double lat = gps[1] - bridgeins->wayPointsAllList[i].fLat;
+					double dis = pow(lng, 2) + pow(lat, 2);
+					if (dis < minDis) {
+						minDis = dis;
+						minDisIndex = i;
+					}
 				}
+				if (minDis < MIN_DISTANCE) {	// 靠近wayPoints，使用wayPoints的方向
+					double wayPointsRotation = bridgeins->wayPointsAllList[minDisIndex].rotation;	// wayPoints朝向
+					double uavRotation = server_->jsonGPS["yaw"].toDouble();
+					bool turnLeft, needTurn;
+					if (uavRotation >= 0) {	// 无人机朝向东北~东南
+						double uavBackRotation = uavRotation - 180;
+
+						needTurn = (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= -90 && wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD - 360);
+
+						if (wayPointsRotation >= uavBackRotation && wayPointsRotation <= uavRotation)
+							turnLeft = true;
+						else
+							turnLeft = false;
+					} else {	// 无人机朝向西北~西南
+						double uavBackRotation = uavRotation + 180;
+
+						needTurn = (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= 90 && wayPointsRotation <= uavRotation + ROTATION_DIFF_THRESHOLD + 360);
+
+						if (wayPointsRotation >= uavRotation && wayPointsRotation <= uavBackRotation)
+							turnLeft = false;
+						else
+							turnLeft = true;
+					}
+
+					// 设置虚拟控制滑块数值
+					if (needTurn) {
+						if (turnLeft) {
+							yawSliderReceive = -ROTATION_VALUE;
+							ui->turnLabel->setText("Turn left");
+						}
+						else {
+							yawSliderReceive = ROTATION_VALUE;
+							ui->turnLabel->setText("Turn right");
+						}
+					} else {
+						yawSliderReceive = control_command.at(0).toDouble();
+						ui->turnLabel->setText(nullptr);
+					}
+				} else {	// 远离WayPoints，不使用wayPoints的方向，设置虚拟控制滑块数值
+					yawSliderReceive = control_command.at(0).toDouble();
+					ui->turnLabel->setText(nullptr);
+				}
+			} else {	// 没有加载wayPoints
+				yawSliderReceive = control_command.at(0).toDouble();
+				ui->turnLabel->setText(nullptr);
 			}
-			if (minDis < MIN_DISTANCE) {	// 靠近wayPoints，使用wayPoints的方向
-				double wayPointsRotation = bridgeins->wayPointsAllList[minDisIndex].rotation;	// wayPoints朝向
-				double uavRotation = server_->jsonGPS["yaw"].toDouble();
-				bool turnLeft, needTurn;
-				if (uavRotation >= 0) {	// 无人机朝向东北~东南
-					double uavBackRotation = uavRotation - 180;
+		}
 
-					needTurn = (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= -90 && wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD - 360);
-
-					if (wayPointsRotation >= uavBackRotation && wayPointsRotation <= uavRotation)
-						turnLeft = true;
-					else
-						turnLeft = false;
-				} else {	// 无人机朝向西北~西南
-					double uavBackRotation = uavRotation + 180;
-
-					needTurn = (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= 90 && wayPointsRotation <= uavRotation + ROTATION_DIFF_THRESHOLD + 360);
-
-					if (wayPointsRotation >= uavRotation && wayPointsRotation <= uavBackRotation)
-						turnLeft = false;
-					else
-						turnLeft = true;
-				}
-
-				// 设置虚拟控制滑块数值
-				if (needTurn) {
-					if (turnLeft)
-						rollSliderReceive = -ROTATION_VALUE;
-					else
-						rollSliderReceive = ROTATION_VALUE;
-				} else
-					rollSliderReceive = control_command.at(2).toDouble();
-			} else	// 远离WayPoints，不使用wayPoints的方向，设置虚拟控制滑块数值
-				rollSliderReceive = control_command.at(2).toDouble();
-		} else
-			rollSliderReceive = control_command.at(2).toDouble();
-
-		yawSliderReceive = control_command.at(0).toDouble();
 		pitchSliderReceive = control_command.at(1).toDouble();
+		rollSliderReceive = control_command.at(2).toDouble();
 
-		if(ui->manualDirectCheckBox->isChecked())
-			rollSliderReceive = manul_direction;
 
 //		// 设置虚拟控制滑块数值
 //		double yawSliderReceive = control_command.at(0).toDouble();
