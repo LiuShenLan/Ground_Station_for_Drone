@@ -175,10 +175,10 @@ MainWindow::~MainWindow() {
 
 // 无人机人工导航控制按钮
 void MainWindow::onTurnLeftButton() {
-	manul_direction = 300;
+	manul_direction = -ROTATION_VALUE;
 }
 void MainWindow::onTurnRightButton() {
-	manul_direction = 60;
+	manul_direction = ROTATION_VALUE;
 }
 void MainWindow::onGoStraightButton() {
 	manul_direction = 0;
@@ -640,6 +640,7 @@ void MainWindow::acceptConnectionDrenet() {
 }
 void MainWindow::onRecvTargetPoint(const QString& msg) {
 	return;	// TODO
+
 	QStringList lst;
 	lst = msg.split(',');
 	double next_point_direction = 0;
@@ -708,18 +709,24 @@ void MainWindow::updateCommand_from_python_controller() {
 					minDisIndex = i;
 				}
 			}
-			if (minDis < 0.0002) {	// 靠近wayPoints，使用wayPoints的方向
+			if (minDis < MIN_DISTANCE) {	// 靠近wayPoints，使用wayPoints的方向
 				double wayPointsRotation = bridgeins->wayPointsAllList[minDisIndex].rotation;	// wayPoints朝向
 				double uavRotation = server_->jsonGPS["yaw"].toDouble();
-				bool turnLeft;
+				bool turnLeft, needTurn;
 				if (uavRotation >= 0) {	// 无人机朝向东北~东南
 					double uavBackRotation = uavRotation - 180;
+
+					needTurn = (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= -90 && wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD - 360);
+
 					if (wayPointsRotation >= uavBackRotation && wayPointsRotation <= uavRotation)
 						turnLeft = true;
 					else
 						turnLeft = false;
 				} else {	// 无人机朝向西北~西南
 					double uavBackRotation = uavRotation + 180;
+
+					needTurn = (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= 90 && wayPointsRotation <= uavRotation + ROTATION_DIFF_THRESHOLD + 360);
+
 					if (wayPointsRotation >= uavRotation && wayPointsRotation <= uavBackRotation)
 						turnLeft = false;
 					else
@@ -727,10 +734,13 @@ void MainWindow::updateCommand_from_python_controller() {
 				}
 
 				// 设置虚拟控制滑块数值
-				if (turnLeft)
-					rollSliderReceive = -10;
-				else
-					rollSliderReceive = 10;
+				if (needTurn) {
+					if (turnLeft)
+						rollSliderReceive = -ROTATION_VALUE;
+					else
+						rollSliderReceive = ROTATION_VALUE;
+				} else
+					rollSliderReceive = control_command.at(2).toDouble();
 			} else	// 远离WayPoints，不使用wayPoints的方向，设置虚拟控制滑块数值
 				rollSliderReceive = control_command.at(2).toDouble();
 		} else
@@ -738,6 +748,9 @@ void MainWindow::updateCommand_from_python_controller() {
 
 		yawSliderReceive = control_command.at(0).toDouble();
 		pitchSliderReceive = control_command.at(1).toDouble();
+
+		if(ui->manualDirectCheckBox->isChecked())
+			rollSliderReceive = manul_direction;
 
 //		// 设置虚拟控制滑块数值
 //		double yawSliderReceive = control_command.at(0).toDouble();
@@ -749,8 +762,8 @@ void MainWindow::updateCommand_from_python_controller() {
 			yawSliderReceive = std::min(yawSliderReceive, SAFE_MODE_YAW_THRESHOLD);
 			pitchSliderReceive = std::max(pitchSliderReceive, -SAFE_MODE_PITCH_THRESHOLD);
 			pitchSliderReceive = std::min(pitchSliderReceive, SAFE_MODE_PITCH_THRESHOLD);
-			rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_POLL_THRESHOLD);
-			rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_POLL_THRESHOLD);
+			rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_ROLL_THRESHOLD);
+			rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_ROLL_THRESHOLD);
 		}
 
 		ui->virtualStickYawSlider->setValue((int)yawSliderReceive + yawBias);
@@ -775,23 +788,22 @@ void MainWindow::updateCommand_from_python_controller() {
 		ui->yawLabel->setText(nullptr);
 		ui->pitchLabel->setText(nullptr);
 	}
-	// 250954973
 
-	// send the map_direct to python controller
-	// 设置方向信息
-	if(direction>180||direction<-180)
-		direction = 0;
-	if(ui->manualDirectCheckBox->isChecked())
-		direction = manul_direction;
-
-	// 显示方向信息
-	if((direction>=0 && direction<30) || (direction>330 && direction<=360))
-		ui->turnLabel->setText(tr("Go straight"));
-	if((direction>=30 && direction<=90))
-		ui->turnLabel->setText(tr("Turn right"));
-	if((direction>=270 && direction<=330))
-		ui->turnLabel->setText(tr("Turn left"));
-	// 发送信息
+//	// send the map_direct to python controller
+//	// 设置方向信息
+//	if(direction>180||direction<-180)
+//		direction = 0;
+//	if(ui->manualDirectCheckBox->isChecked())
+//		direction = manul_direction;
+//
+//	// 显示方向信息
+//	if((direction>=0 && direction<30) || (direction>330 && direction<=360))
+//		ui->turnLabel->setText(tr("Go straight"));
+//	if((direction>=30 && direction<=90))
+//		ui->turnLabel->setText(tr("Turn right"));
+//	if((direction>=270 && direction<=330))
+//		ui->turnLabel->setText(tr("Turn left"));
+//	// 发送信息
 //	QString sWriteData = QString::number(direction);
 //	tcpSocketDronet->write(sWriteData.toUtf8());
 }

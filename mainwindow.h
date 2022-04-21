@@ -22,9 +22,14 @@
 #include "bridge.h"
 
 // 安全模式最大速度
-#define SAFE_MODE_YAW_THRESHOLD		80.0
-#define SAFE_MODE_PITCH_THRESHOLD	30.0
-#define SAFE_MODE_POLL_THRESHOLD	50.0
+#define SAFE_MODE_YAW_THRESHOLD		80.0	// 左右旋转
+#define SAFE_MODE_PITCH_THRESHOLD	30.0	// 左右平移
+#define SAFE_MODE_ROLL_THRESHOLD	50.0	// 前后平移
+
+// 沿路飞行转弯参数
+#define MIN_DISTANCE	0.0002	// 无人机当前位置与相邻wayPoints最小距离阈值
+#define ROTATION_DIFF_THRESHOLD	10	// 无人机当前朝向与最靠近wayPoints朝向差距阈值，大于此阈值将会转向
+#define ROTATION_VALUE	10	// 转弯时滑块输出
 
 // 障碍预测由前进到停止所需要的连续flag跳变阈值
 #define PRE_COLL_FLAG_IS_TRUE_COUNT_THRESHOLD	30
