@@ -23,16 +23,11 @@
 
 // 安全模式最大速度
 #define SAFE_MODE_YAW_THRESHOLD		80.0	// 左右旋转
-#define SAFE_MODE_PITCH_THRESHOLD	30.0	// 左右平移
-#define SAFE_MODE_ROLL_THRESHOLD	50.0	// 前后平移
-
-// 沿路飞行转弯参数
-#define MIN_DISTANCE	0.0000000025	// 无人机当前位置与相邻wayPoints最小距离阈值
-#define ROTATION_DIFF_THRESHOLD	10	// 无人机当前朝向与最靠近wayPoints朝向差距阈值，大于此阈值将会转向
-#define ROTATION_VALUE	10	// 转弯时滑块输出
+#define SAFE_MODE_PITCH_THRESHOLD	50.0	// 左右平移
+#define SAFE_MODE_POLL_THRESHOLD	25.0	// 前进
 
 // 障碍预测由前进到停止所需要的连续flag跳变阈值
-#define PRE_COLL_FLAG_IS_TRUE_COUNT_THRESHOLD	30
+#define PRE_COLL_FLAG_IS_TRUE_COUNT_THRESHOLD	100
 
 // 摄像头数据读取目标
 #define CAM_LOAD_PC_CAMERA		0
@@ -140,8 +135,8 @@ private:
 	void updateCommand_from_python_controller();	// 接受python socket数据并设置虚拟控制与方向信息
 
 private slots:  // 槽声明区
-	// 刷新地图、GPS与无人机信息
-	void onGPSMapRefreshBtn();	// 刷新地图、GPS与无人机信息
+			// 刷新地图、GPS与无人机信息
+			void onGPSMapRefreshBtn();	// 刷新地图、GPS与无人机信息
 	void timeCountsFunction();	// 读取GPS与无人机信息并显示
 	void callJava();	// 调用JAVA程序在地图上显示导航点(将无人机坐标由WGS84转换为BD09)
 

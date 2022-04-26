@@ -13,25 +13,25 @@
 
 class MySlider : public QSlider {
 public:
-  explicit MySlider(QWidget *parent = 0);
+	explicit MySlider(QWidget *parent = 0);
 
 protected:
-  void mousePressEvent(QMouseEvent *event) {
-	//获取点击触发前的值
-	const int value = this->value();
-	//调用父类的鼠标点击处理事件
-	QSlider::mousePressEvent(event);
-	setValue(value);
-	//向父窗口发送自定义事件event type，这样就可以在父窗口中捕获这个事件进行处理
-	QEvent evEvent(static_cast<QEvent::Type>(QEvent::User + 1));
-	QCoreApplication::sendEvent(parentWidget(), &evEvent);
-  }
+	void mousePressEvent(QMouseEvent *event) {
+		//获取点击触发前的值
+		const int value = this->value();
+		//调用父类的鼠标点击处理事件
+		QSlider::mousePressEvent(event);
+		setValue(value);
+		//向父窗口发送自定义事件event type，这样就可以在父窗口中捕获这个事件进行处理
+		QEvent evEvent(static_cast<QEvent::Type>(QEvent::User + 1));
+		QCoreApplication::sendEvent(parentWidget(), &evEvent);
+	}
 };
 
 // Init
 MainWindow::MainWindow(QWidget *parent) :
-	QMainWindow(parent),		// 执行父类QMainWindow的构造函数
-	ui(new Ui::MainWindow) {	// 创建一个Ui::MainWindow类的对象
+		QMainWindow(parent),		// 执行父类QMainWindow的构造函数
+		ui(new Ui::MainWindow) {	// 创建一个Ui::MainWindow类的对象
 	ui->setupUi(this);	// 执行Ui::MainWindow类的setupUi()函数，实现窗口的生成与各种属性的设置、信号与槽的关联
 	InitForm();
 	InitVirtualStickControl();
@@ -175,10 +175,10 @@ MainWindow::~MainWindow() {
 
 // 无人机人工导航控制按钮
 void MainWindow::onTurnLeftButton() {
-	manul_direction = -ROTATION_VALUE;
+	manul_direction = 300;
 }
 void MainWindow::onTurnRightButton() {
-	manul_direction = ROTATION_VALUE;
+	manul_direction = 60;
 }
 void MainWindow::onGoStraightButton() {
 	manul_direction = 0;
@@ -221,7 +221,7 @@ void MainWindow::callJava() {
 //			.arg(ui->GPSLatitudeLineEdit->text().toDouble()*0.01+26.6564);
 
 	QVector<double> gps = WGS84ToBD09(server_->jsonGPS["longitude"].toDouble(),
-                                      server_->jsonGPS["latitude"].toDouble());
+	                                  server_->jsonGPS["latitude"].toDouble());
 	QString strJs = strJs_.arg(gps[0],0,'f',10).arg(gps[1],0,'f',10);
 	ui->mapShow->page()->runJavaScript(strJs);
 }
@@ -230,9 +230,9 @@ void MainWindow::callJava() {
 void MainWindow::onBtnAddLight() {
 	// 根据根据临时WayPoint经纬度信息生成wayPoint对象
 	wayPoint tLight = bridgeins->AddLight(int(ui->navigationPointDirectSlider->value()),
-										  ui->wayPointsHeightLineEdit->text().toDouble(),
-										  ui->wayPointsTakePhotocheckBox->isChecked(),
-										  ui->wayPointsTurnLeftcheckBox->isChecked());
+	                                      ui->wayPointsHeightLineEdit->text().toDouble(),
+	                                      ui->wayPointsTakePhotocheckBox->isChecked(),
+	                                      ui->wayPointsTurnLeftcheckBox->isChecked());
 	// 向WayPoints下拉菜单中写入信息
 	ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
 	ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
@@ -248,9 +248,9 @@ void MainWindow::onBtnAddCurLight() {
 
 	// 根据根据临时WayPoint经纬度信息生成wayPoint对象
 	wayPoint tLight = bridgeins->AddLight((int)rotation,
-										  ui->wayPointsHeightLineEdit->text().toDouble(),
-										  ui->wayPointsTakePhotocheckBox->isChecked(),
-										  ui->wayPointsTurnLeftcheckBox->isChecked());
+	                                      ui->wayPointsHeightLineEdit->text().toDouble(),
+	                                      ui->wayPointsTakePhotocheckBox->isChecked(),
+	                                      ui->wayPointsTurnLeftcheckBox->isChecked());
 	// 向WayPoints下拉菜单中写入信息
 	ui->wayPointsComboBox->addItem(tLight.strDesc, tLight.strName);
 	ui->wayPointsComboBox->setCurrentIndex(ui->wayPointsComboBox->count()-1);
@@ -279,7 +279,7 @@ void MainWindow::sendWayPoint() {
 	}
 
 	QString str = QString(QJsonDocument(jsonToSend).toJson());
-//	qDebug() << str;
+	qDebug() << str;
 	server_->sendMessage(str);
 }
 void MainWindow::onRecvdMsg(const QString& msg) {
@@ -290,8 +290,8 @@ void MainWindow::onRecvdMsg(const QString& msg) {
 	QVector<double> gps = BD09ToWGS84(lst[0].toDouble(), lst[1].toDouble());
 	QString log = "接收到html地图数据(BD09)：%1 | 转换到WSG84: %2, %3";
 	QString logShow = log.arg(msg)
-						.arg(gps[0], 0, 'f', 10)
-						.arg(gps[1], 0, 'f', 10);
+			.arg(gps[0], 0, 'f', 10)
+			.arg(gps[1], 0, 'f', 10);
 	qDebug() << logShow;
 	bridgeins->newPoint(gps[0],gps[1]);
 }
@@ -639,41 +639,34 @@ void MainWindow::acceptConnectionDrenet() {
 	connect(tcpSocketDronet, &QTcpSocket::readyRead, this, &MainWindow::updateCommand_from_python_controller);
 }
 void MainWindow::onRecvTargetPoint(const QString& msg) {
-	return;	// TODO
-
 	QStringList lst;
 	lst = msg.split(',');
 	double next_point_direction = 0;
 	QString targetNum = lst[0]; // WayPoints列表中的WayPoint的索引
 	int targetRotation = lst[1].toInt();	// WayPoint旋转角度
 //	bridgeins->onLightOn(targetNum);
-	double lngBD09 = lst[2].toDouble();   // WayPoint经度，BD09坐标系
-	double latBD09 = lst[3].toDouble();   // WayPoint纬度，BD09坐标系
-    QVector<double> temp = BD09ToWGS84(lngBD09, latBD09);    // WSG84坐标系
-
-	double targetLng = temp[0];   // WayPoint经度，WSG84坐标系
-	double targetLat = temp[1];   // WayPoint纬度，WSG84坐标系
+	double targetLng = lst[2].toDouble();   // WayPoint经度
+	double targetLat = lst[3].toDouble();   // WayPoint纬度
 	int arrayListLength = lst[4].toInt();   // WayPoints数目
 	//qDebug()<<fixed<<qSetRealNumberPrecision(7)<<targetLng<<" "<<targetLat;
 	//qDebug()<<(ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)<<" "<<(ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
 	//qDebug()<<((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125))/(targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062);
 	// 计算方位角
-    QVector<double> gps = WGS84ToBD09(server_->jsonGPS["longitude"].toDouble(), server_->jsonGPS["latitude"].toDouble());
 	// first quadrant
-	if((targetLng - gps[0])>0 && (targetLat - gps[1])>0)
-		next_point_direction = atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
+	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))>0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))>0)
+		next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 	// second quadrant
-	if((targetLng - gps[0])<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())>0)
-		next_point_direction = 360 + atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
+	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))<0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))>0)
+		next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 	// third quadrant
-	if((targetLng - gps[0])<0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
-		next_point_direction = 360 + atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
+	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))<0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))<0)
+		next_point_direction = 360 + atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 	// forth quadrant
-	if((targetLng - gps[0])>0 && (targetLat - ui->GPSLatitudeLineEdit->text().toDouble())<0)
-		next_point_direction = atan2((targetLng - gps[0]), (targetLat - gps[1]))*180/3.14159;
+	if((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0126))>0 && (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062))<0)
+		next_point_direction = atan2((targetLng - (ui->GPSLongitudeLineEdit->text().toDouble()+0.0125)), (targetLat - (ui->GPSLatitudeLineEdit->text().toDouble()+0.0062)))*180/3.14159;
 
-//	next_point_direction = (double)targetRotation;
-	qDebug()<<next_point_direction<<":"<<targetNum<<","<<arrayListLength;//server_->jsonGPS["yaw"].toDouble();
+	next_point_direction = (double)targetRotation;
+//	qDebug()<<next_point_direction<<":"<<targetNum<<","<<arrayListLength;//server_->jsonGPS["yaw"].toDouble();
 	direction = next_point_direction - server_->jsonGPS["yaw"].toDouble();
 	if(direction>180)
 		direction = direction - 360;
@@ -693,97 +686,17 @@ void MainWindow::updateCommand_from_python_controller() {
 		//qDebug()<<"pthon_controller:"<<utf8str<<"\n";
 		QStringList control_command = utf8str.split(",");
 
-		// TODO
-		double yawSliderReceive, pitchSliderReceive, rollSliderReceive;
-		if (ui->manualDirectCheckBox->isChecked()) {	// 手动控制
-			yawSliderReceive = manul_direction;
-
-			if (manul_direction == 0)
-				ui->turnLabel->setText("Go straight");
-			else if (manul_direction < 0)
-				ui->turnLabel->setText("Turn left");
-			else
-				ui->turnLabel->setText("Turn right");
-		}
-		else {
-			if (!bridgeins->wayPointsAllList.empty()) {	// 有wayPoints
-				// 无人机当前位置，gps[0] = lng, gps[1] = lat
-				QVector<double> gps = WGS84ToBD09(server_->jsonGPS["longitude"].toDouble(), server_->jsonGPS["latitude"].toDouble());
-				double minDis = 100;
-				int minDisIndex = 0;
-				for (int i = 0; i < bridgeins->wayPointsAllList.size(); ++i) {
-					double lng = gps[0] - bridgeins->wayPointsAllList[i].fLng;
-					double lat = gps[1] - bridgeins->wayPointsAllList[i].fLat;
-					double dis = pow(lng, 2) + pow(lat, 2);
-					if (dis < minDis) {
-						minDis = dis;
-						minDisIndex = i;
-					}
-				}
-				if (minDis < MIN_DISTANCE) {	// 靠近wayPoints，使用wayPoints的方向
-					double wayPointsRotation = bridgeins->wayPointsAllList[minDisIndex].rotation;	// wayPoints朝向
-					double uavRotation = server_->jsonGPS["yaw"].toDouble();
-					bool turnLeft, needTurn;
-					if (uavRotation >= 0) {	// 无人机朝向东北~东南
-						double uavBackRotation = uavRotation - 180;
-
-						needTurn = (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= -90 && wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD - 360);
-
-						if (wayPointsRotation >= uavBackRotation && wayPointsRotation <= uavRotation)
-							turnLeft = true;
-						else
-							turnLeft = false;
-					} else {	// 无人机朝向西北~西南
-						double uavBackRotation = uavRotation + 180;
-
-						needTurn = (wayPointsRotation >= uavRotation + ROTATION_DIFF_THRESHOLD) || (wayPointsRotation <= uavRotation - ROTATION_DIFF_THRESHOLD) || (wayPointsRotation >= 90 && wayPointsRotation <= uavRotation + ROTATION_DIFF_THRESHOLD + 360);
-
-						if (wayPointsRotation >= uavRotation && wayPointsRotation <= uavBackRotation)
-							turnLeft = false;
-						else
-							turnLeft = true;
-					}
-
-					// 设置虚拟控制滑块数值
-					if (needTurn) {
-						if (turnLeft) {
-							yawSliderReceive = -ROTATION_VALUE;
-							ui->turnLabel->setText("Turn left");
-						}
-						else {
-							yawSliderReceive = ROTATION_VALUE;
-							ui->turnLabel->setText("Turn right");
-						}
-					} else {
-						yawSliderReceive = control_command.at(0).toDouble();
-						ui->turnLabel->setText(nullptr);
-					}
-				} else {	// 远离WayPoints，不使用wayPoints的方向，设置虚拟控制滑块数值
-					yawSliderReceive = control_command.at(0).toDouble();
-					ui->turnLabel->setText(nullptr);
-				}
-			} else {	// 没有加载wayPoints
-				yawSliderReceive = control_command.at(0).toDouble();
-				ui->turnLabel->setText(nullptr);
-			}
-		}
-
-		pitchSliderReceive = control_command.at(1).toDouble();
-		rollSliderReceive = control_command.at(2).toDouble();
-
-
-//		// 设置虚拟控制滑块数值
-//		double yawSliderReceive = control_command.at(0).toDouble();
-//		double pitchSliderReceive = control_command.at(1).toDouble();
-//		double rollSliderReceive = control_command.at(2).toDouble();
-
+		// 设置虚拟控制滑块数值
+		double yawSliderReceive = control_command.at(0).toDouble();
+		double pitchSliderReceive = control_command.at(1).toDouble();
+		double rollSliderReceive = control_command.at(2).toDouble();
 		if (ui->virtualStickSafeModeCheckBox->isChecked()) {	// 安全模式，限制阈值
 			yawSliderReceive = std::max(yawSliderReceive, -SAFE_MODE_YAW_THRESHOLD);
 			yawSliderReceive = std::min(yawSliderReceive, SAFE_MODE_YAW_THRESHOLD);
 			pitchSliderReceive = std::max(pitchSliderReceive, -SAFE_MODE_PITCH_THRESHOLD);
 			pitchSliderReceive = std::min(pitchSliderReceive, SAFE_MODE_PITCH_THRESHOLD);
-			rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_ROLL_THRESHOLD);
-			rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_ROLL_THRESHOLD);
+			rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_POLL_THRESHOLD);
+			rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_POLL_THRESHOLD);
 		}
 
 		ui->virtualStickYawSlider->setValue((int)yawSliderReceive + yawBias);
@@ -808,24 +721,25 @@ void MainWindow::updateCommand_from_python_controller() {
 		ui->yawLabel->setText(nullptr);
 		ui->pitchLabel->setText(nullptr);
 	}
+	// 250954973
 
-//	// send the map_direct to python controller
-//	// 设置方向信息
-//	if(direction>180||direction<-180)
-//		direction = 0;
-//	if(ui->manualDirectCheckBox->isChecked())
-//		direction = manul_direction;
-//
-//	// 显示方向信息
-//	if((direction>=0 && direction<30) || (direction>330 && direction<=360))
-//		ui->turnLabel->setText(tr("Go straight"));
-//	if((direction>=30 && direction<=90))
-//		ui->turnLabel->setText(tr("Turn right"));
-//	if((direction>=270 && direction<=330))
-//		ui->turnLabel->setText(tr("Turn left"));
-//	// 发送信息
-//	QString sWriteData = QString::number(direction);
-//	tcpSocketDronet->write(sWriteData.toUtf8());
+	// send the map_direct to python controller
+	// 设置方向信息
+	if(direction>180||direction<-180)
+		direction = 0;
+	if(ui->manualDirectCheckBox->isChecked())
+		direction = manul_direction;
+
+	// 显示方向信息
+	if((direction>=0 && direction<30) || (direction>330 && direction<=360))
+		ui->turnLabel->setText(tr("Go straight"));
+	if((direction>=30 && direction<=90))
+		ui->turnLabel->setText(tr("Turn right"));
+	if((direction>=270 && direction<=330))
+		ui->turnLabel->setText(tr("Turn left"));
+	// 发送信息
+	QString sWriteData = QString::number(direction);
+	tcpSocketDronet->write(sWriteData.toUtf8());
 }
 
 // TCP coll pred
@@ -889,7 +803,7 @@ void MainWindow::sendCollPredCommand() {
 
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
-//	qDebug() << str;
+	qDebug() << str;
 }
 void MainWindow::onDisableCollButton() {
 	collIsSending = false;
@@ -935,7 +849,7 @@ void MainWindow::onCollSendFalseButton() {
 	QJsonObject jsonToSend_0;
 	jsonToSend_0.insert("mission", 5);
 	jsonToSend_0.insert("isCollFlag", false);
- 
+
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
 	server_->sendMessage(str);
 }

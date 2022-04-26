@@ -11,10 +11,10 @@
 			margin: 0;
 		}
 	</style>
-<!--	<script src="http://api.map.baidu.com/getscript?v=2.0&ak=WiUtV0vfMqRuCVqducdBKyo2GO4dKeWV"-->
-<!--			type="text/javascript"></script>	&lt;!&ndash;引导百度地图API文件&ndash;&gt;-->
+	<!--	<script src="http://api.map.baidu.com/getscript?v=2.0&ak=WiUtV0vfMqRuCVqducdBKyo2GO4dKeWV"-->
+	<!--			type="text/javascript"></script>	&lt;!&ndash;引导百度地图API文件&ndash;&gt;-->
 	<script src="baiduMapAPI.js"
-	        type="text/javascript"></script>	<!--引导百度地图API文件-->
+			type="text/javascript"></script>	<!--引导百度地图API文件-->
 	<title>Baidu Map</title>
 
 </head>
@@ -25,7 +25,7 @@
 <script type="text/javascript">
 	const map = new BMap.Map("map", {minZoom: 5, maxZoom: 19, enableMapClick: false});	// 创建地图实例
 	const initPoint = new BMap.Point(117.0353942718, 36.6553807616);	// 初始化中心点坐标(经度, 纬度)，使用百度BD09坐标
-	let wayPointsAllList = [];	// QT上位机中WayPoints的经纬度信息，BD09坐标系
+	let wayPointsAllList = [];	// QT上位机中WayPoints的经纬度信息
 	let wayPointsAllRotationList = [];		// QT上位机中WayPoints的旋转角度信息
 	let planePoint = new BMap.Point(0, 0);	// 无人机初始化坐标点
 
@@ -207,17 +207,16 @@
 		vectorPlane.setPosition(planePoint);
 		map.setCenter(planePoint);
 
-		// TODO
-		// let mark_ = 0;
-		// for (let j = 0; j < wayPointsAllList.length; j++) {	// 遍历QT上位机中WayPoints的经纬度信息
-		// 	if (Math.abs(lng - wayPointsAllList[j].lng) < 0.01 && Math.abs(lat - wayPointsAllList[j].lat) < 0.01) {   // 无人机位置与WayPoints距离在一定范围之内
-		// 		mark_ = 1;
-		// 		window.bridge.jsSendTargetPoint(j + "," + wayPointsAllRotationList[j] + "," + wayPointsAllList[j].lng + "," + wayPointsAllList[j].lat + "," + wayPointsAllList.length);
-		// 		// QT上位机接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
-		// 	}
-		// }
-		// if (mark_ === 0) // 没有距离无人机足够近的WayPoints
-		// 	window.bridge.jsSendTargetPoint(-1 + "," + rot + "," + 0 + "," + 0 + "," + wayPointsAllList.length);
+		let mark_ = 0;
+		for (let j = 0; j < wayPointsAllList.length; j++) {	// 遍历QT上位机中WayPoints的经纬度信息
+			if (Math.abs(lng - wayPointsAllList[j].lng) < 0.0005 && Math.abs(lat - wayPointsAllList[j].lat) < 0.0005) {   // 无人机位置与WayPoints距离在一定范围之内
+				mark_ = 1;
+				window.bridge.jsSendTargetPoint(j + "," + wayPointsAllRotationList[j] + "," + wayPointsAllList[j].lng + "," + wayPointsAllList[j].lat + "," + wayPointsAllList.length);
+				// QT上位机接收html发送的WayPoints信息，计算前进方向并在QT上位机上显示
+			}
+		}
+		if (mark_ === 0) // 没有距离无人机足够近的WayPoints
+			window.bridge.jsSendTargetPoint(-1 + "," + rot + "," + 0 + "," + 0 + "," + wayPointsAllList.length);
 	}
 
 	setTimeout(function () {
