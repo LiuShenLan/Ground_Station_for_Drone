@@ -101,7 +101,7 @@ private:
 	QTcpSocket *tcpSocketCollPred;	// coll pred TCP socket
 	qint64 coll_pre_receive_length = 12;	// TCP socket收到的coll pre数据长度(防止数据接受出错)
 	double collPred = 1.0;		// coll 预测值
-	double collThreshold = 0.97;// 障碍预测阈值
+	double collThreshold = 0.85;// 障碍预测阈值
 	bool isCollFlag = false;	// 前方是否是障碍
 	bool isCollFlagPre = false;	// 前方是否是障碍上次预测值
 	bool collIsSending = false;	// 是否正在发送障碍预测
@@ -135,8 +135,8 @@ private:
 	void updateCommand_from_python_controller();	// 接受python socket数据并设置虚拟控制与方向信息
 
 private slots:  // 槽声明区
-			// 刷新地图、GPS与无人机信息
-			void onGPSMapRefreshBtn();	// 刷新地图、GPS与无人机信息
+	// 刷新地图、GPS与无人机信息
+	void onGPSMapRefreshBtn();	// 刷新地图、GPS与无人机信息
 	void timeCountsFunction();	// 读取GPS与无人机信息并显示
 	void callJava();	// 调用JAVA程序在地图上显示导航点(将无人机坐标由WGS84转换为BD09)
 

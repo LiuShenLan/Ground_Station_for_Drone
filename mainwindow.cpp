@@ -463,6 +463,7 @@ void MainWindow::sendVirtualStickCommand() {
 	jsonToSend_0.insert("throttle", double(ui->virtualStickThrottleSlider->value())/1000);
 
 	QString str = QString(QJsonDocument(jsonToSend_0).toJson());
+	qDebug() << str;    // TODO:
 	server_->sendMessage(str);
 }
 void MainWindow::onDisableVirtualStickButton() {
@@ -547,39 +548,42 @@ void MainWindow::onVirtualStickResetButton() {
 }
 void MainWindow::keyPressEvent(QKeyEvent *e) {
 	switch(e->key()) {
-		case Qt::Key_W :	// W 增加油门
-			throttleBias++;
+		case Qt::Key_W :	// W 上下平移
+			throttleBias += 5;
 			ui->virtualStickThrottleSlider->setValue(throttleBias);
 			ui->throttleBiasLabel->setText(QString::number(throttleBias));
 			break;
-		case Qt::Key_S :	// S 减少油门
-			throttleBias--;
+		case Qt::Key_S :	// S 上下平移
+			throttleBias -= 5;
 			ui->virtualStickThrottleSlider->setValue(throttleBias);
 			ui->throttleBiasLabel->setText(QString::number(throttleBias));
 			break;
-		case Qt::Key_A :	// A 向左偏航
-			yawBias--;
+		case Qt::Key_A :	// A 左右旋转
+			yawBias -= 5;
 			ui->yawBiasLabel->setText(QString::number(yawBias));
 			break;
-		case Qt::Key_D :	// D 向右偏航
-			yawBias++;
+		case Qt::Key_D :	// D 左右旋转
+			yawBias += 5;
 			ui->yawBiasLabel->setText(QString::number(yawBias));
 			break;
-		case Qt::Key_I :	// I 增加横滚
-			rollBias++;
+		case Qt::Key_I :	// I 前后平移
+			rollBias += 5;
 			ui->rollBiasLabel->setText(QString::number(rollBias));
 			break;
-		case Qt::Key_K :	// K 减少横滚
-			rollBias--;
+		case Qt::Key_K :	// K 前后平移
+			rollBias -= 5;
 			ui->rollBiasLabel->setText(QString::number(rollBias));
 			break;
-		case Qt::Key_J :	// J 减少俯仰
-			pitchBias--;
+		case Qt::Key_J :	// J 左右平移
+			pitchBias -= 5;
 			ui->pitchBiasLabel->setText(QString::number(pitchBias));
 			break;
-		case Qt::Key_L :	// L 增加俯仰
-			pitchBias++;
+		case Qt::Key_L :	// L 左右平移
+			pitchBias += 5;
 			ui->pitchBiasLabel->setText(QString::number(pitchBias));
+			break;
+		case Qt::Key_R :
+			onVirtualStickResetButton();
 			break;
 		default :
 			break;
@@ -677,51 +681,44 @@ void MainWindow::onRecvTargetPoint(const QString& msg) {
 		direction = 0;
 }
 void MainWindow::updateCommand_from_python_controller() {
+	// 读取数据
+	qint64 len = tcpSocketDronet->bytesAvailable();
+	QByteArray alldate = tcpSocketDronet->read(len);
+	QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
+	QString utf8str = utf8codec->toUnicode(alldate.mid(2));
+	//qDebug()<<"pthon_controller:"<<utf8str<<"\n";
+	QStringList control_command = utf8str.split(",");
+
+	// 设置虚拟控制滑块数值
+	double yawSliderReceive = control_command.at(0).toDouble();
+	double pitchSliderReceive = control_command.at(1).toDouble();
+	double rollSliderReceive = control_command.at(2).toDouble();
+	if (ui->virtualStickSafeModeCheckBox->isChecked()) {	// 安全模式，限制阈值
+		yawSliderReceive = std::max(yawSliderReceive, -SAFE_MODE_YAW_THRESHOLD);
+		yawSliderReceive = std::min(yawSliderReceive, SAFE_MODE_YAW_THRESHOLD);
+		pitchSliderReceive = std::max(pitchSliderReceive, -SAFE_MODE_PITCH_THRESHOLD);
+		pitchSliderReceive = std::min(pitchSliderReceive, SAFE_MODE_PITCH_THRESHOLD);
+		rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_POLL_THRESHOLD);
+		rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_POLL_THRESHOLD);
+	}
+
+	ui->yawLabel->setText(QString::number(yawSliderReceive));
+	ui->pitchLabel->setText(QString::number(pitchSliderReceive));
+	if (!setRollFlag)
+		ui->rollLabel->setText(QString::number(rollSliderReceive));
+
 	if (ui->virtualStickDronetCheckBox->isChecked()) {  // 允许uav_dronet控制
-		// 读取数据
-		qint64 len = tcpSocketDronet->bytesAvailable();
-		QByteArray alldate = tcpSocketDronet->read(len);
-		QTextCodec *utf8codec = QTextCodec::codecForName("UTF-8");
-		QString utf8str = utf8codec->toUnicode(alldate.mid(2));
-		//qDebug()<<"pthon_controller:"<<utf8str<<"\n";
-		QStringList control_command = utf8str.split(",");
-
-		// 设置虚拟控制滑块数值
-		double yawSliderReceive = control_command.at(0).toDouble();
-		double pitchSliderReceive = control_command.at(1).toDouble();
-		double rollSliderReceive = control_command.at(2).toDouble();
-		if (ui->virtualStickSafeModeCheckBox->isChecked()) {	// 安全模式，限制阈值
-			yawSliderReceive = std::max(yawSliderReceive, -SAFE_MODE_YAW_THRESHOLD);
-			yawSliderReceive = std::min(yawSliderReceive, SAFE_MODE_YAW_THRESHOLD);
-			pitchSliderReceive = std::max(pitchSliderReceive, -SAFE_MODE_PITCH_THRESHOLD);
-			pitchSliderReceive = std::min(pitchSliderReceive, SAFE_MODE_PITCH_THRESHOLD);
-			rollSliderReceive = std::max(rollSliderReceive, -SAFE_MODE_POLL_THRESHOLD);
-			rollSliderReceive = std::min(rollSliderReceive, SAFE_MODE_POLL_THRESHOLD);
-		}
-
 		ui->virtualStickYawSlider->setValue((int)yawSliderReceive + yawBias);
-		ui->yawLabel->setText(QString::number(yawSliderReceive));
-
 		ui->virtualStickPitchSlider->setValue((int)pitchSliderReceive + pitchBias);
-		ui->pitchLabel->setText(QString::number(pitchSliderReceive));
-
-		if (!setRollFlag) {
+		if (!setRollFlag)
 			ui->virtualStickRollSlider->setValue((int)rollSliderReceive + rollBias);
-			ui->rollLabel->setText(QString::number(rollSliderReceive));
-		}
 	} else {	// 禁止uav_dronet控制
 		// 设置虚拟控制滑块数值
 		ui->virtualStickYawSlider->setValue(yawBias);
 		ui->virtualStickPitchSlider->setValue(pitchBias);
-		if (!setRollFlag) {
+		if (!setRollFlag)
 			ui->virtualStickRollSlider->setValue(rollBias);
-			ui->rollLabel->setText(nullptr);
-		}
-
-		ui->yawLabel->setText(nullptr);
-		ui->pitchLabel->setText(nullptr);
 	}
-	// 250954973
 
 	// send the map_direct to python controller
 	// 设置方向信息
